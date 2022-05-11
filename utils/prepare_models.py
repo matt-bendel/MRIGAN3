@@ -15,7 +15,7 @@ def build_model(args):
 
 def build_discriminator(args):
     model = DiscriminatorModel(
-        in_chans=args.in_chans,
+        in_chans=args.in_chans * 2,
         out_chans=args.out_chans,
     ).to(torch.device('cuda'))
 
