@@ -198,7 +198,7 @@ def ImageCropandKspaceCompression(x):
         x_tocompression = cropped_x.reshape(384 ** 2, cropped_x.shape[-1])
         U, S, Vh = np.linalg.svd(x_tocompression, full_matrices=False)
         coil_compressed_x = np.matmul(x_tocompression, Vh.conj().T)
-        coil_compressed_x = coil_compressed_x[:, 0:16].reshape(384, 384, 16)
+        coil_compressed_x = coil_compressed_x[:, 0:8].reshape(384, 384, 8)
     else:
         coil_compressed_x = cropped_x
 
