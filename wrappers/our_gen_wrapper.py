@@ -101,8 +101,7 @@ class GANWrapper:
         self.args = args
         self.resolution = 128
         self.gen = gen
-        self.data_consistency = self.args.data_consistency
-        self.print_mask = True
+        self.data_consistency = True
 
     def get_noise(self, num_vectors, var):
         # return torch.cuda.FloatTensor(np.random.normal(size=(num_vectors, self.args.latent_size), scale=1))
