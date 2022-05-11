@@ -1,7 +1,6 @@
 import random
 import os
 import torch
-import pytorch_msssim
 
 import numpy as np
 import torch.autograd as autograd
