@@ -232,10 +232,10 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
 
         random.shuffle(files)
 
-        num_files = (round(len(files)) if big_test else round(len(files)*0.3))
+        num_files = (round(len(files)*0.7) if big_test else round(len(files)*0.3))
         print(num_files)
 
-        f_testing_and_Val = sorted(files[0:num_files])
+        f_testing_and_Val = sorted(files[-num_files:]) if big_test else sorted(files[0:num_files])
 
         files = f_testing_and_Val
 
