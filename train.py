@@ -263,9 +263,9 @@ def train(args):
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 128, 128),
+                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 128, 128),
                                    device=args.device)
-                for z in range(args.num_z):
+                for z in range(8):
                     gens[:, z, :, :, :] = G(y, y_true)
 
                 avg = torch.mean(gens, dim=1)
@@ -293,7 +293,7 @@ def train(args):
                             complex_abs(gt[0] * std[0] + mean[0])).cpu().numpy()
 
                         gen_im_list = []
-                        for z in range(args.num_z):
+                        for z in range(8):
                             val_rss = torch.zeros(8, 128, 128, 2).to(args.device)
                             val_rss[:, :, :, 0] = gens[0, z, 0:8, :, :]
                             val_rss[:, :, :, 1] = gens[0, z, 8:16, :, :]
