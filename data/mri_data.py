@@ -162,7 +162,7 @@ class SelectiveSliceData(torch.utils.data.Dataset):
             else:
                 # if restrict_size and ((kspace.shape[1] != 640) or (kspace.shape[2] != 368)):
                 #     continue  # skip non uniform sized images
-                num_slices = 10 # kspace.shape[0]
+                num_slices = 8 # kspace.shape[0]
                 self.examples += [(fname, slice) for slice in range(num_slices)]
 
     def __len__(self):
@@ -254,7 +254,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
                     fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
                 continue
             else:
-                num_slices = 10 # kspace.shape[0]
+                num_slices = 8 # kspace.shape[0]
                 self.examples += [(fname, slice) for slice in range(num_slices)]
 
         print(len(self.examples))
