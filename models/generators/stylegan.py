@@ -3,7 +3,7 @@ from torch import nn
 from utils.stylegan_nets import ToRGB, DoubleConv, ConvBlock
 
 # TODO: FIGURE OUT CONFIG SHIT
-class EncDec(nn.Module):
+class GeneratorModel(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.encoder = Encoder(config['enc_cfg'])
