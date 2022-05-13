@@ -262,7 +262,6 @@ def train(args):
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
-                maps = maps.cpu().numpy()
 
                 gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 128, 128),
                                    device=args.device)
