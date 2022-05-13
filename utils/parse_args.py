@@ -15,7 +15,7 @@ def create_arg_parser():
     parser.add_argument('--latent-size', type=int, default=512, help='Size of latent vector for z location 2')
 
     # LEARNING ARGS
-    parser.add_argument('--batch-size', default=16, type=int, help='Mini batch size')
+    parser.add_argument('--batch-size', default=8, type=int, help='Mini batch size')
     parser.add_argument('--num-epochs', type=int, default=200, help='Number of training epochs')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
     parser.add_argument('--beta_1', type=float, default=0, help='Beta 1 for Adam')
@@ -30,7 +30,7 @@ def create_arg_parser():
                         help='Acceleration rate - 4 or 8')
     parser.add_argument('--data-parallel', required=True, action='store_true',
                         help='If set, use multiple GPUs using data parallelism')
-    parser.add_argument('--num_of_top_slices', default=6, type=int,
+    parser.add_argument('--num_of_top_slices', default=8, type=int,
                         help='top slices have bigger brain image and less air region')
     parser.add_argument('--use-middle-slices', action='store_true',
                         help='If set, only uses central slice of every data collection')
