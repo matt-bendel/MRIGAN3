@@ -10,8 +10,8 @@ class StyleGAN(nn.Module):
             "enc_cfg": {
                 "drips_channels": [64, 64, 64, 64],
                 "drips_depth": [14, 12, 10, 8],
-                "norm": "bias",
-                "drips_norm": "bias",
+                "norm": "instance",
+                "drips_norm": "instance",
                 "channels": [
                     16,
                     128,
