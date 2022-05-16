@@ -37,7 +37,7 @@ class StyleGAN(nn.Module):
         self.encoder = Encoder(config['enc_cfg'])
         self.decoder = Decoder(config['dec_cfg'])
 
-    def forward(self, y, noise_stds=0, encoder_assistance=True, **dec_kwargs):
+    def forward(self, y, noise_stds=1, encoder_assistance=True, **dec_kwargs):
         outputs = self.encoder(y)
         return self.decoder(outputs, encoder_assistance, noise_stds=noise_stds, **dec_kwargs)
 
