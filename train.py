@@ -161,7 +161,7 @@ def generate_gif(type):
     for i in range(8):
         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif{1 if args.stylegan else 2}.gif', images, duration=0.25)
 
     for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
@@ -328,7 +328,7 @@ def train(args):
 
                         fig.colorbar(im, cax=cbar_ax)
 
-                        plt.savefig('std_dev_gen.png')
+                        plt.savefig(f'std_dev_gen_{1 if args.stylegan else 2}.png')
                         plt.close()
 
         psnr_loss = np.mean(losses['psnr'])
