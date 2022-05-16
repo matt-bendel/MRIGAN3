@@ -60,7 +60,7 @@ def get_gan(args):
         start_epoch = checkpoint_gen['epoch']
 
     else:
-        generator = build_model(args)
+        generator = build_model(args) if not args.stylegan else build_model_sg(args)
         discriminator = build_discriminator(args)
 
         if args.data_parallel:
