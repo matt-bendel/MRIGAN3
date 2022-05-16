@@ -145,7 +145,7 @@ noise_inject_factory = {
 class Instance(nn.Module):
     def __init__(self, channels):
         super().__init__()
-        self.instance = torch.nn.InstanceNorm2d(channels, affine=True),
+        self.instance = torch.nn.InstanceNorm2d(channels, affine=True)
 
     def forward(self, x, **kwargs):
         return self.instance(x)
