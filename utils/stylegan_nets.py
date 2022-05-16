@@ -142,6 +142,13 @@ noise_inject_factory = {
     'cat_normalized': lambda channels: NoiseInjectionCatNormalized()
 }
 
+class Instance(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.instance = torch.nn.InstanceNorm2d(channels, affine=True),
+
+    def forward(self, x, **kwargs):
+        return self.instance(x)
 
 class Bias(nn.Module):
     def __init__(self, channels):
@@ -153,7 +160,7 @@ class Bias(nn.Module):
 
 
 norms_factory = {
-    'instance': lambda channels: torch.nn.InstanceNorm2d(channels, affine=True),
+    'instance': lambda channels: Instance(channels),
     'batch': lambda channels: torch.nn.BatchNorm2d(channels, affine=True),
     'bias': lambda channels: Bias(channels)
 }
