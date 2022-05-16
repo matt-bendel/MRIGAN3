@@ -16,8 +16,6 @@ from wrappers.our_gen_wrapper import get_gan, save_model
 from data_loaders.prepare_data import create_data_loaders
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-from utils.math import tensor_to_complex_np
-from utils.fftc import ifft2c_new, fft2c_new
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],

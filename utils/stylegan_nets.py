@@ -3,6 +3,7 @@ import torch
 import math
 from torch.nn import functional as F
 
+
 class EqualConv2d(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size, sampling='none'):
         super().__init__()
@@ -67,6 +68,27 @@ class ToRGB(nn.Module):
         self.conv.extend([ConvLayer(in_channels, in_channels, 3, norm_type='bias', noise_injection_type='none')] * (
                 num_layers - 1))
         self.conv.append(ConvLayer(in_channels, 3, 1, activation=False, norm_type='bias', noise_injection_type='none'))
+        self.conv = nn.Sequential(*self.conv)
+
+    def forward(self, x, skip):
+        out = self.conv(x)
+        if skip is not None:
+            skip = self.upsample(skip)
+            out = out + skip
+        return out
+
+
+class ToMRI(nn.Module):
+    def __init__(self, in_channels, num_layers, upsample=True):
+        super().__init__()
+        if upsample:
+            self.upsample = EqualConv2d(16, 16, 3, sampling='up')
+        else:
+            self.upsample = None
+        self.conv = []
+        self.conv.extend([ConvLayer(in_channels, in_channels, 3, norm_type='bias', noise_injection_type='none')] * (
+                num_layers - 1))
+        self.conv.append(ConvLayer(in_channels, 16, 1, activation=False, norm_type='bias', noise_injection_type='none'))
         self.conv = nn.Sequential(*self.conv)
 
     def forward(self, x, skip):

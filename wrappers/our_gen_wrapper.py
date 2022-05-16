@@ -14,7 +14,7 @@ def load_best_gan(args):
         f'{args.checkpoint_dir}/generator_best_model.pt')
     checkpoint_gen = torch.load(checkpoint_file_gen, map_location=torch.device('cuda'))
 
-    generator = build_model(args)
+    generator = build_model(args) if not args.stylegan else build_model_sg(args)
     if args.data_parallel:
         generator = torch.nn.DataParallel(generator)
 
@@ -26,7 +26,7 @@ def load_best_gan(args):
 
 
 def get_gan(args):
-    from utils.prepare_models import build_model, build_optim, build_discriminator
+    from utils.prepare_models import build_model, build_model_sg, build_optim, build_discriminator
 
     if args.resume:
         checkpoint_file_gen = pathlib.Path(
@@ -37,7 +37,7 @@ def get_gan(args):
             f'{args.checkpoint_dir}/discriminator_model.pt')
         checkpoint_dis = torch.load(checkpoint_file_dis, map_location=torch.device('cuda'))
 
-        generator = build_model(args)
+        generator = build_model(args) if not args.stylegan else build_model_sg(args)
         discriminator = build_discriminator(args)
 
         if args.data_parallel:
@@ -79,6 +79,7 @@ def get_gan(args):
 
 
 def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type):
+    fpath = args.exp_dir if not args.stylegan else args.exp_dir / 'stylegan'
     torch.save(
         {
             'epoch': epoch,
@@ -88,12 +89,12 @@ def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type
             'best_dev_loss': best_dev_loss,
             'exp_dir': args.exp_dir
         },
-        f=args.exp_dir / f'{m_type}_model.pt'
+        f=fpath / f'{m_type}_model.pt'
     )
 
     if is_new_best:
-        shutil.copyfile(args.exp_dir / f'{m_type}_model.pt',
-                        args.exp_dir / f'{m_type}_best_model.pt')
+        shutil.copyfile(fpath / f'{m_type}_model.pt',
+                        fpath / f'{m_type}_best_model.pt')
 
 
 class GANWrapper:
@@ -136,8 +137,11 @@ class GANWrapper:
 
     def __call__(self, y, true_measures, noise_var=1):
         num_vectors = y.size(0)
-        z = self.get_noise(num_vectors, noise_var)
-        samples = self.gen(torch.cat([y, z], dim=1))
+        if not self.args.stylegan:
+            z = self.get_noise(num_vectors, noise_var)
+            samples = self.gen(torch.cat([y, z], dim=1))
+        else:
+            samples = self.gen(y)
         samples = self.readd_measures(samples, true_measures)
 
         return samples
