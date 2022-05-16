@@ -10,8 +10,8 @@ class StyleGAN(nn.Module):
             "enc_cfg": {
                 "drips_channels": [64, 64, 64, 64],
                 "drips_depth": [14, 12, 10, 8],
-                "norm": "instance",
-                "drips_norm": "instance",
+                "norm": "batch",
+                "drips_norm": "batch",
                 "channels": [
                     16,
                     128,
@@ -22,7 +22,7 @@ class StyleGAN(nn.Module):
             },
             "dec_cfg": {
                 "drips_channels": [64, 64, 64, 64],
-                "norm": "instance",
+                "norm": "batch",
                 "noise_type": "pcsf",
                 "channels": [
                     512,
