@@ -23,7 +23,7 @@ class StyleGAN(nn.Module):
             "dec_cfg": {
                 "drips_channels": [64, 64, 64, 64],
                 "norm": "batch",
-                "noise_type": "pcsf",
+                "noise_type": "cat",
                 "channels": [
                     512,
                     256,

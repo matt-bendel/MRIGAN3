@@ -176,11 +176,11 @@ class DiscriminatorModel(nn.Module):
 
         self.dense = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512*2*2,1),
+            nn.Linear(512 * 2 * 2, 1),
         )
 
     def forward(self, input, y):
-        output = torch.cat([input,y], dim=1)
+        output = torch.cat([input, y], dim=1)
         output = self.initial_layers(output)
 
         # Apply down-sampling layers
