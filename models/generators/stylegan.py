@@ -22,7 +22,7 @@ class StyleGAN(nn.Module):
             },
             "dec_cfg": {
                 "drips_channels": [64, 64, 64, 64],
-                "norm": "bias",
+                "norm": "instance",
                 "noise_type": "pcsf",
                 "channels": [
                     512,
