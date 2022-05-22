@@ -251,7 +251,7 @@ def get_metrics(args):
     folds = 0
     for i, data in enumerate(test_loader):
         with torch.no_grad():
-            y, x, y_true, mean, std, maps, fname, slice = data
+            y, x, y_true, mean, std = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
