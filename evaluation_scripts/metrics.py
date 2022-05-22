@@ -255,7 +255,6 @@ def get_metrics(args):
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            maps = maps.cpu().numpy()
 
             gens = torch.zeros(size=(y.size(0), 32, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
