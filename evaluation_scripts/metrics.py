@@ -256,15 +256,15 @@ def get_metrics(args):
             x = x.to(args.device)
             y_true = y_true.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), 32, args.in_chans, args.im_size, args.im_size),
+            gens = torch.zeros(size=(y.size(0), 128, args.in_chans, 128, 128),
                                device=args.device)
-            for z in range(32):
+            for z in range(128):
                 gens[:, z, :, :, :] = G(y, y_true)
 
             avg = torch.mean(gens, dim=1)
 
             temp_gens = torch.zeros(gens.shape, dtype=gens.dtype)
-            for z in range(32):
+            for z in range(128):
                 temp_gens[:, z, :, :, :] = gens[:, z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:,
                                                                                                             None, None,
                                                                                                             None].to(
@@ -272,17 +272,17 @@ def get_metrics(args):
 
             losses['apsd'].append(torch.mean(torch.std(temp_gens, dim=1), dim=(0, 1, 2, 3)).cpu().numpy())
 
-            new_gens = torch.zeros(y.size(0), 32, 16, args.im_size, args.im_size, 2)
-            new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:16, :, :]
-            new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 16:32, :, :]
+            new_gens = torch.zeros(y.size(0), 128, 8, 128, 128, 2)
+            new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
+            new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            avg_gen = torch.zeros(size=(y.size(0), 16, args.im_size, args.im_size, 2), device=args.device)
-            avg_gen[:, :, :, :, 0] = avg[:, 0:16, :, :]
-            avg_gen[:, :, :, :, 1] = avg[:, 16:32, :, :]
+            avg_gen = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
+            avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
+            avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-            gt = torch.zeros(size=(y.size(0), 16, args.im_size, args.im_size, 2), device=args.device)
-            gt[:, :, :, :, 0] = x[:, 0:16, :, :]
-            gt[:, :, :, :, 1] = x[:, 16:32, :, :]
+            gt = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
+            gt[:, :, :, :, 0] = x[:, 0:8, :, :]
+            gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
             for j in range(y.size(0)):
                 count += 1
