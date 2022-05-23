@@ -76,7 +76,11 @@ def compute_gradient_penalty(D, real_samples, fake_samples, args, y):
     # Get random interpolation between real and fake samples
     interpolates = (alpha * real_samples + ((1 - alpha) * fake_samples)).requires_grad_(True)
     d_interpolates = D(input=interpolates, y=y)
-    fake = Tensor(real_samples.shape[0], 1, d_interpolates.shape[-1], d_interpolates.shape[-1]).fill_(1.0).to(args.device)
+    if args.patch_disc:
+        fake = Tensor(real_samples.shape[0], 1, d_interpolates.shape[-1], d_interpolates.shape[-1]).fill_(1.0).to(args.device)
+    else:
+        fake = Tensor(real_samples.shape[0], 1).fill_(1.0).to(args.device)
+
     # Get gradient w.r.t. interpolates
     gradients = autograd.grad(
         outputs=d_interpolates,
