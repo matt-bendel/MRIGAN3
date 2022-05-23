@@ -135,7 +135,7 @@ class CFIDMetric:
             np.sum(np.square(np.abs(s_maps)), axis=1))
 
     def _get_embed_im(self, multi_coil_inp, mean, std):
-        embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, self.args.im_size, self.args.im_size),
+        embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 128, 128),
                                 device=self.args.device)
         for i in range(multi_coil_inp.size(0)):
             reformatted = torch.zeros(size=(8, 384, 384, 2),
