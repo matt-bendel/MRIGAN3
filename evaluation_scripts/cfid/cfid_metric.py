@@ -138,7 +138,7 @@ class CFIDMetric:
         embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 128, 128),
                                 device=self.args.device)
         for i in range(multi_coil_inp.size(0)):
-            reformatted = torch.zeros(size=(8, 384, 384, 2),
+            reformatted = torch.zeros(size=(8, 128, 128, 2),
                                       device=self.args.device)
             reformatted[:, :, :, 0] = multi_coil_inp[i, 0:8, :, :]
             reformatted[:, :, :, 1] = multi_coil_inp[i, 8:16, :, :]
@@ -157,7 +157,8 @@ class CFIDMetric:
         image_embed = []
         cond_embed = []
         true_embed = []
-
+        cfids = []
+        count = 0
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader)):
@@ -201,34 +202,39 @@ class CFIDMetric:
             dtype=torch.float64)
 
     def get_cfid_torch(self, resample=True):
-        y_predict, x_true, y_true = self._get_generated_distribution()
+        y_predict_full, x_true_full, y_true_full = self._get_generated_distribution()
+        cfids = []
 
-        # mean estimations
-        y_true = y_true.to(x_true.device)
-        m_y_predict = torch.mean(y_predict, dim=0)
-        m_x_true = torch.mean(x_true, dim=0)
-        m_y_true = torch.mean(y_true, dim=0)
+        for i in range(31):
+            y_predict, x_true, y_true = y_predict_full[i*72:(i+1)*72, :], x_true_full[i*72:(i+1)*72, :], y_true_full[i*72:(i+1)*72, :]
+            # mean estimations
+            y_true = y_true.to(x_true.device)
+            m_y_predict = torch.mean(y_predict, dim=0)
+            m_x_true = torch.mean(x_true, dim=0)
+            m_y_true = torch.mean(y_true, dim=0)
 
-        no_m_y_true = y_true - m_y_true
-        no_m_y_pred = y_predict - m_y_predict
-        no_m_x_true = x_true - m_x_true
+            no_m_y_true = y_true - m_y_true
+            no_m_y_pred = y_predict - m_y_predict
+            no_m_x_true = x_true - m_x_true
 
-        m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
+            m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
 
-        u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
-        v = vh.t()
-        c_dist_1 = torch.norm(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), v)) ** 2 / y_true.shape[0]
+            u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
+            v = vh.t()
+            c_dist_1 = torch.norm(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), v)) ** 2 / y_true.shape[0]
 
-        v_t_v = torch.matmul(v, vh)
-        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
-        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
+            v_t_v = torch.matmul(v, vh)
+            y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
+            y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
 
-        c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
-        c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
+            c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
+            c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
 
-        c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
-            c_y_predict_given_x_true, c_y_true_given_x_true)
+            c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
+                c_y_predict_given_x_true, c_y_true_given_x_true)
 
-        cfid = m_dist + c_dist_1 + c_dist_2
+            cfid = m_dist + c_dist_1 + c_dist_2
 
-        return cfid.cpu().numpy()
+            cfids.append(cfid.cpu().numpy())
+
+        return cfids

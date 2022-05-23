@@ -18,4 +18,4 @@ def get_cfid(args, G):
                              cuda=True,
                              args=args)
 
-    print('CFID: ', cfid_metric.get_cfid_torch())
+    print(f'CFID: {cfid_metric.get_cfid_torch()}')

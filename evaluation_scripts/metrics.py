@@ -296,7 +296,7 @@ def get_metrics(args):
                 losses['snr'].append(snr(gt_np, avg_gen_np))
                 # losses['mse'].append(mse(gt_np, avg_gen_np))
                 # losses['max_i'].append(gt_np.max())
-            if count % 100 == 0:
+            if count % 72 == 0:
                 folds += 1
                 means['psnr'].append(losses['psnr'])
                 means['snr'].append(losses['snr'])
