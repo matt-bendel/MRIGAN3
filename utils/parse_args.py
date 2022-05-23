@@ -15,6 +15,8 @@ def create_arg_parser():
     parser.add_argument('--latent-size', type=int, default=512, help='Size of latent vector for z location 2')
     parser.add_argument('--stylegan', action='store_true',
                         help='Whether or not to dynamically remove chunk of image')
+    parser.add_argument('--patch-disc', action='store_true',
+                        help='Whether or not to dynamically remove chunk of image')
 
     # LEARNING ARGS
     parser.add_argument('--batch-size', default=8, type=int, help='Mini batch size')

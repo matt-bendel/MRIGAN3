@@ -146,6 +146,7 @@ def generate_error_map(fig, target, recon, method, image_ind, rows, cols, relati
     # Return plotted image and its axis in the subplot
     return im, ax
 
+
 def gif_im(true, gen_im, index, type, disc_num=False):
     fig = plt.figure()
 
@@ -165,6 +166,8 @@ def generate_gif(type):
 
     for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
+
+
 ######################
 
 def train(args):
@@ -202,9 +205,8 @@ def train(args):
                 # Gradient penalty
                 gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
 
-                d_loss = torch.mean(fake_pred) - torch.mean(
-                    real_pred) + args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
-
+                d_loss = fake_pred.mean() - real_pred.mean()
+                d_loss += args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
                 d_loss.backward()
                 opt_D.step()
 
@@ -231,8 +233,9 @@ def train(args):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             std_weight = np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-4
-            g_loss = - adv_weight * torch.mean(gen_pred_loss)
+            adv_weight = 1e-4 if not args.patch_disc else 1e-3
+
+            g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
             g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
 

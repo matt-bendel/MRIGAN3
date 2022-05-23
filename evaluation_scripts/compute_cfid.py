@@ -3,6 +3,7 @@ from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders
 from wrappers.our_gen_wrapper import load_best_gan
 
+import numpy as np
 
 def get_cfid(args, G):
     print("GETTING INCEPTION EMBEDDING")
@@ -18,4 +19,5 @@ def get_cfid(args, G):
                              cuda=True,
                              args=args)
 
-    print(f'CFID: {cfid_metric.get_cfid_torch()}')
+    cfids = cfid_metric.get_cfid_torch()
+    print(f'CFID: {np.mean(cfids)} \\pm {np.std(cfids) / np.sqrt(33)}')
