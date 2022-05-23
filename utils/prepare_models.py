@@ -23,6 +23,7 @@ def build_model_sg(args):
 
 def build_discriminator(args):
     if args.patch_disc:
+        print('PATCH DISC')
         model = PatchDisc(
             input_nc=args.in_chans * 2,
         ).to(torch.device('cuda'))
