@@ -9,7 +9,7 @@ from utils.get_mask import get_mask
 
 # THIS FILE CONTAINTS UTILITY FUNCTIONS FOR OUR GAN AND A WRAPPER CLASS FOR THE GENERATOR
 def load_best_gan(args):
-    from utils.prepare_models import build_model
+    from utils.prepare_models import build_model, build_model_sg
     checkpoint_file_gen = pathlib.Path(
         f'{args.checkpoint_dir}/generator_best_model.pt')
     checkpoint_gen = torch.load(checkpoint_file_gen, map_location=torch.device('cuda'))
