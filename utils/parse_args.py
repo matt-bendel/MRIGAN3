@@ -8,7 +8,7 @@ def create_arg_parser():
     parser = Args()
 
     # GAN ARGS
-    parser.add_argument('--num-iters-discriminator', type=int, default=2,
+    parser.add_argument('--num-iters-discriminator', type=int, default=3,
                         help='Number of iterations of the discriminator')
     parser.add_argument('--num-z', type=int, default=2,
                         help='Number of z values to use during training.')
