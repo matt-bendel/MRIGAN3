@@ -82,7 +82,8 @@ def main(R, data):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
                 coil_compressed_x = crop_and_compress(x.transpose(1, 2, 0)).transpose(2, 0, 1)
                 y = apply_mask(fft(coil_compressed_x, (1, 2)), R)
-                pl.ImagePlot(coil_compressed_x, z=0, title='Multicoil ZFR')
+                zfr = ifft(y, (1, 2))
+                pl.ImagePlot(zfr, z=0, title='Multicoil ZFR')
                 plt.savefig('temp0.png')
 
                 s_map = mr.app.EspiritCalib(y, calib_width=32, show_pbar=True, crop=0.7, kernel_width=5,
@@ -92,7 +93,7 @@ def main(R, data):
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
                 sense_op = sp.linop.Multiply((384, 384), s_map)
-                pl.ImagePlot(sense_op.H * coil_compressed_x, z=0, title='ZFR')
+                pl.ImagePlot(sense_op * zfr, z=0, title='ZFR')
                 plt.savefig('temp00.png')
                 x_ls_multicoil = sense_op * x_ls
 
