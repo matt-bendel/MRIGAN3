@@ -95,8 +95,8 @@ def main(R, data):
                 x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(1)).run()
 
                 sense_op = sp.linop.Multiply((384, 384), s_map)
-                pl.ImagePlot(sense_op.H * coil_compressed_x, title='LS Recon', save_basename='temp')
-                plt.savefig('temp1.png')
+                # pl.ImagePlot(sense_op.H * coil_compressed_x, title='LS Recon', save_basename='temp')
+                # plt.savefig('temp1.png')
                 # F = sp.linop.FFT(y.shape, axes=(-1, -2))
                 # multi_zfr = sense_op.H * F.H * y
                 # pl.ImagePlot(multi_zfr, title='ZFR')
@@ -105,11 +105,9 @@ def main(R, data):
 
                 # pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 # plt.savefig('temp2.png')
-                print(to_tensor(cp.asnumpy(x_ls_multicoil)).shape)
                 recons[i, :, :, :] = cp.asnumpy(x_ls_multicoil)
                 s_maps.append(sense_op)
                 gt[i, :, :, :] = coil_compressed_x
-                exit()
 
             h5 = h5py.File(out_name, 'w')
             h5.create_dataset('gt', data=kspace)
