@@ -84,13 +84,13 @@ def main(R, data):
                 s_map = mr.app.EspiritCalib(y, show_pbar=True, device=sp.Device(1)).run()
 
                 x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True, device=sp.Device(1)).run()
-                print(x_ls.shape)
-                exit()
-
+                print(type(x_ls))
                 sense_op = sp.linop.Multiply(y.shape, s_map)
                 x_ls_multicoil = sense_op * x_ls
 
                 print(x_ls_multicoil.shape)
+                print(type(x_ls_multicoil))
+
                 exit()
 
                 recons[i, :, :, :] = x_ls_multicoil
