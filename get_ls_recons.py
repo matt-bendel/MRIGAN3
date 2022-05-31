@@ -83,9 +83,9 @@ def main(R, data):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
                 coil_compressed_x = crop_and_compress(x.transpose(1, 2, 0)).transpose(2, 0, 1)
                 y = apply_mask(fft(coil_compressed_x, (1, 2)), R)
-                s_map = mr.app.EspiritCalib(y, show_pbar=True, device=sp.Device(1)).run()
+                s_map = mr.app.EspiritCalib(y, show_pbar=True).run()
 
-                x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True, device=sp.Device(1)).run()
+                x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True).run()
                 print(x_ls.shape)
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
