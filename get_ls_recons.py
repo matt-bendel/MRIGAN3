@@ -8,7 +8,7 @@ import sigpy.plot as pl
 import matplotlib.pyplot as plt
 
 from utils.espirit import ifft, fft
-from data.transforms import to_tensor
+
 
 def crop_and_compress(x):
     w_from = (x.shape[0] - 384) // 2  # crop images into 384x384
@@ -55,7 +55,6 @@ def apply_mask(y, R):
     return y * mask
 
 
-
 def main(R, data):
     in_dir = f'/storage/fastMRI_brain/data/multicoil_{data}'
     out_dir = f'/storage/fatMRI_brain_ls/{data}_R={R}'
@@ -83,21 +82,23 @@ def main(R, data):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
                 coil_compressed_x = crop_and_compress(x.transpose(1, 2, 0)).transpose(2, 0, 1)
                 y = apply_mask(fft(coil_compressed_x, (1, 2)), R)
-                pl.ImagePlot(y, z=0, title='ZFR')
+                pl.ImagePlot(coil_compressed_x, z=0, title='Multicoil ZFR')
                 plt.savefig('temp0.png')
 
-                s_map = mr.app.EspiritCalib(y, calib_width=32, show_pbar=True, crop=0.7, kernel_width=5, device=sp.Device(1)).run()
+                s_map = mr.app.EspiritCalib(y, calib_width=32, show_pbar=True, crop=0.7, kernel_width=5,
+                                            device=sp.Device(1)).run()
 
                 x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(1)).run()
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
                 sense_op = sp.linop.Multiply((384, 384), s_map)
+                pl.ImagePlot(sense_op.H * coil_compressed_x, z=0, title='ZFR')
+                plt.savefig('temp00.png')
                 x_ls_multicoil = sense_op * x_ls
 
                 pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 plt.savefig('temp2.png')
 
-                print(to_tensor(x_ls_multicoil).shape)
                 exit()
 
                 recons[i, :, :, :] = x_ls_multicoil.asnumpy()
