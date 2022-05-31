@@ -77,8 +77,8 @@ def main(R, data):
                 continue
 
             kspace = data['kspace']
-            recons = np.zeros(kspace.shape, dtype=kspace.dtype)
-            gt = np.zeros(kspace.shape, dtype=kspace.dtype)
+            recons = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
+            gt = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
             s_maps = []
 
             for i in range(kspace.shape[0]):
@@ -93,7 +93,7 @@ def main(R, data):
                                             device=sp.Device(1)).run()
 
                 x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(1)).run()
-                pl.ImagePlot(coil_compressed_x, title='LS Recon', save_basename='temp')
+                pl.ImagePlot(s_map.H * coil_compressed_x, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
                 sense_op = sp.linop.Multiply((384, 384), s_map)
                 # F = sp.linop.FFT(y.shape, axes=(-1, -2))
