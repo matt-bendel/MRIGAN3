@@ -53,17 +53,6 @@ def apply_mask(y, R):
     return y * mask
 
 
-def get_maps(y):
-    pass
-
-
-def get_ls_recon(y):
-    pass
-
-
-def save_recon(x, dir):
-    pass
-
 
 def main(R, data):
     in_dir = f'/storage/fastMRI_brain/data/multicoil_{data}'
@@ -90,7 +79,7 @@ def main(R, data):
 
             for i in range(kspace.shape[0]):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
-                coil_compressed_x = crop_and_compress(x)
+                coil_compressed_x = crop_and_compress(x.transpose(1, 2, 0)).transpose(2, 0, 1)
                 y = apply_mask(fft(coil_compressed_x, (1, 2)), R)
                 s_map = mr.app.EspiritCalib(y, show_pbar=True, device=sp.Device(1)).run()
 
