@@ -76,6 +76,8 @@ def main(R, data):
                 print('NEXT')
                 continue
 
+            print(basename)
+
             kspace = data['kspace']
             recons = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
             gt = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
