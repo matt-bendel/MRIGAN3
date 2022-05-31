@@ -77,42 +77,40 @@ def main(R, data):
             kspace = data['kspace']
             recons = np.zeros(kspace.shape, dtype=kspace.dtype)
             gt = np.zeros(kspace.shape, dtype=kspace.dtype)
-            s_maps = np.zeros(kspace.shape, dtype=kspace.dtype)
+            s_maps = []
 
             for i in range(kspace.shape[0]):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
                 coil_compressed_x = crop_and_compress(x.transpose(1, 2, 0)).transpose(2, 0, 1)
                 y = apply_mask(fft(coil_compressed_x, (1, 2)), R)
-                zfr = ifft(y, (1, 2))
-                pl.ImagePlot(zfr, z=0, title='Multicoil ZFR')
-                plt.savefig('temp0.png')
+                # zfr = ifft(y, (1, 2))
+                # pl.ImagePlot(zfr, z=0, title='Multicoil ZFR')
+                # plt.savefig('temp0.png')
 
                 s_map = mr.app.EspiritCalib(y, calib_width=32, show_pbar=True, crop=0.7, kernel_width=5,
                                             device=sp.Device(1)).run()
 
                 x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(1)).run()
-                pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
-                plt.savefig('temp1.png')
+                # pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
+                # plt.savefig('temp1.png')
                 sense_op = sp.linop.Multiply((384, 384), s_map)
-                F = sp.linop.FFT(y.shape, axes=(-1, -2))
-                multi_zfr = sense_op.H * F.H * y
-                pl.ImagePlot(multi_zfr, title='ZFR')
-                plt.savefig('temp00.png')
+                # F = sp.linop.FFT(y.shape, axes=(-1, -2))
+                # multi_zfr = sense_op.H * F.H * y
+                # pl.ImagePlot(multi_zfr, title='ZFR')
+                # plt.savefig('temp00.png')
                 x_ls_multicoil = sense_op * x_ls
 
-                pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
-                plt.savefig('temp2.png')
-
-                exit()
+                # pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
+                # plt.savefig('temp2.png')
 
                 recons[i, :, :, :] = x_ls_multicoil.asnumpy()
-                s_maps[i, :, :, :] = s_map.asnumpy()
+                s_maps.append(sense_op)
                 gt[i, :, :, :] = coil_compressed_x
 
             h5 = h5py.File(out_name, 'w')
             h5.create_dataset('gt', data=kspace)
             h5.create_dataset('ls_recons', data=recons)
-            h5.create_dataset('sense_maps', data=s_maps)
+            h5.create_dataset('sense_maps_operator', data=s_maps)
             h5.close()
 
 
