@@ -94,7 +94,9 @@ def main(R, data):
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
                 sense_op = sp.linop.Multiply((384, 384), s_map)
-                pl.ImagePlot(sense_op.H * zfr, z=0, title='ZFR')
+                F = sp.linop.FFT(y.shape, axes=(-1, -2))
+                multi_zfr = sense_op.H * F.H * y
+                pl.ImagePlot(multi_zfr, z=0, title='ZFR')
                 plt.savefig('temp00.png')
                 x_ls_multicoil = sense_op * x_ls
 
