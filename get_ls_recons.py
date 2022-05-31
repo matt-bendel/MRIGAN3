@@ -76,6 +76,7 @@ def main(R, data):
 
             kspace = data['kspace']
             recons = np.zeros(kspace.shape, dtype=kspace.dtype)
+            gt = np.zeros(kspace.shape, dtype=kspace.dtype)
             s_maps = np.zeros(kspace.shape, dtype=kspace.dtype)
 
             for i in range(kspace.shape[0]):
@@ -104,6 +105,7 @@ def main(R, data):
 
                 recons[i, :, :, :] = x_ls_multicoil.asnumpy()
                 s_maps[i, :, :, :] = s_map.asnumpy()
+                gt[i, :, :, :] = coil_compressed_x
 
             h5 = h5py.File(out_name, 'w')
             h5.create_dataset('gt', data=kspace)
