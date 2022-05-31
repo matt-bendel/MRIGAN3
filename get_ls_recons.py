@@ -86,6 +86,7 @@ def main(R, data):
                 s_map = mr.app.EspiritCalib(y, show_pbar=True, device=sp.Device(1)).run()
 
                 x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True, device=sp.Device(1)).run()
+                print(x_ls.shape)
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
                 sense_op = mr.linop.Sense(s_map)
