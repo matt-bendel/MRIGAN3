@@ -8,7 +8,7 @@ def create_arg_parser():
     parser = Args()
 
     # GAN ARGS
-    parser.add_argument('--num-iters-discriminator', type=int, default=2,
+    parser.add_argument('--num-iters-discriminator', type=int, default=1,
                         help='Number of iterations of the discriminator')
     parser.add_argument('--num-z', type=int, default=2,
                         help='Number of z values to use during training.')
@@ -19,7 +19,7 @@ def create_arg_parser():
                         help='Whether or not to dynamically remove chunk of image')
 
     # LEARNING ARGS
-    parser.add_argument('--batch-size', default=8, type=int, help='Mini batch size')
+    parser.add_argument('--batch-size', default=4, type=int, help='Mini batch size')
     parser.add_argument('--num-epochs', type=int, default=200, help='Number of training epochs')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
     parser.add_argument('--beta_1', type=float, default=0, help='Beta 1 for Adam')
