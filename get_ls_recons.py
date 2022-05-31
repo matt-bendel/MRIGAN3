@@ -3,10 +3,12 @@ import h5py
 
 import numpy as np
 import sigpy as sp
+import cupy as cp
 import sigpy.mri as mr
 import sigpy.plot as pl
 import matplotlib.pyplot as plt
 
+from data.transforms import to_tensor
 from utils.espirit import ifft, fft
 
 
@@ -102,10 +104,11 @@ def main(R, data):
 
                 # pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 # plt.savefig('temp2.png')
-
-                recons[i, :, :, :] = x_ls_multicoil.asnumpy()
+                print(to_tensor(cp.asnumpy(x_ls_multicoil)).shape)
+                recons[i, :, :, :] = cp.asnumpy(x_ls_multicoil)
                 s_maps.append(sense_op)
                 gt[i, :, :, :] = coil_compressed_x
+                exit()
 
             h5 = h5py.File(out_name, 'w')
             h5.create_dataset('gt', data=kspace)
