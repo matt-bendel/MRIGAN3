@@ -5,9 +5,10 @@ import numpy as np
 import sigpy as sp
 import sigpy.mri as mr
 import sigpy.plot as pl
+import matplotlib.pyplot as plt
 
 from utils.espirit import ifft, fft
-
+from data.transforms import to_tensor
 
 def crop_and_compress(x):
     w_from = (x.shape[0] - 384) // 2  # crop images into 384x384
@@ -86,18 +87,19 @@ def main(R, data):
 
                 x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True, device=sp.Device(1)).run()
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
-                print(type(x_ls))
+                plt.savefig('temp1.png')
                 sense_op = mr.linop.Sense(s_map)
                 x_ls_multicoil = sense_op * x_ls
 
                 pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
+                plt.savefig('temp2.png')
                 print(x_ls_multicoil.shape)
-                print(type(x_ls_multicoil))
 
+                print(to_tensor(x_ls_multicoil).shape)
                 exit()
 
-                recons[i, :, :, :] = x_ls_multicoil
-                s_maps[i, :, :, :] = s_map
+                recons[i, :, :, :] = x_ls_multicoil.asnumpy()
+                s_maps[i, :, :, :] = s_map.asnumpy()
 
             h5 = h5py.File(out_name, 'w')
             h5.create_dataset('ls_recons', data=recons)
