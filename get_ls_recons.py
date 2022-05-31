@@ -4,6 +4,7 @@ import h5py
 import numpy as np
 import sigpy as sp
 import sigpy.mri as mr
+import sigpy.plot as pl
 
 from utils.espirit import ifft, fft
 
@@ -84,10 +85,12 @@ def main(R, data):
                 s_map = mr.app.EspiritCalib(y, show_pbar=True, device=sp.Device(1)).run()
 
                 x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True, device=sp.Device(1)).run()
+                pl.ImagePlot(x_ls, title='LS Recon')
                 print(type(x_ls))
-                sense_op = sp.linop.Multiply(y.shape, s_map)
+                sense_op = sp.linop.Sense(s_map)
                 x_ls_multicoil = sense_op * x_ls
 
+                pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 print(x_ls_multicoil.shape)
                 print(type(x_ls_multicoil))
 
