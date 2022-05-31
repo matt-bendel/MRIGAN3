@@ -83,10 +83,9 @@ def main(R, data):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
                 coil_compressed_x = crop_and_compress(x.transpose(1, 2, 0)).transpose(2, 0, 1)
                 y = apply_mask(fft(coil_compressed_x, (1, 2)), R)
-                s_map = mr.app.EspiritCalib(y, show_pbar=True).run()
+                s_map = mr.app.EspiritCalib(y, calib_width=32, show_pbar=True, crop=0.7, kernel_width=5, device=sp.Device(1)).run()
 
-                x_ls = mr.app.SenseRecon(y, s_map, lamda=0, show_pbar=True).run()
-                print(x_ls.shape)
+                x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=0, show_pbar=True, device=sp.Device(1)).run()
                 pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
                 plt.savefig('temp1.png')
                 sense_op = mr.linop.Sense(s_map)
@@ -94,7 +93,6 @@ def main(R, data):
 
                 pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 plt.savefig('temp2.png')
-                print(x_ls_multicoil.shape)
 
                 print(to_tensor(x_ls_multicoil).shape)
                 exit()
@@ -103,6 +101,7 @@ def main(R, data):
                 s_maps[i, :, :, :] = s_map.asnumpy()
 
             h5 = h5py.File(out_name, 'w')
+            h5.create_dataset('gt', data=kspace)
             h5.create_dataset('ls_recons', data=recons)
             h5.create_dataset('sense_maps', data=s_maps)
             h5.close()
