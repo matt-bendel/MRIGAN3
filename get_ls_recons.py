@@ -93,8 +93,8 @@ def main(R, data):
                                             device=sp.Device(1)).run()
 
                 x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(1)).run()
-                # pl.ImagePlot(x_ls, title='LS Recon', save_basename='temp')
-                # plt.savefig('temp1.png')
+                pl.ImagePlot(coil_compressed_x, title='LS Recon', save_basename='temp')
+                plt.savefig('temp1.png')
                 sense_op = sp.linop.Multiply((384, 384), s_map)
                 # F = sp.linop.FFT(y.shape, axes=(-1, -2))
                 # multi_zfr = sense_op.H * F.H * y
