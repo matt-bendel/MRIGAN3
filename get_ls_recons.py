@@ -80,7 +80,8 @@ def main(R, data):
             continue
 
         with h5py.File(file, 'r') as data:
-            if data.attrs['acquisition'] != 'AXT2' or data['kspace'].shape[1] < 8 or kspace.shape[-1] < 384:
+            if data.attrs['acquisition'] != 'AXT2' or data['kspace'].shape[1] < 8 or data['kspace'].shape[-1] < 384:
+                print('NEXT')
                 continue
 
             kspace = data['kspace']
