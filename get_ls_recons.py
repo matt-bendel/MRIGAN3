@@ -81,7 +81,7 @@ def main(R, data):
             kspace = data['kspace']
             recons = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
             gt = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
-            s_maps = []
+            s_maps = np.zeros((kspace.shape[0], 8, 384, 384), dtype=kspace.dtype)
 
             for i in range(kspace.shape[0]):
                 x = ifft(kspace[i, :, :, :], (1, 2))  # (slices, num_coils, H, W)
@@ -108,7 +108,7 @@ def main(R, data):
                 # pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 # plt.savefig('temp2.png')
                 recons[i, :, :, :] = cp.asnumpy(x_ls_multicoil)
-                s_maps.append(sense_op)
+                s_maps[i, :, :, :] = s_map
                 gt[i, :, :, :] = coil_compressed_x
 
             h5 = h5py.File(out_name, 'w')
