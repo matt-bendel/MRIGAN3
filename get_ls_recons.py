@@ -108,7 +108,7 @@ def main(R, data):
                 # pl.ImagePlot(x_ls_multicoil, z=0, title='Multicoil LS Recon')
                 # plt.savefig('temp2.png')
                 recons[i, :, :, :] = cp.asnumpy(x_ls_multicoil)
-                s_maps[i, :, :, :] = s_map
+                s_maps[i, :, :, :] = cp.asnumpy(s_map)
                 gt[i, :, :, :] = coil_compressed_x
 
             h5 = h5py.File(out_name, 'w')
