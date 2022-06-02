@@ -113,7 +113,7 @@ def main(R, data):
                 gt[i, :, :, :] = coil_compressed_x
 
             h5 = h5py.File(out_name, 'w')
-            h5.create_dataset('gt', data=kspace)
+            h5.create_dataset('gt', data=gt)
             h5.create_dataset('ls_recons', data=recons)
             h5.create_dataset('sense_maps_operator', data=s_maps)
             h5.close()
