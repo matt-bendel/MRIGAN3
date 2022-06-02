@@ -69,6 +69,7 @@ def main(R, data):
         out_name = os.path.join(out_dir, basename)
 
         if os.path.exists(out_name):
+            print('CONT')
             continue
 
         with h5py.File(file, 'r') as data:
