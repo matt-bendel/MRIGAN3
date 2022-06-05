@@ -227,11 +227,11 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
             num_files = round(len(files) * sample_rate)
             files = files[:num_files]
         for fname in sorted(files):
-            if str(fname) == '/storage/fastMRI_brain_ls/val_R=4/file_brain_AXT2_209_2090296.h5' or str(
-                    fname) == '/storage/fastMRI_brain_ls/val_R=4/file_brain_AXT2_200_2000250.h5' or str(
-                fname) == '/storage/fastMRI_brain_ls/val_R=4/file_brain_AXT2_201_2010106.h5' or str(
-                fname) == '/storage/fastMRI_brain_ls/val_R=4/file_brain_AXT2_204_2130024.h5' or str(
-                fname) == '/storage/fastMRI_brain_ls/val_R=4/file_brain_AXT2_210_2100025.h5':
+            if str(fname) == '/storage/fastMRI_brain_ls/val_4/file_brain_AXT2_209_2090296.h5' or str(
+                    fname) == '/storage/fastMRI_brain_ls/val_4/file_brain_AXT2_200_2000250.h5' or str(
+                fname) == '/storage/fastMRI_brain_ls/val_4/file_brain_AXT2_201_2010106.h5' or str(
+                fname) == '/storage/fastMRI_brain_ls/val_4/file_brain_AXT2_204_2130024.h5' or str(
+                fname) == '/storage/fastMRI_brain_ls/val_4/file_brain_AXT2_210_2100025.h5':
                 continue
             else:
                 num_slices = 8  # kspace.shape[0]

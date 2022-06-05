@@ -59,12 +59,12 @@ class DataTransform:
         gt = reduce_resolution(gt)
         ls_recon = reduce_resolution(ls_recon)
 
-        true_image = torch.clone(gt)
-        true_measures = fft2c_new(gt) * mask
-
         print(gt.shape)
         print(ls_recon.shape)
         exit()
+
+        true_image = torch.clone(gt)
+        true_measures = fft2c_new(gt) * mask
 
         normalized_input, mean, std = transforms.normalize_instance(ls_recon)
         normalized_gt = transforms.normalize(true_image, mean, std)
@@ -87,7 +87,7 @@ class DataTransform:
 def create_datasets(args, val_only, big_test=False):
     if not val_only:
         train_data = SelectiveSliceData(
-            root=args.data_path / f'train_R={args.R}',
+            root=args.data_path / f'train_{args.R}',
             transform=DataTransform(args),
             challenge='multicoil',
             sample_rate=1,
@@ -97,7 +97,7 @@ def create_datasets(args, val_only, big_test=False):
         )
 
     dev_data = SelectiveSliceData_Val(
-        root=args.data_path / f'val_R={args.R}',
+        root=args.data_path / f'val_{args.R}',
         transform=DataTransform(args, test=True),
         challenge='multicoil',
         sample_rate=1,
