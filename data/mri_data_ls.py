@@ -249,7 +249,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
             ls_recons = data['ls_recons'][slice]
             sense_maps = data['sense_maps_operator'][slice]
 
-            return self.transform(ls_recons, gt, sense_maps, fname.name, slice, None)
+            return self.transform(ls_recons, gt, sense_maps, fname.name, slice)
 
 
 class CombinedSliceDataset(torch.utils.data.Dataset):
