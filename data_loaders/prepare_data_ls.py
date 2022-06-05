@@ -33,7 +33,7 @@ class DataTransform:
         self.mask = None
         self.test = test
 
-    def __call__(self, ls_recon, target, sense_maps, fname, slice):
+    def __call__(self, ls_rec, target, sense_maps, fname, slice):
         """
         Args:
             kspace (numpy.array): Input k-space of shape (num_coils, rows, cols, 2) for multi-coil
@@ -54,13 +54,17 @@ class DataTransform:
         mask = get_mask(128, return_mask=True, R=4)
 
         gt = transforms.to_tensor(target)
-        ls_recon = transforms.to_tensor(ls_recon)
+        ls_recon = transforms.to_tensor(ls_rec)
 
         gt = reduce_resolution(gt)
         ls_recon = reduce_resolution(ls_recon)
 
         true_image = torch.clone(gt)
         true_measures = fft2c_new(gt) * mask
+
+        print(gt.shape)
+        print(ls_recon.shape)
+        exit()
 
         normalized_input, mean, std = transforms.normalize_instance(ls_recon)
         normalized_gt = transforms.normalize(true_image, mean, std)
