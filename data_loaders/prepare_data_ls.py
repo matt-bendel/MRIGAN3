@@ -59,10 +59,6 @@ class DataTransform:
         gt = reduce_resolution(gt)
         ls_recon = reduce_resolution(ls_recon)
 
-        print(gt.shape)
-        print(ls_recon.shape)
-        exit()
-
         true_image = torch.clone(gt)
         true_measures = fft2c_new(gt) * mask
 
