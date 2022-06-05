@@ -14,6 +14,7 @@ from utils.math import complex_abs
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import get_gan, save_model
 from data_loaders.prepare_data import create_data_loaders
+from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
@@ -182,7 +183,7 @@ def train(args):
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
-    train_loader, dev_loader = create_data_loaders(args, big_test=False)
+    train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
     for epoch in range(start_epoch, args.num_epochs):
         batch_loss = {

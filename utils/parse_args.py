@@ -34,6 +34,8 @@ def create_arg_parser():
                         help='Acceleration rate - 4 or 8')
     parser.add_argument('--data-parallel', required=True, action='store_true',
                         help='If set, use multiple GPUs using data parallelism')
+    parser.add_argument('--ls', required=True, action='store_true',
+                        help='If set, use multiple GPUs using data parallelism')
     parser.add_argument('--num_of_top_slices', default=8, type=int,
                         help='top slices have bigger brain image and less air region')
     parser.add_argument('--use-middle-slices', action='store_true',
