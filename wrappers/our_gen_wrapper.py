@@ -79,7 +79,7 @@ def get_gan(args):
 
 
 def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type):
-    fpath = args.exp_dir if not args.stylegan else args.exp_dir / 'stylegan' if not args.ls else args.exp_dir / 'ls'
+    fpath = args.exp_dir / 'ls' if args.ls else args.exp_dir if not args.stylegan else args.exp_dir / 'stylegan'
     torch.save(
         {
             'epoch': epoch,
