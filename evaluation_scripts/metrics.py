@@ -246,7 +246,7 @@ def get_metrics(args):
         'max_i': []
     }
 
-    _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_onl = True, big_test=True)
+    _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_only=True, big_test=True)
 
     count = 0
     folds = 0
