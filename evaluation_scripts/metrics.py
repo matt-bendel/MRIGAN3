@@ -9,6 +9,7 @@ import imageio as iio
 from typing import Optional
 from wrappers.our_gen_wrapper import load_best_gan
 from data_loaders.prepare_data import create_data_loaders
+from data_loaders.prepare_data_ls import create_data_loaders_ls
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from utils.math import tensor_to_complex_np
 from utils.fftc import ifft2c_new, fft2c_new
@@ -245,7 +246,7 @@ def get_metrics(args):
         'max_i': []
     }
 
-    _, test_loader = create_data_loaders(args, val_only=True, big_test=True)
+    _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_onl = True, big_test=True)
 
     count = 0
     folds = 0
