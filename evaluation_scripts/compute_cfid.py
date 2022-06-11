@@ -1,6 +1,7 @@
 from evaluation_scripts.cfid.embeddings import InceptionEmbedding
 from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders
+from data_loaders.prepare_data_ls import create_data_loaders_ls
 from wrappers.our_gen_wrapper import load_best_gan
 
 import numpy as np
@@ -10,7 +11,7 @@ def get_cfid(args, G):
     inception_embedding = InceptionEmbedding(parallel=True)
 
     print("GETTING DATA LOADERS")
-    _, loader = create_data_loaders(args, val_only=True, big_test=True)
+    _, loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_only=True, big_test=True)
 
     cfid_metric = CFIDMetric(gan=G,
                              loader=loader,
