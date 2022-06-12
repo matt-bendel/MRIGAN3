@@ -205,7 +205,7 @@ class CFIDMetric:
         y_predict_full, x_true_full, y_true_full = self._get_generated_distribution()
         cfids = []
 
-        for i in range(33):
+        for i in range(32):
             y_predict, x_true, y_true = y_predict_full[i*72:(i+1)*72, :], x_true_full[i*72:(i+1)*72, :], y_true_full[i*72:(i+1)*72, :]
             # mean estimations
             y_true = y_true.to(x_true.device)
