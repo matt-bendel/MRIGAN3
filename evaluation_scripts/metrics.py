@@ -248,6 +248,8 @@ def get_metrics(args):
 
     _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_only=True, big_test=True)
 
+    compute_cfid.get_cfid(args, G)
+
     count = 0
     folds = 0
     for i, data in enumerate(test_loader):
