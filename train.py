@@ -223,7 +223,7 @@ def train(args):
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y, y_true)
 
-            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 30, 30), device=args.device)
+            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 94, 94), device=args.device)
             for k in range(y.shape[0]):
                 cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
                 cond[0, :, :, :] = y[k, :, :, :]
