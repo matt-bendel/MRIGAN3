@@ -14,8 +14,8 @@ class StyleGAN(nn.Module):
                 "drips_norm": "batch",
                 "channels": [
                     16,
-                    128,
-                    128,
+                    384,
+                    384,
                     256,
                     256,
                     512]
@@ -28,8 +28,8 @@ class StyleGAN(nn.Module):
                     512,
                     256,
                     256,
-                    128,
-                    128
+                    384,
+                    384
                 ],
                 "num_trgb_layers": 1
             }

@@ -51,7 +51,7 @@ class DataTransform:
                 norm (float): L2 norm of the entire volume.
         """
         # GRO Sampling mask:
-        mask = get_mask(128, return_mask=True, R=4)
+        mask = get_mask(384, return_mask=True, R=4)
 
         gt = transforms.to_tensor(target)
         ls_recon = transforms.to_tensor(ls_rec)
@@ -69,11 +69,11 @@ class DataTransform:
         normalized_true_measures = transforms.normalize(ifft2c_new(true_measures), mean, std)
         normalized_true_measures = fft2c_new(normalized_true_measures)
 
-        final_input = torch.zeros(16, 128, 128)
+        final_input = torch.zeros(16, 384, 384)
         final_input[0:8, :, :] = normalized_input[:, :, :, 0]
         final_input[8:16, :, :] = normalized_input[:, :, :, 1]
 
-        final_gt = torch.zeros(16, 128, 128)
+        final_gt = torch.zeros(16, 384, 384)
         final_gt[0:8, :, :] = normalized_gt[:, :, :, 0]
         final_gt[8:16, :, :] = normalized_gt[:, :, :, 1]
 
@@ -160,11 +160,11 @@ def create_test_loader(args):
 
 
 def reduce_resolution(im):
-    reduced_im = np.zeros((8, 128, 128, 2))
+    reduced_im = np.zeros((8, 384, 384, 2))
     for i in range(im.shape[0] // 2):
-        reduced_im[i, :, :, 0] = cv2.resize(im[i, :, :, 0].numpy(), dsize=(128, 128),
+        reduced_im[i, :, :, 0] = cv2.resize(im[i, :, :, 0].numpy(), dsize=(384, 384),
                                             interpolation=cv2.INTER_LINEAR)
-        reduced_im[i, :, :, 1] = cv2.resize(im[i, :, :, 1].numpy(), dsize=(128, 128),
+        reduced_im[i, :, :, 1] = cv2.resize(im[i, :, :, 1].numpy(), dsize=(384, 384),
                                             interpolation=cv2.INTER_LINEAR)
 
     return transforms.to_tensor(reduced_im)

@@ -218,7 +218,7 @@ def train(args):
             for param in G.gen.parameters():
                 param.grad = None
 
-            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 128, 128),
+            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 384, 384),
                                device=args.device)
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y, y_true)
@@ -269,18 +269,18 @@ def train(args):
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 128, 128),
+                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 384, 384),
                                    device=args.device)
                 for z in range(8):
                     gens[:, z, :, :, :] = G(y, y_true)
 
                 avg = torch.mean(gens, dim=1)
 
-                avg_gen = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
+                avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
                 avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
                 avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-                gt = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
+                gt = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
                 gt[:, :, :, :, 0] = x[:, 0:8, :, :]
                 gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
@@ -300,7 +300,7 @@ def train(args):
 
                         gen_im_list = []
                         for z in range(8):
-                            val_rss = torch.zeros(8, 128, 128, 2).to(args.device)
+                            val_rss = torch.zeros(8, 384, 384, 2).to(args.device)
                             val_rss[:, :, :, 0] = gens[0, z, 0:8, :, :]
                             val_rss[:, :, :, 1] = gens[0, z, 8:16, :, :]
                             gen_im_list.append(transforms.root_sum_of_squares(

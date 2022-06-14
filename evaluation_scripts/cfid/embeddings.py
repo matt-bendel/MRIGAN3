@@ -86,7 +86,7 @@ class WrapInception(nn.Module):
         # 17 x 17 x 768
         # 17 x 17 x 768
         x = self.net.Mixed_7a(x)
-        # 8 x 8 x 1280
+        # 8 x 8 x 3840
         x = self.net.Mixed_7b(x)
         # 8 x 8 x 2048
         x = self.net.Mixed_7c(x)
