@@ -66,13 +66,15 @@ psnr_vals = []
 ssim_vals = []
 snr_vals = []
 apsd_vals = []
-vals = [1, 2, 4, 8, 16, 32]
+vals = [32]#[1, 2, 4, 8, 16, 32]
 
 exceptions = False
+count = 0
 for k in vals:
     print(f"{k} CODE VECTORS")
     for filename in os.listdir(ref_directory):
         for i in range(6):
+            count += 1
             recons = np.zeros((k, 384, 384))
             recon_object = None
             for j in range(k):
@@ -106,6 +108,7 @@ for k in vals:
     print('SSIM: ', np.mean(ssim_vals))
     print("\n")
 
+print(count)
     # print('MEDIAN')
     # print('APSD: ', np.median(apsd_vals))
     # print('PSNR: ', np.median(psnr_vals))
