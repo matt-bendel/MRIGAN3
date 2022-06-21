@@ -71,6 +71,7 @@ vals = [1, 2, 4, 8, 16, 32]
 exceptions = False
 for filename in os.listdir(ref_directory):
     for k in vals:
+        print(f"{k} CODE VECTORS")
         for i in range(6):
             recons = np.zeros((k, 384, 384))
             recon_object = None
@@ -102,9 +103,10 @@ for filename in os.listdir(ref_directory):
     print('PSNR: ', np.mean(psnr_vals))
     print('SNR: ', np.mean(snr_vals))
     print('SSIM: ', np.mean(ssim_vals))
+    print("\n")
 
-    print('MEDIAN')
-    print('APSD: ', np.median(apsd_vals))
-    print('PSNR: ', np.median(psnr_vals))
-    print('SNR: ', np.median(snr_vals))
-    print('SSIM: ', np.median(ssim_vals))
+    # print('MEDIAN')
+    # print('APSD: ', np.median(apsd_vals))
+    # print('PSNR: ', np.median(psnr_vals))
+    # print('SNR: ', np.median(snr_vals))
+    # print('SSIM: ', np.median(ssim_vals))
