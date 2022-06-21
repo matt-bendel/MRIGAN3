@@ -72,7 +72,7 @@ exceptions = False
 for filename in os.listdir(ref_directory):
     for k in vals:
         for i in range(6):
-            recons = np.zeros((32, 384, 384))
+            recons = np.zeros((k, 384, 384))
             recon_object = None
             for j in range(k):
                 try:
