@@ -62,25 +62,26 @@ recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 # iterate over files in
 # that directory
 
-psnr_vals = []
-ssim_vals = []
-snr_vals = []
-apsd_vals = []
-vals = [32]#[1, 2, 4, 8, 16, 32]
+
+vals = [1, 2, 4, 8, 16, 32]
 
 exceptions = False
 count = 0
 for k in vals:
     print(f"{k} CODE VECTORS")
+    psnr_vals = []
+    ssim_vals = []
+    snr_vals = []
+    apsd_vals = []
     for filename in os.listdir(ref_directory):
         for i in range(6):
-            count += 1
             recons = np.zeros((k, 384, 384))
             recon_object = None
             for j in range(k):
                 try:
                     new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R={R}_sample={j}_outputs.pt'
                     recon_object = torch.load(new_filename)
+                    count += 1
                 except:
                     exceptions = True
                     continue
