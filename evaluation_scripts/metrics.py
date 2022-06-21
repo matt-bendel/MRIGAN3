@@ -248,10 +248,12 @@ def get_metrics(args):
 
     _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_only=True, big_test=True)
 
-    compute_cfid.get_cfid(args, G)
+    # compute_cfid.get_cfid(args, G)
 
     count = 0
     folds = 0
+    num_code = 128
+
     for i, data in enumerate(test_loader):
         with torch.no_grad():
             y, x, y_true, mean, std = data
@@ -259,15 +261,15 @@ def get_metrics(args):
             x = x.to(args.device)
             y_true = y_true.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), 384, args.in_chans, 384, 384),
+            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
-            for z in range(384):
+            for z in range(num_code):
                 gens[:, z, :, :, :] = G(y, y_true)
 
             avg = torch.mean(gens, dim=1)
 
             temp_gens = torch.zeros(gens.shape, dtype=gens.dtype)
-            for z in range(384):
+            for z in range(num_code):
                 temp_gens[:, z, :, :, :] = gens[:, z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:,
                                                                                                             None, None,
                                                                                                             None].to(
@@ -275,9 +277,9 @@ def get_metrics(args):
 
             losses['apsd'].append(torch.mean(torch.std(temp_gens, dim=1), dim=(0, 1, 2, 3)).cpu().numpy())
 
-            new_gens = torch.zeros(y.size(0), 384, 8, 384, 384, 2)
-            new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
-            new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
+            # new_gens = torch.zeros(y.size(0), num_code, 8, 384, 384, 2)
+            # new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
+            # new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
             avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
             avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
