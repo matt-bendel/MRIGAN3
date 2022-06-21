@@ -69,9 +69,9 @@ apsd_vals = []
 vals = [1, 2, 4, 8, 16, 32]
 
 exceptions = False
-for filename in os.listdir(ref_directory):
-    for k in vals:
-        print(f"{k} CODE VECTORS")
+for k in vals:
+    print(f"{k} CODE VECTORS")
+    for filename in os.listdir(ref_directory):
         for i in range(6):
             recons = np.zeros((k, 384, 384))
             recon_object = None
@@ -87,6 +87,7 @@ for filename in os.listdir(ref_directory):
                 recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
 
             if exceptions:
+                print("EXCEPTION")
                 exceptions = False
                 continue
             mean = np.mean(recons, axis=0)
