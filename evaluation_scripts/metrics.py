@@ -252,7 +252,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 128
+    num_code = 64
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -331,4 +331,4 @@ def get_metrics(args):
     print(f'SSIM: {np.mean(means["ssim"]):.4f} \\pm {np.std(means["ssim"]) / np.sqrt(folds):.4f}')
     print(f'APSD: {np.mean(losses["apsd"]):} \\pm {np.std(losses["apsd"]) / np.sqrt(folds):}')
 
-    compute_cfid.get_cfid(args, G)
+    # compute_cfid.get_cfid(args, G)
