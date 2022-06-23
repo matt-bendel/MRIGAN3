@@ -252,7 +252,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 64
+    num_code = 128
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -317,8 +317,8 @@ def get_metrics(args):
     ax1.set_title('MSE')
     # ax2.hist(losses['snr'], bins=15)
     # ax2.set_title('SNR')
-    # plt.savefig('histo.png')
-    # plt.close(fig)
+    plt.savefig('histo.png')
+    plt.close(fig)
     #
     # fig = plt.figure()
     # fig.suptitle('MSE vs. MAX_I')
