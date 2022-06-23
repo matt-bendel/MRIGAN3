@@ -252,7 +252,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 4
+    num_code = 128
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -277,9 +277,9 @@ def get_metrics(args):
 
             losses['apsd'].append(torch.mean(torch.std(temp_gens, dim=1), dim=(0, 1, 2, 3)).cpu().numpy())
 
-            # new_gens = torch.zeros(y.size(0), num_code, 8, 128, 128, 2)
-            # new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
-            # new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
+            new_gens = torch.zeros(y.size(0), num_code, 8, 128, 128, 2)
+            new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
+            new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
             avg_gen = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
             avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
@@ -299,7 +299,10 @@ def get_metrics(args):
                 losses['ssim'].append(ssim(gt_np, avg_gen_np))
                 losses['psnr'].append(psnr(gt_np, avg_gen_np))
                 losses['snr'].append(snr(gt_np, avg_gen_np))
-                # losses['mse'].append(mse(gt_np, avg_gen_np))
+                # for k in range(num_code):
+                #     gen_np = transforms.root_sum_of_squares(
+                #         complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
+                #     losses['mse'].append(mse(gt_np, gen_np))
                 # losses['max_i'].append(gt_np.max())
             if count % 72 == 0:
                 folds += 1
