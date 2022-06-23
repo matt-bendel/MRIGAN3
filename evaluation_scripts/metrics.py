@@ -168,9 +168,9 @@ def get_colorbar(fig, im, ax, left=False):
 
 def get_plots(fname, gt_np, avg_gen_np, temp_gens, R, slice, maps, ind, ind2):
     print(R)
-    recons = np.zeros((32, 384, 384))
+    recons = np.zeros((32, 128, 128))
     recon_object = None
-    gen_recons = np.zeros((32, 384, 384))
+    gen_recons = np.zeros((32, 128, 128))
     recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 
     for j in range(32):
@@ -191,7 +191,7 @@ def get_plots(fname, gt_np, avg_gen_np, temp_gens, R, slice, maps, ind, ind2):
                 0].abs().numpy()
 
         inds = np.isnan(gen_recons[j])
-        gen_recons[j][inds] = np.random.normal(0, np.sqrt(1e-13), (384, 384))[inds]
+        gen_recons[j][inds] = np.random.normal(0, np.sqrt(1e-13), (128, 128))[inds]
         gif_im(gt_np, gen_recons[j], gt_lang, recons[j], j + 1, 'image')
 
     generate_gif('image', R, ind, ind2)
@@ -261,7 +261,7 @@ def get_metrics(args):
             x = x.to(args.device)
             y_true = y_true.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
+            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 128, 128),
                                device=args.device)
             for z in range(num_code):
                 gens[:, z, :, :, :] = G(y, y_true)
@@ -277,15 +277,15 @@ def get_metrics(args):
 
             losses['apsd'].append(torch.mean(torch.std(temp_gens, dim=1), dim=(0, 1, 2, 3)).cpu().numpy())
 
-            # new_gens = torch.zeros(y.size(0), num_code, 8, 384, 384, 2)
+            # new_gens = torch.zeros(y.size(0), num_code, 8, 128, 128, 2)
             # new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
             # new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+            avg_gen = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
             avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
             avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-            gt = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+            gt = torch.zeros(size=(y.size(0), 8, 128, 128, 2), device=args.device)
             gt[:, :, :, :, 0] = x[:, 0:8, :, :]
             gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
