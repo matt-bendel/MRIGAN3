@@ -100,7 +100,7 @@ def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type
 class GANWrapper:
     def __init__(self, gen, args):
         self.args = args
-        self.resolution = 128
+        self.resolution = 384
         self.gen = gen
         self.data_consistency = True
 

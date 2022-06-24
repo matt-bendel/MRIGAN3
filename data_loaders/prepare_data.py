@@ -58,7 +58,7 @@ class DataTransform:
 
         im_tensor = transforms.to_tensor(coil_compressed_x).permute(2, 0, 1, 3)
 
-        im_tensor = reduce_resolution(im_tensor)
+        # im_tensor = reduce_resolution(im_tensor)
 
         true_image = torch.clone(im_tensor)
         true_measures = fft2c_new(im_tensor) * mask
@@ -75,11 +75,11 @@ class DataTransform:
         normalized_true_measures = transforms.normalize(ifft2c_new(true_measures), mean, std)
         normalized_true_measures = fft2c_new(normalized_true_measures)
 
-        final_input = torch.zeros(16, 128, 128)
+        final_input = torch.zeros(16, 384, 384)
         final_input[0:8, :, :] = normalized_input[:, :, :, 0]
         final_input[8:16, :, :] = normalized_input[:, :, :, 1]
 
-        final_gt = torch.zeros(16, 128, 128)
+        final_gt = torch.zeros(16, 384, 384)
         final_gt[0:8, :, :] = normalized_gt[:, :, :, 0]
         final_gt[8:16, :, :] = normalized_gt[:, :, :, 1]
 
