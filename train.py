@@ -83,9 +83,9 @@ def compute_gradient_penalty(D, real_samples, fake_samples, args, y):
         fake = Tensor(real_samples.shape[0], 1).fill_(1.0).to(args.device)
 
     # Get gradient w.r.t. interpolates
-    print(d_interpolates.shape)
-    print(real_samples.shape)
-    print(fake.shape)
+    # print(d_interpolates.shape)
+    # print(real_samples.shape)
+    # print(fake.shape)
     gradients = autograd.grad(
         outputs=d_interpolates,
         inputs=interpolates,
