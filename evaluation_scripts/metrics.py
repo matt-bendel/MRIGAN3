@@ -252,7 +252,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 16
+    num_code = 8
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
