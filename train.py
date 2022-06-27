@@ -241,7 +241,7 @@ def train(args):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             std_weight = np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-4
+            adv_weight = 1e-2
 
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
