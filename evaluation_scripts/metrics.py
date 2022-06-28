@@ -307,7 +307,7 @@ def get_metrics(args):
                 fig, ax1 = plt.subplots(1, 1)
                 fig.suptitle(f'MSE Histogram for {num_code} samples')
                 fig.subplots_adjust(hspace=1)
-                ax1.hist(losses['mse'], bins=100)
+                ax1.hist(losses['mse'], bins=50)
                 ax1.set_title('MSE')
                 # ax2.hist(losses['snr'], bins=15)
                 # ax2.set_title('SNR')
