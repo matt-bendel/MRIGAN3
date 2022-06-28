@@ -311,7 +311,7 @@ def get_metrics(args):
                 ax1.set_title('MSE')
                 # ax2.hist(losses['snr'], bins=15)
                 # ax2.set_title('SNR')
-                plt.xlim([0.0, 1e-2])
+                plt.xlim([-0.05, 0.05])
                 plt.savefig(f'histo_{num_code}.png')
                 plt.close(fig)
                 exit()
