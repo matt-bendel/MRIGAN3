@@ -301,7 +301,7 @@ def get_metrics(args):
                 losses['snr'].append(snr(gt_np, avg_gen_np))
                 for k in range(num_code):
                     gen_np = transforms.root_sum_of_squares(
-                        complex_abs(new_gens[j, k, :, :, :, :] * std[j] + mean[j])).cpu().numpy()
+                        complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                     losses['mse'].append(mse(gt_np, gen_np))
 
                 fig, ax1 = plt.subplots(1, 1)
