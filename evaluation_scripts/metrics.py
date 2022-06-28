@@ -252,7 +252,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 8
+    num_code = 128
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -303,6 +303,17 @@ def get_metrics(args):
                     gen_np = transforms.root_sum_of_squares(
                         complex_abs(new_gens[j, k, :, :, :, :] * std[j] + mean[j])).cpu().numpy()
                     losses['mse'].append(mse(gt_np, gen_np))
+
+                fig, ax1 = plt.subplots(1, 1)
+                fig.suptitle(f'MSE Histogram for {num_code} samples')
+                fig.subplots_adjust(hspace=1)
+                ax1.hist(losses['mse'], bins=20)
+                ax1.set_title('MSE')
+                # ax2.hist(losses['snr'], bins=15)
+                # ax2.set_title('SNR')
+                plt.savefig(f'histo_{num_code}.png')
+                plt.close(fig)
+                exit()
                 # losses['max_i'].append(gt_np.max())
             if count % 72 == 0:
                 folds += 1
