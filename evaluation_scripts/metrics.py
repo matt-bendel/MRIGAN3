@@ -312,10 +312,11 @@ def get_metrics(args):
                 # ax2.hist(losses['snr'], bins=15)
                 # ax2.set_title('SNR')
                 # plt.xlim([-0.05, 0.05])
-                plt.savefig(f'histo_{num_code}.png')
+                plt.savefig(f'histo_{num_code}_{j}.png')
                 plt.close(fig)
-                exit()
+
                 # losses['max_i'].append(gt_np.max())
+            exit()
             if count % 72 == 0:
                 folds += 1
                 means['psnr'].append(losses['psnr'])
