@@ -252,7 +252,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 128
+    num_code = 32
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -304,16 +304,16 @@ def get_metrics(args):
                         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                     losses['mse'].append(mse(gt_np, gen_np))
 
-                fig, ax1 = plt.subplots(1, 1)
-                fig.suptitle(f'MSE Histogram for {num_code} samples')
-                fig.subplots_adjust(hspace=1)
-                ax1.hist(losses['mse'], bins=50)
-                ax1.set_title('MSE')
-                # ax2.hist(losses['snr'], bins=15)
-                # ax2.set_title('SNR')
-                # plt.xlim([-0.05, 0.05])
-                plt.savefig(f'histo_{num_code}_{j}.png')
-                plt.close(fig)
+                # fig, ax1 = plt.subplots(1, 1)
+                # fig.suptitle(f'MSE Histogram for {num_code} samples')
+                # fig.subplots_adjust(hspace=1)
+                # ax1.hist(losses['mse'], bins=50)
+                # ax1.set_title('MSE')
+                # # ax2.hist(losses['snr'], bins=15)
+                # # ax2.set_title('SNR')
+                # # plt.xlim([-0.05, 0.05])
+                # plt.savefig(f'histo_{num_code}_{j}.png')
+                # plt.close(fig)
 
                 # losses['max_i'].append(gt_np.max())
             exit()
@@ -323,15 +323,15 @@ def get_metrics(args):
                 means['snr'].append(losses['snr'])
                 means['ssim'].append(losses['ssim'])
 
-    fig, ax1 = plt.subplots(1, 1)
-    fig.suptitle(f'MSE Histogram for {num_code} samples')
-    fig.subplots_adjust(hspace=1)
-    ax1.hist(losses['mse'], bins=20)
-    ax1.set_title('MSE')
-    # ax2.hist(losses['snr'], bins=15)
-    # ax2.set_title('SNR')
-    plt.savefig(f'histo_{num_code}.png')
-    plt.close(fig)
+    # fig, ax1 = plt.subplots(1, 1)
+    # fig.suptitle(f'MSE Histogram for {num_code} samples')
+    # fig.subplots_adjust(hspace=1)
+    # ax1.hist(losses['mse'], bins=20)
+    # ax1.set_title('MSE')
+    # # ax2.hist(losses['snr'], bins=15)
+    # # ax2.set_title('SNR')
+    # plt.savefig(f'histo_{num_code}.png')
+    # plt.close(fig)
     #
     # fig = plt.figure()
     # fig.suptitle('MSE vs. MAX_I')
