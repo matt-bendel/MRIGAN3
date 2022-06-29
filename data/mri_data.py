@@ -212,13 +212,13 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
         print(len(f))
 
         for fname in f[1:len(f)]:
-            kspace = h5py.File(fname, 'r')['kspace']
+            # kspace = h5py.File(fname, 'r')['kspace']
 
             with h5py.File(fname, 'r') as data:
                 if (data.attrs['acquisition'] == 'AXT2'):
                     # scanner_str = findScannerStrength(data['ismrmrd_header'].value)
                     # if (scanner_str > 2.2):
-                    if kspace.shape[1] >= 8:
+                    if data['kspace'].shape[1] >= 8:
                         keep_files.append(fname)
                     # else:
                         # print(fname)
