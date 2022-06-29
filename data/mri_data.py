@@ -126,11 +126,14 @@ class SelectiveSliceData(torch.utils.data.Dataset):
         f = sorted(files)
 
         for fname in f[1:]:
-            with h5py.File(fname, 'r') as data:
-                if (data.attrs['acquisition'] == 'AXT2'):
-                    #scanner_str = findScannerStrength(data['ismrmrd_header'].value)
-                    # if (scanner_str > 2.2):
-                    keep_files.append(fname)
+            try:
+                with h5py.File(fname, 'r') as data:
+                    if (data.attrs['acquisition'] == 'AXT2'):
+                        #scanner_str = findScannerStrength(data['ismrmrd_header'].value)
+                        # if (scanner_str > 2.2):
+                        keep_files.append(fname)
+            except:
+                print("UHOH")
 
         files = keep_files
 
