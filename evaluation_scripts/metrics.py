@@ -316,7 +316,7 @@ def get_metrics(args):
                 # plt.close(fig)
 
                 # losses['max_i'].append(gt_np.max())
-            exit()
+            # exit()
             if count % 72 == 0:
                 folds += 1
                 means['psnr'].append(losses['psnr'])
