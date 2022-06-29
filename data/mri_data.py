@@ -133,7 +133,8 @@ class SelectiveSliceData(torch.utils.data.Dataset):
                         # if (scanner_str > 2.2):
                         keep_files.append(fname)
             except:
-                print("UHOH")
+                pass
+                # print("UHOH")
 
         files = keep_files
 
@@ -227,7 +228,8 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
                         # else:
                             # print(fname)
                 except:
-                    print("UHOH")
+                    pass
+                    # print("UHOH")
 
         files = keep_files
 
