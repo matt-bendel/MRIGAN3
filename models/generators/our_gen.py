@@ -15,10 +15,10 @@ class ResidualBlock(nn.Module):
         super(ResidualBlock, self).__init__()
         self.conv_block = nn.Sequential(
             nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
-            nn.InstanceNorm2d(in_features),
+            nn.BatchNorm2d(in_features),
             nn.PReLU(),
             nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
-            nn.InstanceNorm2d(in_features),
+            nn.BatchNorm2d(in_features),
             nn.PReLU()
         )
         self.conv_1x1 = nn.Conv2d(in_features, in_features, kernel_size=1)
@@ -44,7 +44,7 @@ class ConvDownBlock(nn.Module):
         # self.conv_2 = nn.Conv2d(out_chans, out_chans, kernel_size=3, padding=1)
         self.res = ResidualBlock(out_chans)
         self.conv_3 = nn.Conv2d(out_chans, out_chans, kernel_size=3, padding=1, stride=2)
-        self.bn = nn.InstanceNorm2d(out_chans)
+        self.bn = nn.BatchNorm2d(out_chans)
         self.activation = nn.PReLU()
 
     def forward(self, input):
@@ -81,12 +81,12 @@ class ConvUpBlock(nn.Module):
         self.out_chans = out_chans
 
         self.conv_1 = nn.ConvTranspose2d(in_chans // 2, in_chans // 2, kernel_size=3, padding=1, stride=2)
-        self.bn = nn.InstanceNorm2d(in_chans // 2)
+        self.bn = nn.BatchNorm2d(in_chans // 2)
         self.activation = nn.PReLU()
 
         self.layers = nn.Sequential(
             nn.Conv2d(in_chans, out_chans, kernel_size=3, padding=1),
-            nn.InstanceNorm2d(out_chans),
+            nn.BatchNorm2d(out_chans),
             nn.PReLU(),
             ResidualBlock(out_chans),
         )
@@ -139,7 +139,7 @@ class GeneratorModel(nn.Module):
 
         self.res_layer_1 = nn.Sequential(
             nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            nn.InstanceNorm2d(ch),
+            nn.BatchNorm2d(ch),
             nn.PReLU(),
             ResidualBlock(ch),
             ResidualBlock(ch),
@@ -160,10 +160,10 @@ class GeneratorModel(nn.Module):
 
         self.conv = nn.Sequential(
             nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            nn.InstanceNorm2d(ch),
+            nn.BatchNorm2d(ch),
             nn.PReLU(),
             # nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            # nn.InstanceNorm2d(ch),
+            # nn.BatchNorm2d(ch),
             # nn.PReLU()
         )
 
