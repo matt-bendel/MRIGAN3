@@ -135,7 +135,7 @@ class GANWrapper:
 
         return output_im
 
-    def __call__(self, y, true_measures, noise_var=1e-2):
+    def __call__(self, y, true_measures, noise_var=1e-1):
         num_vectors = y.size(0)
         if not self.args.stylegan:
             z = self.get_noise(num_vectors, noise_var)
