@@ -242,10 +242,10 @@ def train(args):
 
             std_weight = 2*np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = 1e-4
-            l1_weight = 0.75
+            l1_weight = 0.9
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
-            g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
+            g_loss += - std_weight * torch.std(gens, dim=1).mean()
 
             if g_loss < -20:
                 exit()
@@ -278,7 +278,7 @@ def train(args):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 384, 384),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true)
+                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1)
 
                 avg = torch.mean(gens, dim=1)
 
