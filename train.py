@@ -226,13 +226,21 @@ def train(args):
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y, y_true)
 
-            fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
+            # fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
+            # for k in range(y.shape[0]):
+            #     cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
+            #     cond[0, :, :, :] = y[k, :, :, :]
+            #     cond = cond.repeat(args.num_z, 1, 1, 1)
+            #     temp = D(input=gens[k], y=cond)
+            #     fake_pred[k] = temp[:, 0]
+
+            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 94, 94), device=args.device)
             for k in range(y.shape[0]):
                 cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
                 cond[0, :, :, :] = y[k, :, :, :]
                 cond = cond.repeat(args.num_z, 1, 1, 1)
                 temp = D(input=gens[k], y=cond)
-                fake_pred[k] = temp[:, 0]
+                fake_pred[k, :, :, :] = temp[:, 0, :, :]
 
             avg_recon = torch.mean(gens, dim=1)
 
