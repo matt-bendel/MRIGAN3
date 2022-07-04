@@ -306,19 +306,21 @@ def train(args):
                     losses['ssim'].append(ssim(gt_np, avg_gen_np))
                     losses['psnr'].append(psnr(gt_np, avg_gen_np))
 
-                    if i == 0 and j == 2:
+                    ind = 1
+
+                    if i == 0 and j == ind:
                         output = transforms.root_sum_of_squares(
-                            complex_abs(avg_gen[0] * std[0] + mean[0])).cpu().numpy()
+                            complex_abs(avg_gen[ind] * std[ind] + mean[ind])).cpu().numpy()
                         target = transforms.root_sum_of_squares(
-                            complex_abs(gt[0] * std[0] + mean[0])).cpu().numpy()
+                            complex_abs(gt[ind] * std[ind] + mean[ind])).cpu().numpy()
 
                         gen_im_list = []
                         for z in range(8):
                             val_rss = torch.zeros(8, 384, 384, 2).to(args.device)
-                            val_rss[:, :, :, 0] = gens[0, z, 0:8, :, :]
-                            val_rss[:, :, :, 1] = gens[0, z, 8:16, :, :]
+                            val_rss[:, :, :, 0] = gens[ind, z, 0:8, :, :]
+                            val_rss[:, :, :, 1] = gens[ind, z, 8:16, :, :]
                             gen_im_list.append(transforms.root_sum_of_squares(
-                                complex_abs(val_rss * std[0] + mean[0])).cpu().numpy())
+                                complex_abs(val_rss * std[ind] + mean[ind])).cpu().numpy())
 
                         std_dev = np.zeros(output.shape)
                         for val in gen_im_list:
