@@ -17,6 +17,7 @@ from data_loaders.prepare_data import create_data_loaders
 from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from mail import send_mail
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
@@ -167,12 +168,12 @@ def gif_im(true, gen_im, index, type, disc_num=False):
 
 def generate_gif(type):
     images = []
-    for i in range(8):
+    for i in range(16):
         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif{1 if args.stylegan else 2}.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
-    for i in range(8):
+    for i in range(16):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
 
@@ -366,6 +367,8 @@ def train(args):
         print(save_str)
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
+
+        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
