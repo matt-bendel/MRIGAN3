@@ -15,7 +15,7 @@ from utils.math import tensor_to_complex_np
 from utils.fftc import ifft2c_new, fft2c_new
 from data import transforms
 from utils.math import complex_abs
-
+from mail import send_mail
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -346,5 +346,12 @@ def get_metrics(args):
     print(f'SNR: {np.mean(means["snr"]):.2f} \\pm {np.std(means["snr"]) / np.sqrt(folds):.2f}')
     print(f'SSIM: {np.mean(means["ssim"]):.4f} \\pm {np.std(means["ssim"]) / np.sqrt(folds):.4f}')
     print(f'APSD: {np.mean(losses["apsd"]):} \\pm {np.std(losses["apsd"]) / np.sqrt(folds):}')
+
+    PSNR_STRING = f'PSNR: {np.mean(means["psnr"]):.2f} \\pm {np.std(means["psnr"]) / np.sqrt(folds):.2f}\n'
+    SNR_STRING = f'SNR: {np.mean(means["snr"]):.2f} \\pm {np.std(means["snr"]) / np.sqrt(folds):.2f}\n'
+    SSIM_STRING = f'SSIM: {np.mean(means["ssim"]):.4f} \\pm {np.std(means["ssim"]) / np.sqrt(folds):.4f}\n'
+    APSD_STRING = f'APSD: {np.mean(losses["apsd"]):} \\pm {np.std(losses["apsd"]) / np.sqrt(folds):}\n'
+
+    send_mail("TEST RESULTS", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
 
     # compute_cfid.get_cfid(args, G)
