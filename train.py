@@ -290,11 +290,11 @@ def train(args):
 
                 avg = torch.mean(gens, dim=1)
 
-                avg_gen = torch.zeros(size=(y.size(0), 16, 384, 384, 2), device=args.device)
+                avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
                 avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
                 avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-                gt = torch.zeros(size=(y.size(0), 16, 384, 384, 2), device=args.device)
+                gt = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
                 gt[:, :, :, :, 0] = x[:, 0:8, :, :]
                 gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
@@ -316,7 +316,7 @@ def train(args):
 
                         gen_im_list = []
                         for z in range(16):
-                            val_rss = torch.zeros(16, 384, 384, 2).to(args.device)
+                            val_rss = torch.zeros(8, 384, 384, 2).to(args.device)
                             val_rss[:, :, :, 0] = gens[ind, z, 0:8, :, :]
                             val_rss[:, :, :, 1] = gens[ind, z, 8:16, :, :]
                             gen_im_list.append(transforms.root_sum_of_squares(
