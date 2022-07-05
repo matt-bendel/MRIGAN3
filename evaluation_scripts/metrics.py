@@ -352,6 +352,6 @@ def get_metrics(args):
     SSIM_STRING = f'SSIM: {np.mean(means["ssim"]):.4f} \\pm {np.std(means["ssim"]) / np.sqrt(folds):.4f}\n'
     APSD_STRING = f'APSD: {np.mean(losses["apsd"]):} \\pm {np.std(losses["apsd"]) / np.sqrt(folds):}\n'
 
-    send_mail("TEST RESULTS", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
+    send_mail(f"TEST RESULTS - {num_code} code vectors", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
 
     # compute_cfid.get_cfid(args, G)
