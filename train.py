@@ -168,12 +168,12 @@ def gif_im(true, gen_im, index, type, disc_num=False):
 
 def generate_gif(type):
     images = []
-    for i in range(8):
+    for i in range(16):
         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
-    for i in range(8):
+    for i in range(16):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
 
@@ -250,7 +250,7 @@ def train(args):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             std_weight = 1.3 * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-4
+            adv_weight = 5e-4
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
@@ -284,9 +284,9 @@ def train(args):
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 384, 384),
+                gens = torch.zeros(size=(y.size(0), 16, args.in_chans, 384, 384),
                                    device=args.device)
-                for z in range(8):
+                for z in range(16):
                     gens[:, z, :, :, :] = G(y, y_true, noise_var=1)
 
                 avg = torch.mean(gens, dim=1)
@@ -316,7 +316,7 @@ def train(args):
                             complex_abs(gt[ind] * std[ind] + mean[ind])).cpu().numpy()
 
                         gen_im_list = []
-                        for z in range(8):
+                        for z in range(16):
                             val_rss = torch.zeros(8, 384, 384, 2).to(args.device)
                             val_rss[:, :, :, 0] = gens[ind, z, 0:8, :, :]
                             val_rss[:, :, :, 1] = gens[ind, z, 8:16, :, :]
@@ -327,7 +327,7 @@ def train(args):
                         for val in gen_im_list:
                             std_dev = std_dev + np.power((val - output), 2)
 
-                        std_dev = std_dev / 8
+                        std_dev = std_dev / 16
                         std_dev = np.sqrt(std_dev)
 
                         place = 1
@@ -391,9 +391,4 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    try:
-        train(args)
-    except KeyboardInterrupt:
-        exit()
-    except Exception as e:
-        send_mail("PROGRAM CRASH", e)
+    train(args)

@@ -145,7 +145,7 @@ class GeneratorModel(nn.Module):
             ResidualBlock(ch),
             ResidualBlock(ch),
             ResidualBlock(ch),
-            # ResidualBlock(ch),
+            ResidualBlock(ch),
             # ResidualBlock(ch),
             # ResidualBlock(ch),
             # ResidualBlock(ch),
