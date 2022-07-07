@@ -263,6 +263,7 @@ def get_metrics(args):
 
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
+
             for z in range(num_code):
                 gens[:, z, :, :, :] = G(y, y_true)
 
