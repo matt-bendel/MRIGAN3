@@ -11,6 +11,7 @@ from wrappers.our_gen_wrapper import load_best_gan
 from data_loaders.prepare_data import create_data_loaders
 from data_loaders.prepare_data_ls import create_data_loaders_ls
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from sklearn.decomposition import PCA
 from utils.math import tensor_to_complex_np
 from utils.fftc import ifft2c_new, fft2c_new
 from data import transforms
@@ -252,7 +253,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 4
+    num_code = 128
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -300,10 +301,25 @@ def get_metrics(args):
                 losses['ssim'].append(ssim(gt_np, avg_gen_np))
                 losses['psnr'].append(psnr(gt_np, avg_gen_np))
                 losses['snr'].append(snr(gt_np, avg_gen_np))
-                for k in range(num_code):
-                    gen_np = transforms.root_sum_of_squares(
-                        complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                    losses['mse'].append(mse(gt_np, gen_np))
+                # for k in range(num_code):
+                #     gen_np = transforms.root_sum_of_squares(
+                #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+                #     losses['mse'].append(mse(gt_np, gen_np))
+
+                if i == 0 and j == 2:
+                    errors = np.zeros(num_code, 384 * 384)
+                    for k in range(num_code):
+                        gen_np = transforms.root_sum_of_squares(
+                            complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+                        errors[k, :] = np.abs(gt_np - gen_np).flatten()
+
+                    pca = PCA()
+                    pca_data = pca.fit_transform(errors)
+
+                    print(pca_data.shape)
+
+                    # DO SOMETHING WITH PCA DATA
+
 
                 # fig, ax1 = plt.subplots(1, 1)
                 # fig.suptitle(f'MSE Histogram for {num_code} samples')
