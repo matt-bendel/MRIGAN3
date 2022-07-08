@@ -6,6 +6,7 @@ import numpy as np
 
 from utils.parse_args import create_arg_parser
 from evaluation_scripts.metrics import get_metrics
+from mail import send_mail
 # from evaluation_scripts.single_plot import get_single_plot
 
 # TODO: IMPLEMENT ALL EVAL LOGIC
@@ -28,4 +29,10 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    get_metrics(args)
+    try:
+        get_metrics(args)
+    except KeyboardInterrupt:
+        exit()
+    except Exception as e:
+        send_mail("TESTING FAILED", "See terminal for falure cause.")
+
