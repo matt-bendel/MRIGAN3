@@ -189,7 +189,7 @@ def train(args):
 
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
-    exit()
+    # exit()
 
     for epoch in range(start_epoch, args.num_epochs):
         batch_loss = {
