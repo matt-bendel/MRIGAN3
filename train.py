@@ -353,7 +353,7 @@ def train(args):
 
                         fig.colorbar(im, cax=cbar_ax)
 
-                        plt.savefig(f'std_dev_gen_{1 if args.stylegan else 2}.png')
+                        plt.savefig(f'std_dev_gen.png')
                         plt.close()
 
         psnr_loss = np.mean(losses['psnr'])
