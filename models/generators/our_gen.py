@@ -173,14 +173,14 @@ class GeneratorModel(nn.Module):
             nn.Conv2d(256, 1024, kernel_size=(3, 3), padding=1),
             nn.LeakyReLU(negative_slope=0.2),
         )
-        # self.middle_z_grow_linear = nn.Sequential(
-        #     nn.Linear(latent_size, latent_size // 4 * 6 * 6),
-        #     nn.LeakyReLU(negative_slope=0.2),
-        #     nn.Linear(latent_size // 4 * 6 * 6, latent_size // 4 * 12 * 12),
-        #     nn.LeakyReLU(negative_slope=0.2),
-        #     nn.Linear(latent_size // 4 * 12 * 12, latent_size // 4 * 24 * 24),
-        #     nn.LeakyReLU(negative_slope=0.2),
-        # )
+        self.middle_z_grow_linear = nn.Sequential(
+            nn.Linear(1024, 128 * 6 * 6),
+            nn.LeakyReLU(negative_slope=0.2),
+            nn.Linear(128 * 6 * 6, 128 * 12 * 12),
+            nn.LeakyReLU(negative_slope=0.2),
+            nn.Linear(128 * 12 * 12, 128 * 24 * 24),
+            nn.LeakyReLU(negative_slope=0.2),
+        )
 
         self.up_sample_layers = nn.ModuleList()
         for i in range(num_pool_layers - 1):
@@ -214,7 +214,7 @@ class GeneratorModel(nn.Module):
 
         output = self.res_layer_1(output)
         z_out = self.middle_z_grow_linear(mid_z)
-        z_out = torch.reshape(z_out, (output.shape[0], self.latent_size // 4, 24, 24))
+        z_out = torch.reshape(z_out, (output.shape[0], 128, 24, 24))
         z_out = self.middle_z_grow_conv(z_out)
         output = self.conv(torch.cat([output, z_out], dim=1))
         # output = self.res_layer(output)
