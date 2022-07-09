@@ -253,7 +253,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 8
+    num_code = 128
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -317,6 +317,9 @@ def get_metrics(args):
                     pca_data = pca.fit_transform(errors)
 
                     print(pca_data.shape)
+
+
+                    exit()
 
                     # DO SOMETHING WITH PCA DATA
 

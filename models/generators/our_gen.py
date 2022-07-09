@@ -121,7 +121,7 @@ class GeneratorModel(nn.Module):
 
         self.in_chans = in_chans
         self.out_chans = out_chans
-        self.chans = 64
+        self.chans = 128
         self.num_pool_layers = 4
         self.latent_size = latent_size
 
@@ -159,7 +159,7 @@ class GeneratorModel(nn.Module):
         )
 
         self.conv = nn.Sequential(
-            nn.Conv2d(ch, ch, kernel_size=3, padding=1),
+            nn.Conv2d(ch*2, ch, kernel_size=3, padding=1),
             nn.InstanceNorm2d(ch),
             nn.PReLU(),
             # nn.Conv2d(ch, ch, kernel_size=3, padding=1),
@@ -182,7 +182,7 @@ class GeneratorModel(nn.Module):
             nn.Conv2d(ch // 2, out_chans, kernel_size=1),
         )
 
-    def forward(self, input):
+    def forward(self, input, mid_z=None):
         """
         Args:
             input (torch.Tensor): Input tensor of shape [batch_size, self.in_chans, height, width]
@@ -198,7 +198,7 @@ class GeneratorModel(nn.Module):
             stack.append(skip_out)
 
         output = self.res_layer_1(output)
-        output = self.conv(output)
+        output = self.conv(torch.cat([output, mid_z], dim=1))
         # output = self.res_layer(output)
 
         # Apply up-sampling layers
