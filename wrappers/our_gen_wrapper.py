@@ -106,7 +106,7 @@ class GANWrapper:
 
     def get_noise(self, num_vectors, var):
         # return torch.cuda.FloatTensor(np.random.normal(size=(num_vectors, self.args.latent_size), scale=1))
-        return torch.empty((num_vectors, 2, self.resolution, self.resolution)).normal_(mean=0, std=np.sqrt(var)).cuda()
+        return torch.randn(num_vectors, 2, self.resolution, self.resolution).cuda()
 
     def update_gen_status(self, val):
         self.gen.eval() if val else self.gen.train()
@@ -138,9 +138,10 @@ class GANWrapper:
     def __call__(self, y, true_measures, noise_var=1):
         num_vectors = y.size(0)
         if not self.args.stylegan:
-            z = self.get_noise(num_vectors, 1)
-            z_2 = torch.empty((num_vectors, 1024, 24, 24)).normal_(mean=0, std=np.sqrt(1)).cuda()
-            samples = self.gen(torch.cat([y, z], dim=1), mid_z=z_2)
+            # z = self.get_noise(num_vectors, 1)
+            z_2 = torch.randn(num_vectors, 1024).cuda()
+            # samples = self.gen(torch.cat([y, z], dim=1), mid_z=z_2)
+            samples = self.gen(y, mid_z=z_2)
         else:
             samples = self.gen(y)
         samples = self.readd_measures(samples, true_measures)

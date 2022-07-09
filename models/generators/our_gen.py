@@ -108,7 +108,7 @@ class ConvUpBlock(nn.Module):
 
 
 class GeneratorModel(nn.Module):
-    def __init__(self, in_chans, out_chans, z_location=None, latent_size=None):
+    def __init__(self, in_chans, out_chans, z_location=None, latent_size=1024):
         """
         Args:
             in_chans (int): Number of channels in the input to the U-Net model.
@@ -167,6 +167,21 @@ class GeneratorModel(nn.Module):
             # nn.PReLU()
         )
 
+        self.middle_z_grow_conv = nn.Sequential(
+            nn.Conv2d(latent_size // 4, latent_size // 2, kernel_size=(3, 3), padding=1),
+            nn.LeakyReLU(negative_slope=0.2),
+            nn.Conv2d(latent_size // 2, latent_size, kernel_size=(3, 3), padding=1),
+            nn.LeakyReLU(negative_slope=0.2),
+        )
+        self.middle_z_grow_linear = nn.Sequential(
+            nn.Linear(latent_size, latent_size // 4 * 6 * 6),
+            nn.LeakyReLU(negative_slope=0.2),
+            nn.Linear(latent_size // 4 * 6 * 6, latent_size // 4 * 12 * 12),
+            nn.LeakyReLU(negative_slope=0.2),
+            nn.Linear(latent_size // 4 * 12 * 12, latent_size // 4 * 24 * 24),
+            nn.LeakyReLU(negative_slope=0.2),
+        )
+
         self.up_sample_layers = nn.ModuleList()
         for i in range(num_pool_layers - 1):
             # if i > 0:
@@ -198,7 +213,10 @@ class GeneratorModel(nn.Module):
             stack.append(skip_out)
 
         output = self.res_layer_1(output)
-        output = self.conv(torch.cat([output, mid_z], dim=1))
+        z_out = self.middle_z_grow_linear(mid_z)
+        z_out = torch.reshape(z_out, (output.shape[0], self.latent_size // 4, 24, 24))
+        z_out = self.middle_z_grow_conv(z_out)
+        output = self.conv(torch.cat([output, z_out], dim=1))
         # output = self.res_layer(output)
 
         # Apply up-sampling layers
