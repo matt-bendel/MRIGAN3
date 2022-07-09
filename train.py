@@ -187,6 +187,8 @@ def train(args):
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
+    exit()
+
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
     for epoch in range(start_epoch, args.num_epochs):
