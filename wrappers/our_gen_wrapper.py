@@ -138,8 +138,8 @@ class GANWrapper:
     def __call__(self, y, true_measures, noise_var=1):
         num_vectors = y.size(0)
         if not self.args.stylegan:
-            z = self.get_noise(num_vectors, 1e-1)
-            z_2 = torch.empty((num_vectors, 1024, 24, 24)).normal_(mean=0, std=np.sqrt(1e-2)).cuda()
+            z = self.get_noise(num_vectors, 1)
+            z_2 = torch.empty((num_vectors, 1024, 24, 24)).normal_(mean=0, std=np.sqrt(1)).cuda()
             samples = self.gen(torch.cat([y, z], dim=1), mid_z=z_2)
         else:
             samples = self.gen(y)
