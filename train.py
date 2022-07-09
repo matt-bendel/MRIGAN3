@@ -168,12 +168,12 @@ def gif_im(true, gen_im, index, type, disc_num=False):
 
 def generate_gif(type):
     images = []
-    for i in range(16):
+    for i in range(8):
         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
-    for i in range(16):
+    for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
 
