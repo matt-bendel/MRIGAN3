@@ -139,7 +139,7 @@ class GANWrapper:
         num_vectors = y.size(0)
         if not self.args.stylegan:
             # z = self.get_noise(num_vectors, 1)
-            z_2 = torch.randn(num_vectors, 1024).cuda()
+            z_2 = np.sqrt(1e-1) * torch.randn(num_vectors, 1024).cuda()
             # samples = self.gen(torch.cat([y, z], dim=1), mid_z=z_2)
             samples = self.gen(y, mid_z=z_2)
         else:
