@@ -35,5 +35,5 @@ if __name__ == '__main__':
         exit()
     except Exception as e:
         print(e)
-        send_mail("TESTING FAILED", "See terminal for falure cause.")
+        # send_mail("TESTING FAILED", "See terminal for falure cause.")
 
