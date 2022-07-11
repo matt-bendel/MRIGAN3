@@ -314,10 +314,12 @@ def get_metrics(args):
                         errors[k, :] = np.abs(gt_np - gen_np).flatten()
 
                     errors = errors - np.mean(errors, axis=0)
-                    print(np.mean(errors, axis=0))
 
-                    U, S, Vh = np.linalg.svd(errors)
+                    print(f"RANK: {np.linalg.matrick_rank(errors)}")
+                    print("GETTING SVD")
+                    U, S, Vh = np.linalg.svd(errors, full_matrices=False)
 
+                    print("GOT SVD")
                     lamda = 1 / num_code * np.matmul(S.transpose(), S)
 
                     lamda_flat = np.diag(lamda)
