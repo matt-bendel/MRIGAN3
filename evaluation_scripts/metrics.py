@@ -313,15 +313,30 @@ def get_metrics(args):
                             complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                         errors[k, :] = np.abs(gt_np - gen_np).flatten()
 
-                    pca = PCA()
-                    pca_data = pca.fit_transform(errors)
+                    errors = errors - np.mean(errors, axis=0)
+                    print(np.mean(errors, axis=0))
 
-                    print(pca_data.shape)
+                    U, S, Vh = np.linalg.svd(errors)
+
+                    lamda = 1 / num_code * np.matmul(S.transpose(), S)
+
+                    lamda_flat = np.diag(lamda)
+                    plt.plot(np.arange(1, 129, 1), lamda_flat)
+                    plt.title("Eigenvalues for 128 samples")
+                    plt.savefig("eigenvalues_pca.png")
+                    plt.close()
+
+                    largest_eig_inds = lamda_flat.argsort()[-5:]
+
+                    for k in range(len(largest_eig_inds)):
+                        lamda_val = lamda_flat[largest_eig_inds[k]]
+                        eigenvector_val = Vh.transpose()[largest_eig_inds[k], :].reshape((384, 384))
+                        plt.imshow(eigenvector_val, cmap="jet")
+                        plt.title(f"Eigenvector for Eigenvalue: {lamda_val:.2f}")
+                        plt.savefig(f"eigenvector_{k}.png")
 
 
                     exit()
-
-                    # DO SOMETHING WITH PCA DATA
 
 
                 # fig, ax1 = plt.subplots(1, 1)
