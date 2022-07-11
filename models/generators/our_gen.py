@@ -212,11 +212,11 @@ class GeneratorModel(nn.Module):
             stack.append(skip_out)
 
         output = self.res_layer_1(output)
-        # z_out = self.middle_z_grow_linear(mid_z)
-        # z_out = torch.reshape(z_out, (output.shape[0], 128, 24, 24))
-        # z_out = self.middle_z_grow_conv(z_out)
-        # output = self.conv(torch.cat([output, z_out], dim=1))
-        output = self.conv(output)
+        z_out = self.middle_z_grow_linear(mid_z)
+        z_out = torch.reshape(z_out, (output.shape[0], 128, 24, 24))
+        z_out = self.middle_z_grow_conv(z_out)
+        output = self.conv(torch.cat([output, z_out], dim=1))
+        # output = self.conv(output)
         # output = self.res_layer(output)
 
         # Apply up-sampling layers
