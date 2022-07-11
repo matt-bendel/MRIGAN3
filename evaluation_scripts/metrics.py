@@ -319,13 +319,14 @@ def get_metrics(args):
                     print("GETTING SVD")
                     U, S, Vh = np.linalg.svd(errors, full_matrices=False)
 
+                    print(S.shape)
                     print("GOT SVD")
                     lamda = 1 / num_code * np.matmul(S.transpose(), S)
 
                     print(lamda.shape)
 
                     lamda_flat = np.diag(lamda)
-                    plt.plot(np.arange(1, 129, 1), lamda_flat)
+                    plt.plot(np.arange(1, len(lamda_flat), 1), lamda_flat)
                     plt.title("Eigenvalues for 128 samples")
                     plt.savefig("eigenvalues_pca.png")
                     plt.close()
