@@ -29,11 +29,11 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    try:
-        get_metrics(args)
-    except KeyboardInterrupt:
-        exit()
-    except Exception as e:
-        print(e)
+    # try:
+    get_metrics(args)
+    # except KeyboardInterrupt:
+    #     exit()
+    # except Exception as e:
+    #     print(e)
         # send_mail("TESTING FAILED", "See terminal for falure cause.")
 
