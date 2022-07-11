@@ -315,7 +315,7 @@ def get_metrics(args):
 
                     errors = errors - np.mean(errors, axis=0)
 
-                    print(f"RANK: {np.linalg.matrick_rank(errors)}")
+                    print(f"RANK: {np.linalg.matrix_rank(errors)}")
                     print("GETTING SVD")
                     U, S, Vh = np.linalg.svd(errors, full_matrices=False)
 
