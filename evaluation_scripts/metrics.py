@@ -311,33 +311,36 @@ def get_metrics(args):
 
                 if i == 0 and j == 2:
                     print("IN PCA")
-                    errors = np.zeros((num_code, 384 * 384 * 8 * 2))
-                    for k in range(num_code):
-                        # gen_np = transforms.root_sum_of_squares(
-                        #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                        errors[k, :] = (gt[j].cpu().numpy() - new_gens[j, k].cpu().numpy()).flatten() #np.abs(gt_np - gen_np).flatten()
-
-                    print("GOT ERRORS")
-                    # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
-                    # plt.title(f"Mean Error Map")
-                    # plt.savefig(f"mean_error_map.png")
+                    torch.save(new_gens[j].cpu().numpy(), 'toy_sample.pt')
+                    unnormal_gt = gt[j] * std[j] + mean[j]
+                    torch.save(unnormal_gt, 'toy_gt.pt')
+                    # errors = np.zeros((num_code, 384 * 384 * 8 * 2))
+                    # for k in range(num_code):
+                    #     # gen_np = transforms.root_sum_of_squares(
+                    #     #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+                    #     errors[k, :] = (gt[j].cpu().numpy() - new_gens[j, k].cpu().numpy()).flatten() #np.abs(gt_np - gen_np).flatten()
+                    #
+                    # print("GOT ERRORS")
+                    # # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
+                    # # plt.title(f"Mean Error Map")
+                    # # plt.savefig(f"mean_error_map.png")
+                    # # plt.close()
+                    #
+                    # errors = errors - np.mean(errors, axis=0)
+                    #
+                    # # print(f"RANK: {np.linalg.matrix_rank(errors)}")
+                    # print("GETTING SVD")
+                    # U, S, Vh = np.linalg.svd(errors, full_matrices=False)
+                    #
+                    # print("GOT SVD")
+                    # lamda = 1 / num_code * S ** 2
+                    #
+                    # lamda_flat = lamda
+                    # print(np.sum(lamda))
+                    # plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
+                    # plt.title(f"Eigenvalues for {num_code} samples")
+                    # plt.savefig("eigenvalues_pca.png")
                     # plt.close()
-
-                    errors = errors - np.mean(errors, axis=0)
-
-                    # print(f"RANK: {np.linalg.matrix_rank(errors)}")
-                    print("GETTING SVD")
-                    U, S, Vh = np.linalg.svd(errors, full_matrices=False)
-
-                    print("GOT SVD")
-                    lamda = 1 / num_code * S ** 2
-
-                    lamda_flat = lamda
-                    print(np.sum(lamda))
-                    plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
-                    plt.title(f"Eigenvalues for {num_code} samples")
-                    plt.savefig("eigenvalues_pca.png")
-                    plt.close()
 
                     # for k in range(5):
                     #     lamda_val = lamda_flat[k]
