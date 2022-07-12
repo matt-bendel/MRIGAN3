@@ -311,7 +311,7 @@ def get_metrics(args):
                     for k in range(num_code):
                         # gen_np = transforms.root_sum_of_squares(
                         #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                        errors[k, :] = (gt[j] - new_gens[j, k]).cpu().numpy().flatten() #np.abs(gt_np - gen_np).flatten()
+                        errors[k, :] = (gt[j].cpu().numpy() - new_gens[j, k].cpu().numpy()).flatten() #np.abs(gt_np - gen_np).flatten()
 
                     # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
                     # plt.title(f"Mean Error Map")
