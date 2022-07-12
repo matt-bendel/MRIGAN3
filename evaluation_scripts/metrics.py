@@ -311,9 +311,9 @@ def get_metrics(args):
 
                 if i == 0 and j == 2:
                     print("IN PCA")
-                    torch.save(new_gens[j].cpu().numpy(), 'toy_sample.pt')
+                    torch.save(new_gens[j].cpu(), 'toy_sample.pt')
                     unnormal_gt = gt[j] * std[j] + mean[j]
-                    torch.save(unnormal_gt.cpu().numpy(), 'toy_gt.pt')
+                    torch.save(unnormal_gt.cpu(), 'toy_gt.pt')
                     # errors = np.zeros((num_code, 384 * 384 * 8 * 2))
                     # for k in range(num_code):
                     #     # gen_np = transforms.root_sum_of_squares(
