@@ -328,6 +328,7 @@ def get_metrics(args):
                     lamda = 1 / num_code * S ** 2
 
                     lamda_flat = lamda
+                    print(np.sum(lamda))
                     plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
                     plt.title("Eigenvalues for 128 samples")
                     plt.savefig("eigenvalues_pca.png")
