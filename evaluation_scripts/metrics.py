@@ -331,7 +331,7 @@ def get_metrics(args):
                 #     for k in range(5):
                 #         lamda_val = lamda_flat[k]
                 #         eigenvector_val = Vh[k, :].reshape((384, 384))
-                #         plt.imshow(eigenvector_val, cmap="jet")
+                #         plt.imshow(eigenvector_val, cmap="viridis")
                 #         plt.colorbar()
                 #         plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
                 #         plt.savefig(f"eigenvector_{k}.png")
