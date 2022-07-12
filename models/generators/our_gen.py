@@ -158,17 +158,17 @@ class GeneratorModel(nn.Module):
             # ResidualBlock(ch),
         )
 
-        self.conv = nn.Sequential(
-            nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            nn.InstanceNorm2d(ch),
-            nn.PReLU(),
-        )
-
         # self.conv = nn.Sequential(
-        #     nn.Conv2d(ch*2, ch, kernel_size=3, padding=1),
+        #     nn.Conv2d(ch, ch, kernel_size=3, padding=1),
         #     nn.InstanceNorm2d(ch),
         #     nn.PReLU(),
         # )
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(ch*2, ch, kernel_size=3, padding=1),
+            nn.InstanceNorm2d(ch),
+            nn.PReLU(),
+        )
 
         # self.middle_z_grow_conv = nn.Sequential(
         #     nn.Conv2d(128, 256, kernel_size=(3, 3), padding=1),
