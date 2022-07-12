@@ -158,28 +158,28 @@ class GeneratorModel(nn.Module):
             # ResidualBlock(ch),
         )
 
-        # self.conv = nn.Sequential(
-        #     nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-        #     nn.InstanceNorm2d(ch),
-        #     nn.PReLU(),
-        # )
-
         self.conv = nn.Sequential(
-            nn.Conv2d(ch*2, ch, kernel_size=3, padding=1),
+            nn.Conv2d(ch, ch, kernel_size=3, padding=1),
             nn.InstanceNorm2d(ch),
             nn.PReLU(),
         )
-
-        self.middle_z_grow_conv = nn.Sequential(
-            nn.Conv2d(128, 256, kernel_size=(3, 3), padding=1),
-            nn.LeakyReLU(negative_slope=0.2),
-            nn.Conv2d(256, 1024, kernel_size=(3, 3), padding=1),
-            nn.LeakyReLU(negative_slope=0.2),
-        )
-        self.middle_z_grow_linear = nn.Sequential(
-            nn.Linear(512, 128 * 24 * 24),
-            nn.LeakyReLU(negative_slope=0.2),
-        )
+        #
+        # self.conv = nn.Sequential(
+        #     nn.Conv2d(ch*2, ch, kernel_size=3, padding=1),
+        #     nn.InstanceNorm2d(ch),
+        #     nn.PReLU(),
+        # )
+        #
+        # self.middle_z_grow_conv = nn.Sequential(
+        #     nn.Conv2d(128, 256, kernel_size=(3, 3), padding=1),
+        #     nn.LeakyReLU(negative_slope=0.2),
+        #     nn.Conv2d(256, 1024, kernel_size=(3, 3), padding=1),
+        #     nn.LeakyReLU(negative_slope=0.2),
+        # )
+        # self.middle_z_grow_linear = nn.Sequential(
+        #     nn.Linear(512, 128 * 24 * 24),
+        #     nn.LeakyReLU(negative_slope=0.2),
+        # )
 
         self.up_sample_layers = nn.ModuleList()
         for i in range(num_pool_layers - 1):
