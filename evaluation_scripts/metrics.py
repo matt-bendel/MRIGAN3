@@ -298,7 +298,7 @@ def get_metrics(args):
                     np_gens[z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[j, z, :, :, :, :])).cpu().numpy()
                 # avg_gen_np = transforms.root_sum_of_squares(
                 #     complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
-                avg_gen_np = np.mean(np_gens[j], axis=0)
+                avg_gen_np = np.mean(np_gens, axis=0)
                 gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
 
                 losses['ssim'].append(ssim(gt_np, avg_gen_np))
