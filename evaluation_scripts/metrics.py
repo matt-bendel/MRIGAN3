@@ -283,7 +283,7 @@ def get_metrics(args):
             new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
             new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            np_gens = np.zeros(y.size(0), num_code, 384, 384)
+            np_gens = np.zeros((y.size(0), num_code, 384, 384))
             for z in range(num_code):
                 np_gens[:, z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[:, z, :, :, :, :])).cpu().numpy()
 
@@ -327,7 +327,7 @@ def get_metrics(args):
 
                     errors = errors - np.mean(errors, axis=0)
 
-                    print(f"RANK: {np.linalg.matrix_rank(errors)}")
+                    # print(f"RANK: {np.linalg.matrix_rank(errors)}")
                     print("GETTING SVD")
                     U, S, Vh = np.linalg.svd(errors, full_matrices=False)
 
@@ -341,14 +341,14 @@ def get_metrics(args):
                     plt.savefig("eigenvalues_pca.png")
                     plt.close()
 
-                    for k in range(5):
-                        lamda_val = lamda_flat[k]
-                        eigenvector_val = Vh[k, :].reshape((384, 384))
-                        plt.imshow(eigenvector_val, cmap="viridis")
-                        plt.colorbar()
-                        plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
-                        plt.savefig(f"eigenvector_{k}.png")
-                        plt.close()
+                    # for k in range(5):
+                    #     lamda_val = lamda_flat[k]
+                    #     eigenvector_val = Vh[k, :].reshape((384, 384))
+                    #     plt.imshow(eigenvector_val, cmap="viridis")
+                    #     plt.colorbar()
+                    #     plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
+                    #     plt.savefig(f"eigenvector_{k}.png")
+                    #     plt.close()
 
 
                     exit()
