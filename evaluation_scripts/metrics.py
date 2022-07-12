@@ -307,7 +307,7 @@ def get_metrics(args):
                 #     losses['mse'].append(mse(gt_np, gen_np))
 
                 if i == 0 and j == 2:
-                    errors = np.zeros((num_code, 384 * 384))
+                    errors = np.zeros((num_code, 384 * 384 * 8 * 2))
                     for k in range(num_code):
                         # gen_np = transforms.root_sum_of_squares(
                         #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
