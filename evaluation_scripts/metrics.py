@@ -309,14 +309,14 @@ def get_metrics(args):
                 if i == 0 and j == 2:
                     errors = np.zeros((num_code, 384 * 384))
                     for k in range(num_code):
-                        gen_np = transforms.root_sum_of_squares(
-                            complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                        errors[k, :] = np.abs(gt_np - gen_np).flatten()
+                        # gen_np = transforms.root_sum_of_squares(
+                        #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+                        errors[k, :] = (gt[j] - new_gens[j, k]).cpu().numpy().flatten() #np.abs(gt_np - gen_np).flatten()
 
-                    plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
-                    plt.title(f"Mean Error Map")
-                    plt.savefig(f"mean_error_map.png")
-                    plt.close()
+                    # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
+                    # plt.title(f"Mean Error Map")
+                    # plt.savefig(f"mean_error_map.png")
+                    # plt.close()
 
                     errors = errors - np.mean(errors, axis=0)
 
@@ -334,14 +334,14 @@ def get_metrics(args):
                     plt.savefig("eigenvalues_pca.png")
                     plt.close()
 
-                    for k in range(5):
-                        lamda_val = lamda_flat[k]
-                        eigenvector_val = Vh[k, :].reshape((384, 384))
-                        plt.imshow(eigenvector_val, cmap="viridis")
-                        plt.colorbar()
-                        plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
-                        plt.savefig(f"eigenvector_{k}.png")
-                        plt.close()
+                    # for k in range(5):
+                    #     lamda_val = lamda_flat[k]
+                    #     eigenvector_val = Vh[k, :].reshape((384, 384))
+                    #     plt.imshow(eigenvector_val, cmap="viridis")
+                    #     plt.colorbar()
+                    #     plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
+                    #     plt.savefig(f"eigenvector_{k}.png")
+                    #     plt.close()
 
 
                     exit()
