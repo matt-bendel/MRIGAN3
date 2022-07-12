@@ -283,7 +283,7 @@ def get_metrics(args):
             new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
             new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            # np_gens = np.zeros((y.size(0), num_code, 384, 384))
+            np_gens = np.zeros((y.size(0), num_code, 384, 384))
             # for z in range(num_code):
             #     np_gens[:, z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[:, z, :, :, :, :])).cpu().numpy()
 
