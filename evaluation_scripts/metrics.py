@@ -253,7 +253,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 128
+    num_code = 32
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -283,9 +283,13 @@ def get_metrics(args):
             new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
             new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
-            avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
-            avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
+            np_gens = np.zeros(y.size(0), num_code, 384, 384)
+            for z in range(num_code):
+                np_gens[:, z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[:, z, :, :, :, :])).cpu().numpy()
+
+            # avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+            # avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
+            # avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
             gt = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
             gt[:, :, :, :, 0] = x[:, 0:8, :, :]
@@ -294,8 +298,9 @@ def get_metrics(args):
             for j in range(y.size(0)):
                 count += 1
 
-                avg_gen_np = transforms.root_sum_of_squares(
-                    complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
+                # avg_gen_np = transforms.root_sum_of_squares(
+                #     complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
+                avg_gen_np = np.mean(np_gens[j], axis=0)
                 gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
 
                 losses['ssim'].append(ssim(gt_np, avg_gen_np))
@@ -306,33 +311,35 @@ def get_metrics(args):
                 #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                 #     losses['mse'].append(mse(gt_np, gen_np))
 
-                if i == 0 and j == 2:
-                    errors = np.zeros((num_code, 384 * 384 * 8 * 2))
-                    for k in range(num_code):
-                        # gen_np = transforms.root_sum_of_squares(
-                        #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                        errors[k, :] = (gt[j].cpu().numpy() - new_gens[j, k].cpu().numpy()).flatten() #np.abs(gt_np - gen_np).flatten()
-
-                    # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
-                    # plt.title(f"Mean Error Map")
-                    # plt.savefig(f"mean_error_map.png")
-                    # plt.close()
-
-                    errors = errors - np.mean(errors, axis=0)
-
-                    print(f"RANK: {np.linalg.matrix_rank(errors)}")
-                    print("GETTING SVD")
-                    U, S, Vh = np.linalg.svd(errors, full_matrices=False)
-
-                    print("GOT SVD")
-                    lamda = 1 / num_code * S ** 2
-
-                    lamda_flat = lamda
-                    print(np.sum(lamda))
-                    plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
-                    plt.title("Eigenvalues for 128 samples")
-                    plt.savefig("eigenvalues_pca.png")
-                    plt.close()
+                # if i == 0 and j == 2:
+                #     print("IN PCA")
+                #     errors = np.zeros((num_code, 384 * 384 * 8 * 2))
+                #     for k in range(num_code):
+                #         # gen_np = transforms.root_sum_of_squares(
+                #         #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+                #         errors[k, :] = (gt[j].cpu().numpy() - new_gens[j, k].cpu().numpy()).flatten() #np.abs(gt_np - gen_np).flatten()
+                #
+                #     print("GOT ERRORS")
+                #     # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
+                #     # plt.title(f"Mean Error Map")
+                #     # plt.savefig(f"mean_error_map.png")
+                #     # plt.close()
+                #
+                #     errors = errors - np.mean(errors, axis=0)
+                #
+                #     print(f"RANK: {np.linalg.matrix_rank(errors)}")
+                #     print("GETTING SVD")
+                #     U, S, Vh = np.linalg.svd(errors, full_matrices=False)
+                #
+                #     print("GOT SVD")
+                #     lamda = 1 / num_code * S ** 2
+                #
+                #     lamda_flat = lamda
+                #     print(np.sum(lamda))
+                #     plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
+                #     plt.title("Eigenvalues for 128 samples")
+                #     plt.savefig("eigenvalues_pca.png")
+                #     plt.close()
 
                     # for k in range(5):
                     #     lamda_val = lamda_flat[k]
@@ -344,7 +351,7 @@ def get_metrics(args):
                     #     plt.close()
 
 
-                    exit()
+                    # exit()
 
 
                 # fig, ax1 = plt.subplots(1, 1)
