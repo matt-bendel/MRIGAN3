@@ -313,7 +313,7 @@ def get_metrics(args):
                             complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                         errors[k, :] = np.abs(gt_np - gen_np).flatten()
 
-                    plt.imshow(np.mean(errors, axis=0))
+                    plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
                     plt.title(f"Mean Error Map")
                     plt.savefig(f"mean_error_map.png")
                     plt.close()
