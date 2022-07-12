@@ -253,7 +253,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 128
+    num_code = 8
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -291,54 +291,54 @@ def get_metrics(args):
             gt[:, :, :, :, 0] = x[:, 0:8, :, :]
             gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
-            for j in range(y.size(0)):
-                count += 1
-
-                avg_gen_np = transforms.root_sum_of_squares(
-                    complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
-                gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
-
-                losses['ssim'].append(ssim(gt_np, avg_gen_np))
-                losses['psnr'].append(psnr(gt_np, avg_gen_np))
-                losses['snr'].append(snr(gt_np, avg_gen_np))
-                # for k in range(num_code):
-                #     gen_np = transforms.root_sum_of_squares(
-                #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                #     losses['mse'].append(mse(gt_np, gen_np))
-
-                if i == 0 and j == 2:
-                    errors = np.zeros((num_code, 384 * 384))
-                    for k in range(num_code):
-                        gen_np = transforms.root_sum_of_squares(
-                            complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                        errors[k, :] = np.abs(gt_np - gen_np).flatten()
-
-                    errors = errors - np.mean(errors, axis=0)
-
-                    print(f"RANK: {np.linalg.matrix_rank(errors)}")
-                    print("GETTING SVD")
-                    U, S, Vh = np.linalg.svd(errors, full_matrices=False)
-
-                    print("GOT SVD")
-                    lamda = 1 / num_code * S ** 2
-
-                    lamda_flat = lamda
-                    plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
-                    plt.title("Eigenvalues for 128 samples")
-                    plt.savefig("eigenvalues_pca.png")
-                    plt.close()
-
-                    for k in range(5):
-                        lamda_val = lamda_flat[k]
-                        eigenvector_val = Vh[k, :].reshape((384, 384))
-                        plt.imshow(eigenvector_val, cmap="viridis")
-                        plt.colorbar()
-                        plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
-                        plt.savefig(f"eigenvector_{k}.png")
-                        plt.close()
-
-
-                    exit()
+            # for j in range(y.size(0)):
+            #     count += 1
+            #
+            #     avg_gen_np = transforms.root_sum_of_squares(
+            #         complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
+            #     gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
+            #
+            #     losses['ssim'].append(ssim(gt_np, avg_gen_np))
+            #     losses['psnr'].append(psnr(gt_np, avg_gen_np))
+            #     losses['snr'].append(snr(gt_np, avg_gen_np))
+            #     # for k in range(num_code):
+            #     #     gen_np = transforms.root_sum_of_squares(
+            #     #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+            #     #     losses['mse'].append(mse(gt_np, gen_np))
+            #
+            #     if i == 0 and j == 2:
+            #         errors = np.zeros((num_code, 384 * 384))
+            #         for k in range(num_code):
+            #             gen_np = transforms.root_sum_of_squares(
+            #                 complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
+            #             errors[k, :] = np.abs(gt_np - gen_np).flatten()
+            #
+            #         errors = errors - np.mean(errors, axis=0)
+            #
+            #         print(f"RANK: {np.linalg.matrix_rank(errors)}")
+            #         print("GETTING SVD")
+            #         U, S, Vh = np.linalg.svd(errors, full_matrices=False)
+            #
+            #         print("GOT SVD")
+            #         lamda = 1 / num_code * S ** 2
+            #
+            #         lamda_flat = lamda
+            #         plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
+            #         plt.title("Eigenvalues for 128 samples")
+            #         plt.savefig("eigenvalues_pca.png")
+            #         plt.close()
+            #
+            #         for k in range(5):
+            #             lamda_val = lamda_flat[k]
+            #             eigenvector_val = Vh[k, :].reshape((384, 384))
+            #             plt.imshow(eigenvector_val, cmap="viridis")
+            #             plt.colorbar()
+            #             plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
+            #             plt.savefig(f"eigenvector_{k}.png")
+            #             plt.close()
+            #
+            #
+            #         exit()
 
 
                 # fig, ax1 = plt.subplots(1, 1)
