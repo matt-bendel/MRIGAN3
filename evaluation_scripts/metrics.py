@@ -253,7 +253,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 128
+    num_code = 8
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -309,11 +309,11 @@ def get_metrics(args):
                 #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                 #     losses['mse'].append(mse(gt_np, gen_np))
 
-                if i == 0 and j == 2:
-                    print("IN PCA")
-                    torch.save(new_gens[j].cpu(), 'toy_sample.pt')
-                    unnormal_gt = gt[j] * std[j] + mean[j]
-                    torch.save(unnormal_gt.cpu(), 'toy_gt.pt')
+                # if i == 0 and j == 2:
+                #     print("IN PCA")
+                #     torch.save(new_gens[j].cpu(), 'toy_sample.pt')
+                #     unnormal_gt = gt[j] * std[j] + mean[j]
+                #     torch.save(unnormal_gt.cpu(), 'toy_gt.pt')
                     # errors = np.zeros((num_code, 384 * 384 * 8 * 2))
                     # for k in range(num_code):
                     #     # gen_np = transforms.root_sum_of_squares(
@@ -352,7 +352,7 @@ def get_metrics(args):
                     #     plt.close()
 
 
-                    exit()
+                    # exit()
 
 
                 # fig, ax1 = plt.subplots(1, 1)
