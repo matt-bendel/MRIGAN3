@@ -283,9 +283,9 @@ def get_metrics(args):
             new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
             new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            np_gens = np.zeros((y.size(0), num_code, 384, 384))
-            for z in range(num_code):
-                np_gens[:, z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[:, z, :, :, :, :])).cpu().numpy()
+            # np_gens = np.zeros((y.size(0), num_code, 384, 384))
+            # for z in range(num_code):
+            #     np_gens[:, z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[:, z, :, :, :, :])).cpu().numpy()
 
             # avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
             # avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
