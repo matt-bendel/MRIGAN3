@@ -268,7 +268,7 @@ def get_metrics(args):
             for z in range(num_code):
                 gens[:, z, :, :, :] = G(y, y_true)
 
-            avg = torch.mean(gens, dim=1)
+            # avg = torch.mean(gens, dim=1)
 
             temp_gens = torch.zeros(gens.shape, dtype=gens.dtype)
             for z in range(num_code):
@@ -283,10 +283,6 @@ def get_metrics(args):
             new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
             new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-            np_gens = np.zeros((y.size(0), num_code, 384, 384))
-            # for z in range(num_code):
-            #     np_gens[:, z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[:, z, :, :, :, :])).cpu().numpy()
-
             # avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
             # avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
             # avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
@@ -297,7 +293,9 @@ def get_metrics(args):
 
             for j in range(y.size(0)):
                 count += 1
-
+                np_gens = np.zeros((num_code, 384, 384))
+                for z in range(num_code):
+                    np_gens[z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[j, z, :, :, :, :])).cpu().numpy()
                 # avg_gen_np = transforms.root_sum_of_squares(
                 #     complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
                 avg_gen_np = np.mean(np_gens[j], axis=0)
@@ -337,7 +335,7 @@ def get_metrics(args):
                     lamda_flat = lamda
                     print(np.sum(lamda))
                     plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
-                    plt.title("Eigenvalues for 128 samples")
+                    plt.title(f"Eigenvalues for {num_code} samples")
                     plt.savefig("eigenvalues_pca.png")
                     plt.close()
 
