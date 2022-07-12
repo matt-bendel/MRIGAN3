@@ -335,6 +335,7 @@ def get_metrics(args):
                         plt.colorbar()
                         plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
                         plt.savefig(f"eigenvector_{k}.png")
+                        plt.close()
 
 
                     exit()
