@@ -296,21 +296,26 @@ def get_metrics(args, num_z):
                 new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
                                            device=sp.Device(3), show_pbar=False, crop=0.70, kernel_width=6).run().get()
+                img_shape = (384, 384)
+                S = sp.linop.Multiply(img_shape, maps)
+                F = sp.linop.FFT((8, 384, 384), axes=(-1, -2))
                 gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     fft2c_new(avg_gen[j] * std[j] + mean[j]).cpu())
-                avg_gen_np = \
-                    torch.tensor(
-                        get_mvue(avg_ksp.reshape((1,) + avg_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
-                        0].abs().numpy()
-                gt_np = \
-                    torch.tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
-                        0].abs().numpy()
+                # avg_gen_np = \
+                #     torch.tensor(
+                #         get_mvue(avg_ksp.reshape((1,) + avg_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
+                #         0].abs().numpy()
+                avg_gen_np = torch.tensor(S.H * F.H * avg_ksp)
+                # gt_np = \
+                #     torch.tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
+                #         0].abs().numpy()
+                gt_np = torch.tensor(S.H * F.H * gt_ksp)
 
-                inds = np.isnan(avg_gen_np)
-                avg_gen_np[inds] = np.zeros((384, 384))[inds]
-
-                inds = np.isnan(gt_np)
-                gt_np[inds] = np.zeros((384, 384))[inds]
+                # inds = np.isnan(avg_gen_np)
+                # avg_gen_np[inds] = np.zeros((384, 384))[inds]
+                #
+                # inds = np.isnan(gt_np)
+                # gt_np[inds] = np.zeros((384, 384))[inds]
 
                 count += 1
                 # np_gens = np.zeros((num_code, 384, 384))
