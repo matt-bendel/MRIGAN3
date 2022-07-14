@@ -336,12 +336,12 @@ def get_metrics(args, num_z):
 
                 if i % 25 == 0:
                     fig = plt.figure()
-                    fig.subplots_adjust(wspace=0, hspace=0.05)
+                    # fig.subplots_adjust(wspace=0, hspace=0.05)
 
                     generate_image(fig, gt_np, gt_np, f'GT', 1, 2, 2, disc_num=False)
                     generate_image(fig, gt_np, avg_gen_np, f'RC-GAN', 2, 2, 2, disc_num=False)
 
-                    im, ax = generate_error_map(fig, gt_np, avg_gen_np, f'RC-GAN', 4, 3, 2)
+                    im, ax = generate_error_map(fig, gt_np, avg_gen_np, f'RC-GAN', 4, 2, 2)
 
                     get_colorbar(fig, im, ax)
 
