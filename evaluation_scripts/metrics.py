@@ -262,7 +262,6 @@ def get_metrics(args):
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            maps = mr.app.EspiritCalib(tensor_to_complex_np(y_true.cpu()), calib_width=32, device=sp.Device(3)).run().get()
 
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
@@ -294,6 +293,8 @@ def get_metrics(args):
             gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
             for j in range(y.size(0)):
+                maps = mr.app.EspiritCalib(tensor_to_complex_np(y_true[j].cpu()), calib_width=32,
+                                           device=sp.Device(3)).run().get()
                 gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     fft2c_new(avg_gen[j] * std[j] + mean[j]).cpu())
                 avg_gen_np = \
