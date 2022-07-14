@@ -339,7 +339,7 @@ def get_metrics(args, num_z):
 
                     get_colorbar(fig, im, ax)
 
-                    plt.savefig(f'comp_plots_{i}.png')
+                    plt.savefig(f'comp_plots_{num_code}_{i}.png')
                     plt.close(fig)
                 #     print("IN PCA")
                 #     torch.save(new_gens[j].cpu(), 'toy_sample.pt')
