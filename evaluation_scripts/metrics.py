@@ -262,7 +262,7 @@ def get_metrics(args):
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            maps = mr.app.EspiritCalib(tensor_to_complex_np(y_true), calib_width=32, device=sp.Device(3)).run().get()
+            maps = mr.app.EspiritCalib(tensor_to_complex_np(y_true.cpu()), calib_width=32, device=sp.Device(3)).run().get()
 
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
