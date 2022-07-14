@@ -305,11 +305,11 @@ def get_metrics(args, num_z):
                 #     torch.tensor(
                 #         get_mvue(avg_ksp.reshape((1,) + avg_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
                 #         0].abs().numpy()
-                avg_gen_np = torch.tensor(S.H * F.H * avg_ksp)
+                avg_gen_np = torch.tensor(S.H * F.H * avg_ksp).abs().numpy()
                 # gt_np = \
                 #     torch.tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
                 #         0].abs().numpy()
-                gt_np = torch.tensor(S.H * F.H * gt_ksp)
+                gt_np = torch.tensor(S.H * F.H * gt_ksp).abs().numpy()
 
                 # inds = np.isnan(avg_gen_np)
                 # avg_gen_np[inds] = np.zeros((384, 384))[inds]
