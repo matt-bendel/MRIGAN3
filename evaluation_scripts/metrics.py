@@ -328,7 +328,19 @@ def get_metrics(args):
                 #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                 #     losses['mse'].append(mse(gt_np, gen_np))
 
-                # if i == 0 and j == 2:
+                if i % 25 == 0:
+                    fig = plt.figure()
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
+
+                    generate_image(fig, gt_np, gt_np, f'GT', 1, 2, 2, disc_num=False)
+                    generate_image(fig, gt_np, avg_gen_np, f'RC-GAN', 2, 2, 2, disc_num=False)
+
+                    im, ax = generate_error_map(fig, gt_np, avg_gen_np, f'RC-GAN', 4, 3, 2)
+
+                    get_colorbar(fig, im, ax)
+
+                    plt.savefig(f'comp_plots_{i}.png')
+                    plt.close(fig)
                 #     print("IN PCA")
                 #     torch.save(new_gens[j].cpu(), 'toy_sample.pt')
                 #     unnormal_gt = gt[j] * std[j] + mean[j]
