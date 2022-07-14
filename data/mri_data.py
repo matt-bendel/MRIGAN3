@@ -281,7 +281,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
             # else:
             #     with h5py.File(pathlib.Path(str(fname).replace('multicoil_val', 'multicoil_val_T2_sense_maps')), 'r') as sense_data:
             #         sense_maps = sense_data['s_maps'][slice]
-            return self.transform(kspace, target, data.attrs, fname.name, slice, None)
+            return self.transform(kspace, target, data.attrs, fname.name, slice, torch.zeros(1))
 
 
 class CombinedSliceDataset(torch.utils.data.Dataset):
