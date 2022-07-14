@@ -5,6 +5,7 @@ import sigpy as sp
 from evaluation_scripts import compute_cfid
 import matplotlib.pyplot as plt
 import imageio as iio
+import sigpy.mri as mr
 
 from typing import Optional
 from wrappers.our_gen_wrapper import load_best_gan
@@ -253,15 +254,15 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 32
+    num_code = 8
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
-            y, x, y_true, mean, std, maps = data
+            y, x, y_true, mean, std, _ = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            maps = maps.cpu().numpy()
+            maps = mr.app.EspiritCalib(tensor_to_complex_np(y_true), calib_width=32, device=sp.Device(3)).run().get()
 
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
