@@ -226,7 +226,7 @@ def get_plots(fname, gt_np, avg_gen_np, temp_gens, R, slice, maps, ind, ind2):
     plt.close(fig)
 
 
-def get_metrics(args):
+def get_metrics(args, num_z):
     G = load_best_gan(args)
     G.update_gen_status(val=True)
 
@@ -254,7 +254,7 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 32
+    num_code = num_z
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
@@ -294,7 +294,7 @@ def get_metrics(args):
 
             for j in range(y.size(0)):
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(y_true[j].cpu()), calib_width=32,
-                                           device=sp.Device(3)).run().get()
+                                           device=sp.Device(3), show_pbar=False).run().get()
                 gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     fft2c_new(avg_gen[j] * std[j] + mean[j]).cpu())
                 avg_gen_np = \
