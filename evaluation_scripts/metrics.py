@@ -253,11 +253,11 @@ def get_metrics(args):
 
     count = 0
     folds = 0
-    num_code = 128
+    num_code = 32
 
     for i, data in enumerate(test_loader):
         with torch.no_grad():
-            y, x, y_true, mean, std = data
+            y, x, y_true, mean, std, maps = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
@@ -292,14 +292,24 @@ def get_metrics(args):
             gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
             for j in range(y.size(0)):
+                gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                    fft2c_new(avg_gen[j] * std[j] + mean[j]).cpu())
+                avg_gen_np = \
+                    torch.tensor(
+                        get_mvue(avg_ksp.reshape((1,) + avg_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
+                        0].abs().numpy()
+                gt_np = \
+                    torch.tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
+                        0].abs().numpy()
+
                 count += 1
-                np_gens = np.zeros((num_code, 384, 384))
-                for z in range(num_code):
-                    np_gens[z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[j, z, :, :, :, :])).cpu().numpy()
+                # np_gens = np.zeros((num_code, 384, 384))
+                # for z in range(num_code):
+                #     np_gens[z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[j, z, :, :, :, :])).cpu().numpy()
                 # avg_gen_np = transforms.root_sum_of_squares(
                 #     complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
-                avg_gen_np = np.mean(np_gens, axis=0)
-                gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
+                # avg_gen_np = np.mean(np_gens, axis=0)
+                # gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
 
                 losses['ssim'].append(ssim(gt_np, avg_gen_np))
                 losses['psnr'].append(psnr(gt_np, avg_gen_np))
