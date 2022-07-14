@@ -305,6 +305,12 @@ def get_metrics(args):
                     torch.tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
                         0].abs().numpy()
 
+                inds = np.isnan(avg_gen_np)
+                avg_gen_np[inds] = np.zeros((384, 384))[inds]
+
+                inds = np.isnan(gt_np)
+                gt_np[inds] = np.zeros((384, 384))[inds]
+
                 count += 1
                 # np_gens = np.zeros((num_code, 384, 384))
                 # for z in range(num_code):
