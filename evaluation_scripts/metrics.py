@@ -163,64 +163,6 @@ def get_colorbar(fig, im, ax, left=False):
         cbar_ax.yaxis.set_label_position('left')
 
 
-def get_plots(fname, gt_np, avg_gen_np, temp_gens, R, slice, maps, ind, ind2):
-    print(R)
-    recons = np.zeros((32, 128, 128))
-    recon_object = None
-    gen_recons = np.zeros((32, 128, 128))
-    recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
-
-    for j in range(32):
-        try:
-            new_filename = recon_directory + fname + f'|langevin|slide_idx_{slice}_R={R}_sample={j}_outputs.pt'
-            recon_object = torch.load(new_filename)
-        except:
-            print('EXCEPT')
-            return
-
-        recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
-        gt_lang = recon_object['gt'][0][0].abs().cpu().numpy()
-
-        ksp = tensor_to_complex_np(fft2c_new(temp_gens[j]).cpu())
-        gen_recons[j] = \
-            torch.tensor(
-                get_mvue(ksp.reshape((1,) + ksp.shape), maps.reshape((1,) + maps.shape)))[
-                0].abs().numpy()
-
-        inds = np.isnan(gen_recons[j])
-        gen_recons[j][inds] = np.random.normal(0, np.sqrt(1e-13), (128, 128))[inds]
-        gif_im(gt_np, gen_recons[j], gt_lang, recons[j], j + 1, 'image')
-
-    generate_gif('image', R, ind, ind2)
-
-    avg_lang = np.mean(recons, axis=0)
-    std_lang = np.std(recons, axis=0)
-    gt_lang = recon_object['gt'][0][0].abs().cpu().numpy()
-    zfr_lang = recon_object['zfr'][0].abs().cpu().numpy()
-
-    std_recon = np.std(gen_recons, axis=0)
-    fig = plt.figure()
-    fig.subplots_adjust(wspace=0, hspace=0.05)
-
-    generate_image(fig, gt_lang, gt_lang, f'GT', 1, 3, 4, disc_num=False)
-    generate_image(fig, gt_lang, zfr_lang, f'ZFR', 2, 3, 4, disc_num=False)
-    generate_image(fig, gt_lang, avg_lang, f'CSGM', 3, 3, 4, disc_num=False)
-    generate_image(fig, gt_np, avg_gen_np, f'RC-GAN', 4, 3, 4, disc_num=False)
-
-    generate_error_map(fig, gt_lang, zfr_lang, f'ZFR', 6, 3, 4)
-    generate_error_map(fig, gt_lang, avg_lang, f'CSGM', 7, 3, 4)
-    im, ax = generate_error_map(fig, gt_np, avg_gen_np, f'RC-GAN', 8, 3, 4)
-
-    get_colorbar(fig, im, ax)
-
-    generate_image(fig, gt_lang, std_lang, 'Std. Dev', 11, 3, 4)
-    im, ax = generate_image(fig, gt_np, std_recon, 'Std. Dev', 12, 3, 4)
-    get_colorbar(fig, im, ax)
-
-    plt.savefig(f'comp_plots_R={R}_{ind}_{ind2}.png')
-    plt.close(fig)
-
-
 def get_metrics(args, num_z):
     G = load_best_gan(args)
     G.update_gen_status(val=True)
