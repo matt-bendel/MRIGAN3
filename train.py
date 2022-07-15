@@ -416,10 +416,10 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    try:
-        train(args)
-    except KeyboardInterrupt:
-        exit()
-    except Exception as e:
-        print(e)
-        send_mail("TRAINING CRASH", "Log in to see cause.")
+    # try:
+    train(args)
+    # except KeyboardInterrupt:
+    #     exit()
+    # except Exception as e:
+    #     print(e)
+    #     send_mail("TRAINING CRASH", "Log in to see cause.")
