@@ -63,11 +63,6 @@ def ssim(
     return ssim
 
 
-def get_mvue(kspace, s_maps):
-    return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(
-        np.sum(np.square(np.abs(s_maps)), axis=1))
-
-
 def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=False, disc_num=False):
     # rows and cols are both previously defined ints
     ax = fig.add_subplot(rows, cols, image_ind)
@@ -296,35 +291,20 @@ def get_metrics(args, num_z):
                 new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
                                            device=sp.Device(3), show_pbar=False, crop=0.70, kernel_width=6).run().get()
-                img_shape = (384, 384)
-                S = sp.linop.Multiply(img_shape, maps)
-                F = sp.linop.FFT((8, 384, 384), axes=(-1, -2))
-                gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
-                    fft2c_new(avg_gen[j] * std[j] + mean[j]).cpu())
-                # avg_gen_np = \
-                #     torch.tensor(
-                #         get_mvue(avg_ksp.reshape((1,) + avg_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
-                #         0].abs().numpy()
-                avg_gen_np = torch.tensor(S.H * F.H * avg_ksp).abs().numpy()
-                # gt_np = \
-                #     torch.tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps[j].reshape((1,) + maps[j].shape)))[
-                #         0].abs().numpy()
-                gt_np = torch.tensor(S.H * F.H * gt_ksp).abs().numpy()
+                S = sp.linop.Multiply((384, 384), maps)
+                # F = sp.linop.FFT((8, 384, 384), axes=(-1, -2))
+                # gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                #     fft2c_new(avg_gen[j] * std[j] + mean[j]).cpu())
+                gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np((avg_gen[j] * std[j] + mean[j]).cpu())
 
-                # inds = np.isnan(avg_gen_np)
-                # avg_gen_np[inds] = np.zeros((384, 384))[inds]
-                #
-                # inds = np.isnan(gt_np)
-                # gt_np[inds] = np.zeros((384, 384))[inds]
+                # avg_gen_np = torch.tensor(S.H * F.H * avg_ksp).abs().numpy()
+                avg_gen_np = torch.tensor(S.H * avg_ksp).abs().numpy()
+
+                # gt_np = torch.tensor(S.H * F.H * gt_ksp).abs().numpy()
+                gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
+
 
                 count += 1
-                # np_gens = np.zeros((num_code, 384, 384))
-                # for z in range(num_code):
-                #     np_gens[z, :, :] = transforms.root_sum_of_squares(complex_abs(new_gens[j, z, :, :, :, :])).cpu().numpy()
-                # avg_gen_np = transforms.root_sum_of_squares(
-                #     complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
-                # avg_gen_np = np.mean(np_gens, axis=0)
-                # gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
 
                 losses['ssim'].append(ssim(gt_np, avg_gen_np))
                 losses['psnr'].append(psnr(gt_np, avg_gen_np))
