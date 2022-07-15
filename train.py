@@ -7,10 +7,14 @@ import torch.autograd as autograd
 import matplotlib.pyplot as plt
 # TODO: REMOVE
 import imageio as iio
+import sigpy as sp
+import sigpy.mri as mr
+
 ################
 from typing import Optional
 from data import transforms
-from utils.math import complex_abs
+from utils.fftc import fft2c_new, ifft2c_new
+from utils.math import complex_abs, tensor_to_complex_np
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import get_gan, save_model
 from data_loaders.prepare_data import create_data_loaders
@@ -314,9 +318,16 @@ def train(args):
                 gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
                 for j in range(y.size(0)):
-                    avg_gen_np = transforms.root_sum_of_squares(
-                        complex_abs(avg_gen[j] * std[j] + mean[j])).cpu().numpy()
-                    gt_np = transforms.root_sum_of_squares(complex_abs(gt[j] * std[j] + mean[j])).cpu().numpy()
+                    new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
+                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                               device=sp.Device(3), show_pbar=False, crop=0.70,
+                                               kernel_width=6).run().get()
+                    S = sp.linop.Multiply((384, 384), maps)
+                    gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                        (avg_gen[j] * std[j] + mean[j]).cpu())
+
+                    avg_gen_np = torch.tensor(S.H * avg_ksp).abs().numpy()
+                    gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
                     losses['ssim'].append(ssim(gt_np, avg_gen_np))
                     losses['psnr'].append(psnr_coil(gt[j] * std[j] + mean[j], avg_gen[j] * std[j] + mean[j]))
