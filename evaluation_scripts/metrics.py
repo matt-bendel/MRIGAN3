@@ -256,50 +256,72 @@ def get_metrics(args, num_z):
                 #         complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
                 #     losses['mse'].append(mse(gt_np, gen_np))
 
-                if i % 25 == 0:
+                ind = 2
+                if i == 0 and j == ind:
                     fig = plt.figure()
                     # fig.subplots_adjust(wspace=0, hspace=0.05)
 
-                    generate_image(fig, gt_np, gt_np, f'GT', 1, 2, 2, disc_num=False)
-                    generate_image(fig, gt_np, avg_gen_np, f'RC-GAN', 2, 2, 2, disc_num=False)
+                    generate_image(fig, gt_np, gt_np, f'GT', 1, 3, 2, disc_num=False)
+                    generate_image(fig, gt_np, avg_gen_np, f'RC-GAN', 2, 3, 2, disc_num=False)
 
-                    im, ax = generate_error_map(fig, gt_np, avg_gen_np, f'RC-GAN', 4, 2, 2)
+                    im, ax = generate_error_map(fig, gt_np, avg_gen_np, f'RC-GAN', 4, 3, 2)
 
                     get_colorbar(fig, im, ax)
 
-                    plt.savefig(f'comp_plots_{num_code}_{i}.png')
+                    gen_im_list = []
+                    for z in range(num_code):
+                        temp_gen = tensor_to_complex_np((new_gens[j, z]).cpu())
+                        gen_im_list.append(torch.tensor(S.H * temp_gen).abs().numpy())
+
+                    std_dev = np.zeros(avg_gen_np.shape)
+                    for val in gen_im_list:
+                        std_dev = std_dev + np.power((val - avg_gen_np), 2)
+
+                    std_dev = std_dev / num_code
+                    std_dev = np.sqrt(std_dev)
+
+                    im, ax = generate_image(fig, gt_np, std_dev, 'Std. Dev', 6, 3, 2)
+
+                    get_colorbar(fig, im, ax)
+
+                    plt.savefig(f'comp_plots_{num_code}.png')
                     plt.close(fig)
-                #     print("IN PCA")
-                #     torch.save(new_gens[j].cpu(), 'toy_sample.pt')
-                #     unnormal_gt = gt[j] * std[j] + mean[j]
-                #     torch.save(unnormal_gt.cpu(), 'toy_gt.pt')
-                    # errors = np.zeros((num_code, 384 * 384 * 8 * 2))
-                    # for k in range(num_code):
-                    #     # gen_np = transforms.root_sum_of_squares(
-                    #     #     complex_abs(new_gens[j, k, :, :, :, :])).cpu().numpy()
-                    #     errors[k, :] = (gt[j].cpu().numpy() - new_gens[j, k].cpu().numpy()).flatten() #np.abs(gt_np - gen_np).flatten()
-                    #
-                    # print("GOT ERRORS")
-                    # # plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
-                    # # plt.title(f"Mean Error Map")
-                    # # plt.savefig(f"mean_error_map.png")
-                    # # plt.close()
-                    #
-                    # errors = errors - np.mean(errors, axis=0)
-                    #
-                    # # print(f"RANK: {np.linalg.matrix_rank(errors)}")
-                    # print("GETTING SVD")
-                    # U, S, Vh = np.linalg.svd(errors, full_matrices=False)
-                    #
-                    # print("GOT SVD")
-                    # lamda = 1 / num_code * S ** 2
-                    #
-                    # lamda_flat = lamda
-                    # print(np.sum(lamda))
-                    # plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
-                    # plt.title(f"Eigenvalues for {num_code} samples")
-                    # plt.savefig("eigenvalues_pca.png")
-                    # plt.close()
+
+                    place = 1
+                    for r, val in enumerate(gen_im_list):
+                        gif_im(gt_np, val, place, 'image')
+                        place += 1
+
+                    generate_gif('image')
+
+                    print("IN PCA")
+                    errors = np.zeros((num_code, 384 * 384 * 8 * 2))
+                    count = 0
+                    for val in gen_im_list:
+                        errors[count, :] = np.abs(gt_np - val).flatten()
+                        count += 1
+
+                    print("GOT ERRORS")
+                    plt.imshow(np.mean(errors, axis=0).reshape(384, 384))
+                    plt.title(f"Mean Error Map")
+                    plt.savefig(f"mean_error_map.png")
+                    plt.close()
+
+                    errors = errors - np.mean(errors, axis=0)
+
+                    print(f"RANK: {np.linalg.matrix_rank(errors)}")
+                    print("GETTING SVD")
+                    U, S, Vh = np.linalg.svd(errors, full_matrices=False)
+
+                    print("GOT SVD")
+                    lamda = 1 / num_code * S ** 2
+
+                    lamda_flat = lamda
+                    print(np.sum(lamda))
+                    plt.plot(np.arange(1, len(lamda_flat) + 1, 1), lamda_flat)
+                    plt.title(f"Eigenvalues for {num_code} samples")
+                    plt.savefig("eigenvalues_pca.png")
+                    plt.close()
 
                     # for k in range(5):
                     #     lamda_val = lamda_flat[k]

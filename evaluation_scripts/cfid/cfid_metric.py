@@ -4,8 +4,11 @@ import torch
 
 import numpy as np
 import sigpy as sp
+import sigpy.mri as mr
+
 from data import transforms
-from utils.math import complex_abs
+from utils.fftc import fft2c_new, ifft2c_new
+from utils.math import complex_abs, tensor_to_complex_np
 from tqdm import tqdm
 
 def symmetric_matrix_square_root_torch(mat, eps=1e-10):
@@ -134,7 +137,7 @@ class CFIDMetric:
         return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(
             np.sum(np.square(np.abs(s_maps)), axis=1))
 
-    def _get_embed_im(self, multi_coil_inp, mean, std):
+    def _get_embed_im(self, multi_coil_inp, mean, std, maps):
         embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 384, 384),
                                 device=self.args.device)
         for i in range(multi_coil_inp.size(0)):
@@ -142,8 +145,10 @@ class CFIDMetric:
                                       device=self.args.device)
             reformatted[:, :, :, 0] = multi_coil_inp[i, 0:8, :, :]
             reformatted[:, :, :, 1] = multi_coil_inp[i, 8:16, :, :]
-            im = transforms.root_sum_of_squares(
-                        complex_abs(reformatted * std[i] + mean[i]))
+
+            unnormal_im = tensor_to_complex_np((reformatted[i] * std[i] + mean[i]).cpu())
+
+            im = torch.tensor(maps[i].H * unnormal_im).abs()
 
             im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
 
@@ -168,13 +173,23 @@ class CFIDMetric:
             true_cond = true_cond.cuda()
             mean = mean.cuda()
             std = std.cuda()
+            maps = []
 
             with torch.no_grad():
                 recon = self.gan(condition, true_cond)
 
-                image = self._get_embed_im(recon, mean, std)
-                condition_im = self._get_embed_im(condition, mean, std)
-                true_im = self._get_embed_im(gt, mean, std)
+                for j in range(condition.shape[0]):
+                    new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
+                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                               device=sp.Device(3), show_pbar=False, crop=0.70,
+                                               kernel_width=6).run().get()
+                    S = sp.linop.Multiply((384, 384), maps)
+
+                    maps.append(S)
+
+                image = self._get_embed_im(recon, mean, std, maps)
+                condition_im = self._get_embed_im(condition, mean, std, maps)
+                true_im = self._get_embed_im(gt, mean, std, maps)
 
                 img_e = self.image_embedding(image)
                 cond_e = self.condition_embedding(condition_im)
