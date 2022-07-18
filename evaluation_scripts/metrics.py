@@ -119,27 +119,25 @@ def generate_error_map(fig, target, recon, method, image_ind, rows, cols, relati
     return im, ax
 
 
-def gif_im(true, gen_im, lang_true, lang_im, index, type, disc_num=False):
+def gif_im(true, gen_im, index, type, disc_num=False):
     fig = plt.figure()
 
-    generate_image(fig, true, gen_im, f'z {index}', 1, 2, 2, disc_num=False)
-    generate_image(fig, lang_true, lang_im, f'z {index}', 2, 2, 2, disc_num=False)
-    im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 3, 2, 2)
-    im, ax = generate_error_map(fig, lang_true, lang_im, f'z {index}', 4, 2, 2)
+    generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
+    im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/temp-final-mri/gif_{type}_{index - 1}.png')
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
     plt.close()
 
 
-def generate_gif(type, R, ind, ind2):
+def generate_gif(type, num):
     images = []
-    for i in range(32):
-        images.append(iio.imread(f'/home/bendel.8/Git_Repos/temp-final-mri/gif_{type}_{i}.png'))
+    for i in range(num):
+        images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif_R={R}_{ind}_{ind2}.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
-    for i in range(32):
-        os.remove(f'/home/bendel.8/Git_Repos/temp-final-mri/gif_{type}_{i}.png')
+    for i in range(num):
+        os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
 
 def get_colorbar(fig, im, ax, left=False):
@@ -257,7 +255,7 @@ def get_metrics(args, num_z):
                 #     losses['mse'].append(mse(gt_np, gen_np))
 
                 ind = 2
-                if i == 0 and j == ind:
+                if i == 0 and j == ind and num_code >= 32:
                     fig = plt.figure()
                     # fig.subplots_adjust(wspace=0, hspace=0.05)
 
