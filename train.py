@@ -267,7 +267,7 @@ def train(args):
             for k in range(y.shape[0] - 1):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
-            std_weight = 1.05 * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            std_weight = 1.1 * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = 1e-3
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
@@ -275,7 +275,7 @@ def train(args):
             g_loss += - std_weight * torch.std(gens, dim=1).mean()
 
             if g_loss < -20:
-                exit()
+                raise Exception
 
             g_loss.backward()
             opt_G.step()
