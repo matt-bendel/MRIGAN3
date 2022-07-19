@@ -293,7 +293,7 @@ def get_metrics(args, num_z):
                     generate_gif('image', num_code)
 
                     print("IN PCA")
-                    errors = np.zeros((num_code, 384 * 384 * 8 * 2))
+                    errors = np.zeros((num_code, 384 * 384))
                     count = 0
                     for val in gen_im_list:
                         errors[count, :] = np.abs(gt_np - val).flatten()
