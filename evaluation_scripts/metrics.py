@@ -290,7 +290,7 @@ def get_metrics(args, num_z):
                         gif_im(gt_np, val, place, 'image')
                         place += 1
 
-                    generate_gif('image')
+                    generate_gif('image', num_code)
 
                     print("IN PCA")
                     errors = np.zeros((num_code, 384 * 384 * 8 * 2))
@@ -321,37 +321,11 @@ def get_metrics(args, num_z):
                     plt.savefig("eigenvalues_pca.png")
                     plt.close()
 
-                    # for k in range(5):
-                    #     lamda_val = lamda_flat[k]
-                    #     eigenvector_val = Vh[k, :].reshape((384, 384))
-                    #     plt.imshow(eigenvector_val, cmap="viridis")
-                    #     plt.colorbar()
-                    #     plt.title(f"Eigenvector for Eigenvalue: {lamda_val}")
-                    #     plt.savefig(f"eigenvector_{k}.png")
-                    #     plt.close()
-
-
-                    # exit()
-
-
-                # fig, ax1 = plt.subplots(1, 1)
-                # fig.suptitle(f'MSE Histogram for {num_code} samples')
-                # fig.subplots_adjust(hspace=1)
-                # ax1.hist(losses['mse'], bins=50)
-                # ax1.set_title('MSE')
-                # # ax2.hist(losses['snr'], bins=15)
-                # # ax2.set_title('SNR')
-                # # plt.xlim([-0.05, 0.05])
-                # plt.savefig(f'histo_{num_code}_{j}.png')
-                # plt.close(fig)
-
-                # losses['max_i'].append(gt_np.max())
-            # exit()
-            if count % 72 == 0:
-                folds += 1
-                means['psnr'].append(losses['psnr'])
-                means['snr'].append(losses['snr'])
-                means['ssim'].append(losses['ssim'])
+                if count % 72 == 0:
+                    folds += 1
+                    means['psnr'].append(losses['psnr'])
+                    means['snr'].append(losses['snr'])
+                    means['ssim'].append(losses['ssim'])
 
     # fig, ax1 = plt.subplots(1, 1)
     # fig.suptitle(f'MSE Histogram for {num_code} samples')
