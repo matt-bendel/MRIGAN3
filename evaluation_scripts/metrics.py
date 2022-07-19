@@ -323,9 +323,15 @@ def get_metrics(args, num_z):
 
                 if count % 72 == 0:
                     folds += 1
-                    means['psnr'].append(losses['psnr'])
-                    means['snr'].append(losses['snr'])
-                    means['ssim'].append(losses['ssim'])
+                    means['psnr'].append(np.mean(losses['psnr']))
+                    means['snr'].append(np.mean(losses['snr']))
+                    means['ssim'].append(np.mean(losses['ssim']))
+
+                    losses['psnr'] = []
+                    losses['snr'] = []
+                    losses['ssim'] = []
+
+
 
     # fig, ax1 = plt.subplots(1, 1)
     # fig.suptitle(f'MSE Histogram for {num_code} samples')
