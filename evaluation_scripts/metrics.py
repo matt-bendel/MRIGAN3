@@ -134,7 +134,7 @@ def generate_gif(type, num):
     for i in range(num):
         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif_test.gif', images, duration=0.25)
 
     for i in range(num):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
