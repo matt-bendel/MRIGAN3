@@ -84,14 +84,16 @@ def main(args):
         pin_memory=True
     )
 
-    for i in range(6):
-        print(f"{i} CODE VECTORS")
+    for i in range(1):
+        num_code = 32
+
+        print(f"{num_code} CODE VECTORS")
         psnr_vals = []
         ssim_vals = []
         snr_vals = []
         apsd_vals = []
 
-        num_code = 2**i
+
 
         for i, data in enumerate(loader):
             with torch.no_grad():
