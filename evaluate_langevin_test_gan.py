@@ -181,7 +181,7 @@ if __name__ == '__main__':
     args.out_chans = 16
 
     main(args)
-print(count)
+
     # print('MEDIAN')
     # print('APSD: ', np.median(apsd_vals))
     # print('PSNR: ', np.median(psnr_vals))
