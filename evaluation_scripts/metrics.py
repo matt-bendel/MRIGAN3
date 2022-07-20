@@ -165,6 +165,8 @@ def get_metrics(args, num_z):
     G = load_best_gan(args)
     G.update_gen_status(val=True)
 
+    CFID = compute_cfid.get_cfid(args, G)
+
     losses = {
         'psnr': [],
         'snr': [],
@@ -361,7 +363,8 @@ def get_metrics(args, num_z):
     SNR_STRING = f'SNR: {np.mean(means["snr"]):.2f} \\pm {np.std(means["snr"]) / np.sqrt(folds):.2f}\n'
     SSIM_STRING = f'SSIM: {np.mean(means["ssim"]):.4f} \\pm {np.std(means["ssim"]) / np.sqrt(folds):.4f}\n'
     APSD_STRING = f'APSD: {np.mean(losses["apsd"]):} \\pm {np.std(losses["apsd"]) / np.sqrt(folds):}\n'
+    CFID_STRING = f'CFID: {CFID}\n'
 
-    send_mail(f"TEST RESULTS - {num_code} code vectors", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
+    send_mail(f"TEST RESULTS - {num_code} code vectors", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}{CFID_STRING}')
 
-    # compute_cfid.get_cfid(args, G)
+

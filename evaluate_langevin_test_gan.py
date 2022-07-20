@@ -9,6 +9,7 @@ import sigpy as sp
 import sigpy.mri as mr
 from data.mri_data import SelectiveSliceData_Val
 from data_loaders.prepare_data import DataTransform
+from evaluation_scripts import compute_cfid
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from torch.utils.data import DataLoader
@@ -65,6 +66,7 @@ def main(args):
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
+    compute_cfid.get_cfid(args, G)
 
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',
