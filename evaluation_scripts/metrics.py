@@ -187,7 +187,8 @@ def get_metrics(args, num_z):
 
     _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_only=True, big_test=True)
 
-    # compute_cfid.get_cfid(args, G)
+    if num_z == 1:
+        compute_cfid.get_cfid(args, G)
 
     count = 0
     folds = 0
