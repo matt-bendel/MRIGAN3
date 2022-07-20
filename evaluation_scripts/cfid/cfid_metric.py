@@ -146,7 +146,7 @@ class CFIDMetric:
             reformatted[:, :, :, 0] = multi_coil_inp[i, 0:8, :, :]
             reformatted[:, :, :, 1] = multi_coil_inp[i, 8:16, :, :]
 
-            unnormal_im = tensor_to_complex_np((reformatted[i] * std[i] + mean[i]).cpu())
+            unnormal_im = tensor_to_complex_np((reformatted * std[i] + mean[i]).cpu())
 
             im = torch.tensor(maps[i].H * unnormal_im).abs()
 
