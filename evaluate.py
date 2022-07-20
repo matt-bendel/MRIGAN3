@@ -30,8 +30,8 @@ if __name__ == '__main__':
     args.out_chans = 16
 
     try:
-        for i in range(2):
-            num = 128 if i == 0 else 1
+        for i in range(6):
+            num = 2**i
             get_metrics(args, num)
     except KeyboardInterrupt:
         exit()
