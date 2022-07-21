@@ -13,6 +13,7 @@ import sigpy.mri as mr
 ################
 from typing import Optional
 from data import transforms
+from evaluation_scripts.metrics import get_metrics
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from utils.parse_args import create_arg_parser
@@ -202,6 +203,8 @@ def train(args):
     args.out_chans = 16
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
+    # TODO: REMOVE THIS NEXT LINE
+    best_loss = 0
 
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
@@ -267,7 +270,8 @@ def train(args):
             for k in range(y.shape[0] - 1):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
-            std_weight = 1.25 * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            mult = 1.25
+            std_weight = 0 * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = 1e-3
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
@@ -415,6 +419,32 @@ if __name__ == '__main__':
     random.seed(0)
     np.random.seed(0)
     torch.manual_seed(0)
+
+    args.in_chans = 16
+    args.out_chans = 16
+
+    vals = [0, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
+
+    for val in vals:
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+        try:
+            train(args)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TRAINING CRASH", "See terminal for failure cause.")
+
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+        try:
+            for i in range(6):
+                num = 2 ** i
+                get_metrics(args, num, is_super=True, std_val=val)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TESTING FAILED", "See terminal for failure cause.")
 
     # try:
     train(args)

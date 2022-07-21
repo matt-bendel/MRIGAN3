@@ -161,7 +161,7 @@ def get_colorbar(fig, im, ax, left=False):
         cbar_ax.yaxis.set_label_position('left')
 
 
-def get_metrics(args, num_z):
+def get_metrics(args, num_z, is_super=False, std_val=-1):
     G = load_best_gan(args)
     G.update_gen_status(val=True)
 
@@ -366,6 +366,9 @@ def get_metrics(args, num_z):
     APSD_STRING = f'APSD: {np.mean(losses["apsd"]):} \\pm {np.std(losses["apsd"]) / np.sqrt(folds):}\n'
     # CFID_STRING = f'CFID: {CFID}\n'
 
-    send_mail(f"TEST RESULTS - {num_code} code vectors", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
+    if is_super:
+        send_mail(f"TEST RESULTS - {num_code} code vectors - {std_val} std. weight", f'Results for std. weight {std_val}\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
+    else:
+        send_mail(f"TEST RESULTS - {num_code} code vectors", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
 
 
