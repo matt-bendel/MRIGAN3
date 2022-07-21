@@ -196,15 +196,16 @@ def generate_gif(type):
 
 ######################
 
-def train(args):
+def train(args, bl=1):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
     args.in_chans = 16
     args.out_chans = 16
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
-    # TODO: REMOVE THIS NEXT LINE
-    best_loss = 0
+
+    if bl == 0:
+        best_loss = 0
 
     if args.resume:
         start_epoch += 1
@@ -434,7 +435,7 @@ if __name__ == '__main__':
         else:
             args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
-            train(args)
+            train(args, bl=0)
         except KeyboardInterrupt:
             exit()
         except Exception as e:
