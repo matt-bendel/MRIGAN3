@@ -426,7 +426,10 @@ if __name__ == '__main__':
     vals = [0, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
 
     for val in vals:
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+        if val == 0:
+            args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+        else:
+            args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
             train(args)
         except KeyboardInterrupt:
