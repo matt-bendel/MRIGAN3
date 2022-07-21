@@ -206,6 +206,9 @@ def train(args):
     # TODO: REMOVE THIS NEXT LINE
     best_loss = 0
 
+    if args.resume:
+        start_epoch += 1
+
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
     # exit()
