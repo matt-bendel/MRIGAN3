@@ -196,7 +196,7 @@ def generate_gif(type):
 
 ######################
 
-def train(args, bl=1):
+def train(args, bl=1, std_mult=-1):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
     args.in_chans = 16
@@ -275,6 +275,10 @@ def train(args, bl=1):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             mult = 0
+
+            if std_mult != -1:
+                mult = std_mult
+
             std_weight = mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = 1e-3
             l1_weight = 1
@@ -435,7 +439,7 @@ if __name__ == '__main__':
         else:
             args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
-            train(args, bl=0)
+            train(args, bl=0, std_mult=val)
         except KeyboardInterrupt:
             exit()
         except Exception as e:
