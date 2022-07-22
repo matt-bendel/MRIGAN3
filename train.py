@@ -454,7 +454,7 @@ if __name__ == '__main__':
             send_mail("TESTING FAILED", "See terminal for failure cause.")
 
     # try:
-    train(args)
+    # train(args)
     # except KeyboardInterrupt:
     #     exit()
     # except Exception as e:
