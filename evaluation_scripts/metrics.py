@@ -186,9 +186,9 @@ def get_metrics(args, num_z, is_super=False, std_val=-1):
     }
 
     _, test_loader = create_data_loaders(args, val_only=True, big_test=True) if not args.ls else create_data_loaders_ls(args, val_only=True, big_test=True)
-
-    # if num_z == 1:
-    #     compute_cfid.get_cfid(args, G)
+    CFID_STRING = ""
+    if num_z == 1:
+        CFID_STRING = compute_cfid.get_cfid(args, G)
 
     count = 0
     folds = 0
@@ -367,7 +367,7 @@ def get_metrics(args, num_z, is_super=False, std_val=-1):
     # CFID_STRING = f'CFID: {CFID}\n'
 
     if is_super:
-        send_mail(f"TEST RESULTS - {num_code} code vectors - {std_val} std. weight", f'Results for std. weight {std_val}\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
+        send_mail(f"TEST RESULTS - {num_code} code vectors - {std_val} adv. weight", f'Results for adv. weight {std_val}\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}{CFID_STRING}')
     else:
         send_mail(f"TEST RESULTS - {num_code} code vectors", f'Results\n{PSNR_STRING}{SNR_STRING}{SSIM_STRING}{APSD_STRING}')
 

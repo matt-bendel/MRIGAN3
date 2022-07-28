@@ -196,11 +196,22 @@ def generate_gif(type):
 
 ######################
 
-def train(args, bl=1, std_mult=-1):
+def tune_std_weight(signed_diff):
+    if np.abs(signed_diff) < 0.05:
+        return 0 if np.sign(signed_diff) == 1 else -0.025
+
+    if np.abs(signed_diff) > 0.25:
+        return 0.1 if np.sign(signed_diff) == 1 else -0.1
+
+    return signed_diff * 0.1
+
+def train(args, bl=1, adv_mult=0.0):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
     args.in_chans = 16
     args.out_chans = 16
+
+    std_mult = 1.25
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
@@ -274,13 +285,13 @@ def train(args, bl=1, std_mult=-1):
             for k in range(y.shape[0] - 1):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
-            mult = 0
+            mult = 1e-3
 
-            if std_mult != -1:
-                mult = std_mult
+            if adv_mult > 0:
+                mult = adv_mult
 
-            std_weight = mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-3
+            std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            adv_weight = mult
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
@@ -303,6 +314,7 @@ def train(args, bl=1, std_mult=-1):
 
         losses = {
             'psnr': [],
+            'single_psnr': [],
             'ssim': []
         }
 
@@ -341,8 +353,16 @@ def train(args, bl=1, std_mult=-1):
                     avg_gen_np = torch.tensor(S.H * avg_ksp).abs().numpy()
                     gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
+                    single_gen = torch.zeros(8, 384, 384, 2).to(args.device)
+                    single_gen[:, :, :, 0] = gens[j, 0, 0:8, :, :]
+                    single_gen[:, :, :, 1] = gens[j, 0, 8:16, :, :]
+
+                    single_gen_complex_np = tensor_to_complex_np((single_gen * std[j] + mean[j]).cpu())
+                    single_gen_np = torch.tensor(S.H * single_gen_complex_np).abs().numpy()
+
                     losses['ssim'].append(ssim(gt_np, avg_gen_np))
                     losses['psnr'].append(psnr(gt_np, avg_gen_np))
+                    losses['single_psnr'].append(psnr(gt_np, single_gen_np))
 
                     ind = 1
 
@@ -393,6 +413,8 @@ def train(args, bl=1, std_mult=-1):
                         plt.savefig(f'std_dev_gen.png')
                         plt.close()
 
+        psnr_diff = (np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr'])
+        print(f"PSNR DIFF: {psnr_diff:.2f}")
         psnr_loss = np.mean(losses['psnr'])
         best_model = psnr_loss > best_loss
         best_loss = psnr_loss if psnr_loss > best_loss else best_loss
@@ -409,6 +431,9 @@ def train(args, bl=1, std_mult=-1):
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
+
+        if (epoch + 1 % 5) == 0:
+            std_mult += tune_std_weight(psnr_diff)
 
 
 if __name__ == '__main__':
@@ -431,15 +456,35 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    vals = [0, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
+    # vals = [0, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
+    #
+    # for val in vals:
+    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+    #     try:
+    #         train(args, bl=0, std_mult=val)
+    #     except KeyboardInterrupt:
+    #         exit()
+    #     except Exception as e:
+    #         print(e)
+    #         send_mail("TRAINING CRASH", "See terminal for failure cause.")
+    #
+    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+    #     try:
+    #         for i in range(6):
+    #             num = 2 ** i
+    #             get_metrics(args, num, is_super=True, std_val=val)
+    #     except KeyboardInterrupt:
+    #         exit()
+    #     except Exception as e:
+    #         print(e)
+    #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
+
+    vals = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5]
     for val in vals:
-        if val == 0:
-            args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-        else:
-            args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
-            train(args, bl=0, std_mult=val)
+            train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
             exit()
         except Exception as e:
