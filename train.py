@@ -197,7 +197,7 @@ def generate_gif(type):
 ######################
 
 def tune_std_weight(signed_diff):
-    if np.abs(signed_diff) < 0.05:
+    if np.abs(signed_diff) < 0.1:
         return 0 if np.sign(signed_diff) == 1 else -0.025
 
     if np.abs(signed_diff) > 0.25:
@@ -432,8 +432,8 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        if (epoch + 1 % 2) == 0:
-            std_mult += tune_std_weight(psnr_diff)
+        # if (epoch + 1 % 2) == 0:
+        std_mult += tune_std_weight(psnr_diff)
 
 
 if __name__ == '__main__':
