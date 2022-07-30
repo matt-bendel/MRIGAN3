@@ -200,7 +200,7 @@ def tune_std_weight(signed_diff):
     if np.abs(signed_diff) < 0.1:
         return 0 if np.sign(signed_diff) == 1 else -0.025
 
-    if np.abs(signed_diff) > 0.35:
+    if np.abs(signed_diff) > 0.3:
         return 0.1 if np.sign(signed_diff) == 1 else -0.1
 
     return signed_diff * 0.1
@@ -211,7 +211,7 @@ def train(args, bl=1, adv_mult=0.0):
     args.in_chans = 16
     args.out_chans = 16
 
-    std_mult = 1.4
+    std_mult = 1
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
