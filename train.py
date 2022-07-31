@@ -200,7 +200,7 @@ def tune_std_weight(signed_diff):
     if np.abs(signed_diff) < 0.05:
         return 0 if np.sign(signed_diff) == 1 else -0.025
 
-    if np.abs(signed_diff) > 0.35:
+    if np.abs(signed_diff) > 0.3:
         return 0.1 if np.sign(signed_diff) == 1 else -0.1
 
     return signed_diff * 0.1
