@@ -197,10 +197,10 @@ def generate_gif(type):
 ######################
 
 def tune_std_weight(signed_diff):
-    if np.abs(signed_diff) < 0.1:
+    if np.abs(signed_diff) < 0.05:
         return 0 if np.sign(signed_diff) == 1 else -0.025
 
-    if np.abs(signed_diff) > 0.3:
+    if np.abs(signed_diff) > 0.35:
         return 0.1 if np.sign(signed_diff) == 1 else -0.1
 
     return signed_diff * 0.1
@@ -481,7 +481,7 @@ if __name__ == '__main__':
     #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
 
-    vals = [1e-3, 1e-1, 1e-2, 1e-4, 1e-5]
+    vals = [1e-3, 1e-2, 1e-4]
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
