@@ -415,7 +415,7 @@ def train(args, bl=1, adv_mult=0.0):
 
         psnr_diff = (np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr'])
         print(f"PSNR DIFF: {psnr_diff:.2f}")
-        print(f"WEIGHT: {std_weight}")
+        print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
         best_model = psnr_loss > best_loss and psnr_diff >= 0
         best_loss = psnr_loss if psnr_loss > best_loss else best_loss
@@ -433,8 +433,8 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        if (epoch + 1 % 2) == 0:
-            std_mult += tune_std_weight(psnr_diff)
+        # if (epoch + 1 % 2) == 0:
+        std_mult += tune_std_weight(psnr_diff)
 
 
 if __name__ == '__main__':
