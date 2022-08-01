@@ -200,10 +200,10 @@ def tune_std_weight(signed_diff):
     if np.abs(signed_diff) < 0.05:
         return 0 if np.sign(signed_diff) == 1 else -0.025
 
-    # if np.abs(signed_diff) > 0.3:
-    return 0.05 if np.sign(signed_diff) == 1 else -0.05
+    if np.abs(signed_diff) > 0.25:
+        return 0.05 if np.sign(signed_diff) == 1 else -0.05
 
-    # return signed_diff * 0.1
+    return signed_diff * 0.1
 
 def train(args, bl=1, adv_mult=0.0):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
