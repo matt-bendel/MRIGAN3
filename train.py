@@ -435,7 +435,9 @@ def train(args, bl=1, adv_mult=0.0):
 
         # if (epoch + 1) % 2 == 0:
         #     print("TUNING")
-        std_mult += tune_std_weight(psnr_diff)
+        # std_mult += tune_std_weight(psnr_diff)
+        mu_0 = 5
+        std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(losses['psnr']) / np.mean(losses['single_psnr']))
 
 
 if __name__ == '__main__':
