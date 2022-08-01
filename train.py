@@ -433,11 +433,11 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        # if (epoch + 1) % 2 == 0:
-        #     print("TUNING")
+        if (epoch + 1) % 2 == 0:
+            print("TUNING")
         # std_mult += tune_std_weight(psnr_diff)
-        mu_0 = 4
-        std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(losses['psnr']) / np.mean(losses['single_psnr']))
+            mu_0 = 4
+            std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(losses['psnr']) / np.mean(losses['single_psnr']))
 
 
 if __name__ == '__main__':
