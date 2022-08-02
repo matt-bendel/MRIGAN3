@@ -285,13 +285,15 @@ def train(args, bl=1, adv_mult=0.0):
             for k in range(y.shape[0] - 1):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
-            mult = 1e-3
+            # mult = 1e-3
+            mult = 1.4
 
             if adv_mult > 0:
                 mult = adv_mult
 
-            std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = mult
+            std_weight = adv_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            # adv_weight = mult
+            adv_weight = 1e-3
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
@@ -433,11 +435,10 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        if (epoch + 1) % 2 == 0:
-            print("TUNING")
-        # std_mult += tune_std_weight(psnr_diff)
-            mu_0 = 4
-            std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(losses['psnr']) / np.mean(losses['single_psnr']))
+        # TODO: ACTIVATE FOR ADV
+        # if (epoch + 1) % 2 == 0:
+        #     mu_0 = 4.5
+        #     std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(losses['psnr']) / np.mean(losses['single_psnr']))
 
 
 if __name__ == '__main__':
@@ -460,12 +461,35 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    # vals = [0, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
-    #
+    vals = [1.4, 1.5, 1.6]
+
+    for val in vals:
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+        try:
+            train(args, bl=0, adv_mult=val)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TRAINING CRASH", "See terminal for failure cause.")
+
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+        try:
+            for i in range(8):
+                num = 2 ** i
+                get_metrics(args, num, is_super=True, std_val=val)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TESTING FAILED", "See terminal for failure cause.")
+
+
+    # vals = [1e-3, 1e-2, 1e-4]
     # for val in vals:
     #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
     #     try:
-    #         train(args, bl=0, std_mult=val)
+    #         train(args, bl=0, adv_mult=val)
     #     except KeyboardInterrupt:
     #         exit()
     #     except Exception as e:
@@ -482,29 +506,6 @@ if __name__ == '__main__':
     #     except Exception as e:
     #         print(e)
     #         send_mail("TESTING FAILED", "See terminal for failure cause.")
-
-
-    vals = [1e-3, 1e-2, 1e-4]
-    for val in vals:
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
-        try:
-            train(args, bl=0, adv_mult=val)
-        except KeyboardInterrupt:
-            exit()
-        except Exception as e:
-            print(e)
-            send_mail("TRAINING CRASH", "See terminal for failure cause.")
-
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-        try:
-            for i in range(6):
-                num = 2 ** i
-                get_metrics(args, num, is_super=True, std_val=val)
-        except KeyboardInterrupt:
-            exit()
-        except Exception as e:
-            print(e)
-            send_mail("TESTING FAILED", "See terminal for failure cause.")
 
     # try:
     # train(args)

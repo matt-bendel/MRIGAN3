@@ -216,7 +216,7 @@ def get_metrics(args, num_z, is_super=False, std_val=-1):
                                                                                                             None].to(
                     args.device)
 
-            losses['apsd'].append(torch.mean(torch.std(temp_gens, dim=1), dim=(0, 1, 2, 3)).cpu().numpy())
+            losses['apsd'].append(torch.mean(torch.mean(torch.std(temp_gens, dim=1, unbiased=True), dim=(1, 2, 3)), dim=0).cpu().numpy())
 
             new_gens = torch.zeros(y.size(0), num_code, 8, 384, 384, 2)
             new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
