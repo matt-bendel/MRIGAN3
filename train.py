@@ -206,6 +206,7 @@ def tune_std_weight(signed_diff):
     return signed_diff * 0.1
 
 def train(args, bl=1, adv_mult=0.0):
+    print(f"WEIGHT: {adv_mult}")
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
     args.in_chans = 16
