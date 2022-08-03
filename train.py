@@ -421,8 +421,9 @@ def train(args, bl=1, adv_mult=0.0):
 
         send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
 
-        save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
-        save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
+        if adv_weight < 1.5 and psnr_diff > 0:
+            save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
+            save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
         # TODO: ACTIVATE FOR ADV
         # if (epoch + 1) % 2 == 0:
@@ -455,7 +456,7 @@ if __name__ == '__main__':
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
-            args.batch_size = 36
+            args.batch_size = 40
             train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
             exit()
