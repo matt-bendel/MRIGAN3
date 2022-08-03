@@ -455,7 +455,7 @@ if __name__ == '__main__':
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
-            args.batch_size = 36
+            args.batch_size = 40
             train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
             exit()
