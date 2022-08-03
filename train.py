@@ -193,18 +193,6 @@ def generate_gif(type):
     for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
-
-######################
-
-def tune_std_weight(signed_diff):
-    if np.abs(signed_diff) < 0.05:
-        return 0 if np.sign(signed_diff) == 1 else -0.025
-
-    if np.abs(signed_diff) > 0.25:
-        return 0.05 if np.sign(signed_diff) == 1 else -0.05
-
-    return signed_diff * 0.1
-
 def train(args, bl=1, adv_mult=0.0):
     print(f"WEIGHT: {adv_mult}")
     args.exp_dir.mkdir(parents=True, exist_ok=True)
@@ -467,6 +455,7 @@ if __name__ == '__main__':
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
+            args.batch_size = 36
             train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
             exit()
@@ -476,6 +465,7 @@ if __name__ == '__main__':
 
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
         try:
+            args.batch_size = 20
             for i in range(8):
                 num = 2 ** i
                 get_metrics(args, num, is_super=True, std_val=val)
