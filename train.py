@@ -424,6 +424,9 @@ def train(args, bl=1, adv_mult=0.0):
         if adv_weight < 1.5 and psnr_diff > 0:
             save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
             save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
+        elif adv_weight > 1.4:
+            save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
+            save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
         # TODO: ACTIVATE FOR ADV
         # if (epoch + 1) % 2 == 0:
