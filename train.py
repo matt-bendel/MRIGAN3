@@ -193,7 +193,7 @@ def generate_gif(type):
     for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
-def train(args, bl=1, adv_mult=0.0, std_mult_arg=False):
+def train(args, bl=1, adv_mult=0.0):
     print(f"WEIGHT: {adv_mult}")
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -281,7 +281,8 @@ def train(args, bl=1, adv_mult=0.0, std_mult_arg=False):
             if adv_mult > 0:
                 mult = adv_mult
 
-            std_weight = (std_mult if not std_mult_arg else std_mult_arg) * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            # TODO: std_mult *
+            std_weight = 1.8 * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = mult
             # adv_weight = 1e-3
             l1_weight = 1
@@ -468,13 +469,13 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    vals = [1.6]
+    vals = [1.8]
 
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
         try:
             args.batch_size = 36
-            train(args, bl=0, adv_mult=val, std_mult_arg=val)
+            train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
             exit()
         except Exception as e:
@@ -493,27 +494,27 @@ if __name__ == '__main__':
             print(e)
             send_mail("TESTING FAILED", "See terminal for failure cause.")
 
-    vals = [1e-2, 1e-4]
-    for val in vals:
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
-        try:
-            train(args, bl=0, adv_mult=val)
-        except KeyboardInterrupt:
-            exit()
-        except Exception as e:
-            print(e)
-            send_mail("TRAINING CRASH", "See terminal for failure cause.")
-
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-        try:
-            for i in range(6):
-                num = 2 ** i
-                get_metrics(args, num, is_super=True, std_val=val)
-        except KeyboardInterrupt:
-            exit()
-        except Exception as e:
-            print(e)
-            send_mail("TESTING FAILED", "See terminal for failure cause.")
+    # vals = [1e-2, 1e-4]
+    # for val in vals:
+    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+    #     try:
+    #         train(args, bl=0, adv_mult=val)
+    #     except KeyboardInterrupt:
+    #         exit()
+    #     except Exception as e:
+    #         print(e)
+    #         send_mail("TRAINING CRASH", "See terminal for failure cause.")
+    #
+    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+    #     try:
+    #         for i in range(6):
+    #             num = 2 ** i
+    #             get_metrics(args, num, is_super=True, std_val=val)
+    #     except KeyboardInterrupt:
+    #         exit()
+    #     except Exception as e:
+    #         print(e)
+    #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
     # try:
     # train(args)
