@@ -193,7 +193,7 @@ def generate_gif(type):
     for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
-def train(args, bl=1, adv_mult=0.0):
+def train(args, bl=1, adv_mult=0.0, std_mult_arg=False):
     print(f"WEIGHT: {adv_mult}")
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -202,6 +202,7 @@ def train(args, bl=1, adv_mult=0.0):
 
     std_mult = 1
     std_mults = [1.000]
+    psnr_diffs = []
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
@@ -280,7 +281,7 @@ def train(args, bl=1, adv_mult=0.0):
             if adv_mult > 0:
                 mult = adv_mult
 
-            std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            std_weight = (std_mult if not std_mult_arg else std_mult_arg) * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = mult
             # adv_weight = 1e-3
             l1_weight = 1
@@ -428,16 +429,23 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        if (epoch + 1) % 2 == 0:
-            mu_0 = 4
-            std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(losses['psnr']) / np.mean(losses['single_psnr']))
-            std_mults.append(std_mult)
+        # if (epoch + 1) % 2 == 0:
+        mu_0 = 2
+        std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
+            losses['psnr']) / np.mean(losses['single_psnr']))
+        std_mults.append(std_mult)
+        psnr_diffs.append(((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
+            losses['psnr']) / np.mean(losses['single_psnr'])))
 
     std_mult_str = ""
     for val in std_mults:
         std_mult_str += f"{val},"
 
-    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", std_mult_str)
+    psnr_diff_str = ""
+    for val in psnr_diffs:
+        psnr_diff_str += f"{val},"
+
+    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", f"{std_mult_str}\n{psnr_diff_str}")
 
 
 if __name__ == '__main__':
@@ -460,41 +468,30 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    # vals = [1.4, 1.5, 1.6]
-    #
-    # for val in vals:
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
-    #     try:
-    #         args.batch_size = 36
-    #         train(args, bl=0, adv_mult=val)
-    #     except KeyboardInterrupt:
-    #         exit()
-    #     except Exception as e:
-    #         print(e)
-    #         send_mail("TRAINING CRASH", "See terminal for failure cause.")
-    #
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-    #     try:
-    #         args.batch_size = 20
-    #         for i in range(8):
-    #             num = 2 ** i
-    #             get_metrics(args, num, is_super=True, std_val=val)
-    #     except KeyboardInterrupt:
-    #         exit()
-    #     except Exception as e:
-    #         print(e)
-    #         send_mail("TESTING FAILED", "See terminal for failure cause.")
+    vals = [1.8]
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-    try:
-        for i in range(6):
-            num = 2 ** i
-            get_metrics(args, num, is_super=True, std_val=1e-3)
-    except KeyboardInterrupt:
-        exit()
-    except Exception as e:
-        print(e)
-        send_mail("TESTING FAILED", "See terminal for failure cause.")
+    for val in vals:
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+        try:
+            args.batch_size = 36
+            train(args, bl=0, adv_mult=val, std_mult_arg=val)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TRAINING CRASH", "See terminal for failure cause.")
+
+        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+        try:
+            args.batch_size = 20
+            for i in range(8):
+                num = 2 ** i
+                get_metrics(args, num, is_super=True, std_val=val)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TESTING FAILED", "See terminal for failure cause.")
 
     vals = [1e-2, 1e-4]
     for val in vals:
