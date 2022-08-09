@@ -468,7 +468,7 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    vals = [1.7]
+    vals = [1.6]
 
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
