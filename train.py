@@ -494,7 +494,11 @@ if __name__ == '__main__':
 
     vals = [1e-3, 1e-2, 1e-4]
     for val in vals:
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+        if val == 1e-3:
+            args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+        else:
+            args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+
         try:
             train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
