@@ -435,6 +435,8 @@ def train(args, bl=1, adv_mult=0.0):
         std_mults.append(std_mult)
         psnr_diffs.append(((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
             losses['psnr']) / np.mean(losses['single_psnr'])))
+        np.savetxt('std_weights.txt', std_mults)
+        np.savetxt('psnr_diffs.txt', std_mults)
 
     std_mult_str = ""
     for val in std_mults:
