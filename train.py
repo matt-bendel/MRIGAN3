@@ -200,8 +200,8 @@ def train(args, bl=1, adv_mult=0.0):
     args.in_chans = 16
     args.out_chans = 16
 
-    std_mult = 1
-    std_mults = [1.000]
+    std_mult = 1.375
+    std_mults = [1.375]
     psnr_diffs = []
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
@@ -408,8 +408,13 @@ def train(args, bl=1, adv_mult=0.0):
         print(f"PSNR DIFF: {psnr_diff:.2f}")
         print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
-        best_model = psnr_loss > best_loss and psnr_diff >= 0
-        best_loss = psnr_loss if psnr_loss > best_loss else best_loss
+        if epoch + 1 == 113:
+            best_loss = 0
+
+        psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
+            losses['psnr']) / np.mean(losses['single_psnr']))
+        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.005)
+        best_loss = psnr_loss if psnr_loss > best_loss and best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
