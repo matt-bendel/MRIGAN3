@@ -408,7 +408,7 @@ def train(args, bl=1, adv_mult=0.0):
         print(f"PSNR DIFF: {psnr_diff:.2f}")
         print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
-        if epoch + 1 == 113:
+        if epoch + 1 == 112:
             best_loss = 0
 
         psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
