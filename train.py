@@ -201,7 +201,7 @@ def train(args, bl=1, adv_mult=0.0):
     args.out_chans = 16
 
     std_mult = 1.375
-    std_mults = [1.375]
+    std_mults = [std_mult]
     psnr_diffs = []
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
@@ -414,7 +414,7 @@ def train(args, bl=1, adv_mult=0.0):
         psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
             losses['psnr']) / np.mean(losses['single_psnr']))
         best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.005)
-        best_loss = psnr_loss if psnr_loss > best_loss and best_model else best_loss
+        best_loss = psnr_loss if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
@@ -440,8 +440,20 @@ def train(args, bl=1, adv_mult=0.0):
         std_mults.append(std_mult)
         psnr_diffs.append(((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
             losses['psnr']) / np.mean(losses['single_psnr'])))
-        np.savetxt('std_weights.txt', std_mults)
-        np.savetxt('psnr_diffs.txt', std_mults)
+
+        file = open("std_weights.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(std_mults)
+        file.write(content)
+        file.close()
+
+        file = open("psnr_diffs.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(psnr_diffs)
+        file.write(content)
+        file.close()
 
     std_mult_str = ""
     for val in std_mults:
