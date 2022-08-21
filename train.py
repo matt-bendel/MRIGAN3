@@ -211,15 +211,12 @@ def train(args, bl=1, adv_mult=0.0):
         with open("std_weights.txt", "r") as file1:
             for line in file1.readlines():
                 for i in line.split(","):
-                    std_mults.append(float(i.strip()))
+                    std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
         with open("psnr_diffs.txt", "r") as file1:
             for line in file1.readlines():
                 for i in line.split(","):
-                    temp = i.replace('[', '').replace(']', '').replace(' ', '')
-                    print(temp)
-                    print(dtype(temp))
-                    psnr_diffs.append(float(temp))
+                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
         std_mult = std_mults[-1]
         print(std_mults)
