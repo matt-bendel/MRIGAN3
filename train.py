@@ -219,7 +219,7 @@ def train(args, bl=1, adv_mult=0.0):
                     psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
         std_mult = std_mults[-1]
-        print(std_mults)
+        print(std_mult)
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
