@@ -216,7 +216,7 @@ def train(args, bl=1, adv_mult=0.0):
         with open("psnr_diffs.txt", "r") as file1:
             for line in file1.readlines():
                 for i in line.split(","):
-                    psnr_diffs.append(float(i.strip()))
+                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '')))
 
         std_mult = std_mults[-1]
 
