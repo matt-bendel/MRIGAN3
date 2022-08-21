@@ -200,9 +200,25 @@ def train(args, bl=1, adv_mult=0.0):
     args.in_chans = 16
     args.out_chans = 16
 
-    std_mult = 1.33
+    # TODO: CHANGE BACK TO 1
+    std_mult = 1
     std_mults = [std_mult]
     psnr_diffs = []
+
+    if args.resume:
+        std_mults = []
+        psnr_diffs = []
+        with open("std_weights.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    std_mults.append(float(i.strip()))
+
+        with open("psnr_diffs.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    psnr_diffs.append(float(i.strip()))
+
+        std_mult = std_mults[-1]
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
