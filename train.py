@@ -216,10 +216,10 @@ def train(args, bl=1, adv_mult=0.0):
         with open("psnr_diffs.txt", "r") as file1:
             for line in file1.readlines():
                 for i in line.split(","):
-                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '')))
+                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
         std_mult = std_mults[-1]
-        print(std_mults)
+
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
     # if bl == 0:
