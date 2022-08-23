@@ -301,8 +301,8 @@ def train(args, bl=1, adv_mult=0.0):
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
             g_loss += - std_weight * torch.std(gens, dim=1).mean()
 
-            if g_loss < -20:
-                raise Exception
+            # if g_loss < -20:
+            #     raise Exception
 
             g_loss.backward()
             opt_G.step()
