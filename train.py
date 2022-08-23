@@ -205,21 +205,21 @@ def train(args, bl=1, adv_mult=0.0):
     std_mults = [std_mult]
     psnr_diffs = []
 
-    if args.resume:
-        std_mults = []
-        psnr_diffs = []
-        with open("std_weights.txt", "r") as file1:
-            for line in file1.readlines():
-                for i in line.split(","):
-                    std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
-
-        with open("psnr_diffs.txt", "r") as file1:
-            for line in file1.readlines():
-                for i in line.split(","):
-                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
-
-        std_mult = std_mults[-1]
-        print(std_mult)
+    # if args.resume:
+    #     std_mults = []
+    #     psnr_diffs = []
+    #     with open("std_weights.txt", "r") as file1:
+    #         for line in file1.readlines():
+    #             for i in line.split(","):
+    #                 std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+    #
+    #     with open("psnr_diffs.txt", "r") as file1:
+    #         for line in file1.readlines():
+    #             for i in line.split(","):
+    #                 psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+    #
+    #     std_mult = std_mults[-1]
+    #     print(std_mult)
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
