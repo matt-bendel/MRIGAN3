@@ -446,7 +446,7 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
         # if (epoch + 1) % 2 == 0:
-        mu_0 = 0.01
+        mu_0 = 0.1
         std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
@@ -521,7 +521,7 @@ if __name__ == '__main__':
     #         print(e)
     #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
-    vals = [1e-2, 1e-1, 1e-3, 1e-4]
+    vals = [1e-1]
     for val in vals:
         args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
 
