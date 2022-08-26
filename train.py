@@ -450,7 +450,8 @@ def train(args, bl=1, adv_mult=0.0):
         # std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         # std_mults.append(std_mult)
         mu_0 = 0.5
-        std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
+        std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
+            losses['psnr']) / np.mean(losses['single_psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
 
