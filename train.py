@@ -201,7 +201,7 @@ def train(args, bl=1, adv_mult=0.0):
     args.out_chans = 16
 
     # TODO: CHANGE BACK TO 1
-    std_mult = 1
+    std_mult = 1.375
     std_mults = [std_mult]
     psnr_diffs = []
 
@@ -449,9 +449,8 @@ def train(args, bl=1, adv_mult=0.0):
         # mu_0 = 0.001
         # std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         # std_mults.append(std_mult)
-        mu_0 = 0.5
-        std_mult += mu_0 * ((np.mean(losses['single_psnr']) + 2.5) / np.mean(losses['single_psnr']) - np.mean(
-            losses['psnr']) / np.mean(losses['single_psnr']))
+        mu_0 = 0.001
+        std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
 
