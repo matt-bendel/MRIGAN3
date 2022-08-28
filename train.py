@@ -201,7 +201,7 @@ def train(args, bl=1, adv_mult=0.0):
     args.out_chans = 16
 
     # TODO: CHANGE BACK TO 1
-    std_mult = 1.375
+    std_mult = 1
     std_mults = [std_mult]
     psnr_diffs = []
 
