@@ -449,7 +449,7 @@ def train(args, bl=1, adv_mult=0.0):
         # mu_0 = 0.001
         # std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         # std_mults.append(std_mult)
-        mu_0 = 1e-4
+        mu_0 = 1e-3
         std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
