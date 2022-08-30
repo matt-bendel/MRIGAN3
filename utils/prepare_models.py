@@ -25,7 +25,7 @@ def build_discriminator(args):
     if args.patch_disc:
         print('PATCH DISC')
         model = PatchDisc(
-            input_nc=args.in_chans * 2,
+            input_nc=args.in_chans * 2 if not args.adler else args.in_chans * 3,
         ).to(torch.device('cuda'))
     else:
         model = DiscriminatorModel(

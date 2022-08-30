@@ -200,26 +200,6 @@ def train(args, bl=1, adv_mult=0.0):
     args.in_chans = 16
     args.out_chans = 16
 
-    std_mult = 1
-    std_mults = [std_mult]
-    psnr_diffs = []
-
-    if args.resume:
-        std_mults = []
-        psnr_diffs = []
-        with open("std_weights.txt", "r") as file1:
-            for line in file1.readlines():
-                for i in line.split(","):
-                    std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
-
-        with open("psnr_diffs.txt", "r") as file1:
-            for line in file1.readlines():
-                for i in line.split(","):
-                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
-
-        std_mult = std_mults[-1]
-        print(std_mult)
-
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
     if bl == 0:
@@ -249,59 +229,40 @@ def train(args, bl=1, adv_mult=0.0):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, y_true)
+                output_gen_1 = G(y, y_true)
+                output_gen_2 = G(y, y_true)
 
-                real_pred = D(input=x, y=y)
-                fake_pred = D(input=x_hat, y=y)
+                rand_num = np.random.randint(0, 2, 1)
+                if rand_num == 0:
+                    x_expect = torch.cat([x, output_gen_1], 1)
+                else:
+                    x_expect = torch.cat([output_gen_1, x], 1)
+
+                # MAKE PREDICTIONS
+                x_posterior_concat = torch.cat([output_gen_1, output_gen_2], 1)
+                real_pred = discriminator(input=x_expect, y=y)
+                fake_pred = discriminator(input=x_posterior_concat, y=y)
 
                 # Gradient penalty
-                gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
+                gradient_penalty = compute_gradient_penalty(discriminator, x_expect.data,
+                                                            x_posterior_concat.data, args, old_input.data)
+                # Adversarial loss
+                d_loss = fake_pred.mean() - real_pred.mean() + lambda_gp * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
 
-                d_loss = fake_pred.mean() - real_pred.mean()
-                d_loss += args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
                 d_loss.backward()
-                opt_D.step()
+                optimizer_D.step()
 
             for param in G.gen.parameters():
                 param.grad = None
 
-            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 384, 384),
-                               device=args.device)
-            for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y, y_true)
+            output_gen_1 = G(y, y_true)
+            output_gen_2 = G(y, y_true)
 
-            if args.patch_disc:
-                fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 94, 94), device=args.device)
-                for k in range(y.shape[0]):
-                    cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
-                    cond[0, :, :, :] = y[k, :, :, :]
-                    cond = cond.repeat(args.num_z, 1, 1, 1)
-                    temp = D(input=gens[k], y=cond)
-                    fake_pred[k, :, :, :] = temp[:, 0, :, :]
-            else:
-                fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
-                for k in range(y.shape[0]):
-                    cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
-                    cond[0, :, :, :] = y[k, :, :, :]
-                    cond = cond.repeat(args.num_z, 1, 1, 1)
-                    temp = D(input=gens[k], y=cond)
-                    fake_pred[k] = temp[:, 0]
+            x_posterior_concat = torch.cat([output_gen_1, output_gen_2], 1)
 
-            avg_recon = torch.mean(gens, dim=1)
+            fake_pred = discriminator(input=x_posterior_concat, y=y)
 
-            gen_pred_loss = torch.mean(fake_pred[0])
-            for k in range(y.shape[0] - 1):
-                gen_pred_loss += torch.mean(fake_pred[k + 1])
-
-            std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = adv_mult
-            l1_weight = 1
-            g_loss = - adv_weight * gen_pred_loss.mean()
-            g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
-            g_loss += - std_weight * torch.std(gens, dim=1).mean()
-
-            # if g_loss < -20:
-            #     raise Exception
+            g_loss = -fake_pred.mean()
 
             g_loss.backward()
             opt_G.step()
@@ -420,11 +381,8 @@ def train(args, bl=1, adv_mult=0.0):
         print(f"PSNR DIFF: {psnr_diff:.2f}")
         print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
-        # if epoch + 1 == 112:
-        #     best_loss = 0
 
-        psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr']))
-        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.15)
+        best_model = psnr_loss > best_loss
         best_loss = psnr_loss if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
@@ -444,38 +402,6 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        # if (epoch + 1) % 2 == 0:
-        # mu_0 = 0.001
-        # std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
-        # std_mults.append(std_mult)
-        mu_0 = 1e-2
-        std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
-        std_mults.append(std_mult)
-        psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
-
-        file = open("std_weights.txt", "w+")
-
-        # Saving the 2D array in a text file
-        content = str(std_mults)
-        file.write(content)
-        file.close()
-
-        file = open("psnr_diffs.txt", "w+")
-
-        # Saving the 2D array in a text file
-        content = str(psnr_diffs)
-        file.write(content)
-        file.close()
-
-    std_mult_str = ""
-    for val in std_mults:
-        std_mult_str += f"{val},"
-
-    psnr_diff_str = ""
-    for val in psnr_diffs:
-        psnr_diff_str += f"{val},"
-
-    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}")
 
 
 if __name__ == '__main__':
@@ -498,32 +424,7 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    # vals = [1.8]
-    #
-    # for val in vals:
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
-    #     try:
-    #         args.batch_size = 36
-    #         train(args, bl=0, adv_mult=val)
-    #     except KeyboardInterrupt:
-    #         exit()
-    #     except Exception as e:
-    #         print(e)
-    #         send_mail("TRAINING CRASH", "See terminal for failure cause.")
-    #
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-    #     try:
-    #         args.batch_size = 20
-    #         for i in range(8):
-    #             num = 2 ** i
-    #             get_metrics(args, num, is_super=True, std_val=val)
-    #     except KeyboardInterrupt:
-    #         exit()
-    #     except Exception as e:
-    #         print(e)
-    #         send_mail("TESTING FAILED", "See terminal for failure cause.")
-
-    vals = [1e-2]
+    vals = [1e-3]
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
     for val in vals:
         try:
@@ -543,29 +444,3 @@ if __name__ == '__main__':
         except Exception as e:
             print(e)
             send_mail("TESTING FAILED", "See terminal for failure cause.")
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-
-    # try:
-    #     train(args, bl=0, adv_mult=1e-2)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TRAINING CRASH", "See terminal for failure cause.")
-    #
-    # try:
-    #     for i in range(6):
-    #         num = 2 ** i
-    #         get_metrics(args, num, is_super=True, std_val=1e-2)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TESTING FAILED", "See terminal for failure cause.")
-    # try:
-    # train(args)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TRAINING CRASH", "Log in to see cause.")

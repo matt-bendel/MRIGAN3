@@ -32,6 +32,8 @@ def create_arg_parser():
     # DATA ARGS
     parser.add_argument('--R', default=4, type=int,
                         help='Acceleration rate - 4 or 8')
+    parser.add_argument('--adler', action='store_true',
+                        help='If set, use multiple GPUs using data parallelism')
     parser.add_argument('--data-parallel', required=True, action='store_true',
                         help='If set, use multiple GPUs using data parallelism')
     parser.add_argument('--ls', action='store_true',
