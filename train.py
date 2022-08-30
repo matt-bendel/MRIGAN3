@@ -200,26 +200,25 @@ def train(args, bl=1, adv_mult=0.0):
     args.in_chans = 16
     args.out_chans = 16
 
-    # TODO: CHANGE BACK TO 1
     std_mult = 1
     std_mults = [std_mult]
     psnr_diffs = []
 
-    # if args.resume:
-    #     std_mults = []
-    #     psnr_diffs = []
-    #     with open("std_weights.txt", "r") as file1:
-    #         for line in file1.readlines():
-    #             for i in line.split(","):
-    #                 std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
-    #
-    #     with open("psnr_diffs.txt", "r") as file1:
-    #         for line in file1.readlines():
-    #             for i in line.split(","):
-    #                 psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
-    #
-    #     std_mult = std_mults[-1]
-    #     print(std_mult)
+    if args.resume:
+        std_mults = []
+        psnr_diffs = []
+        with open("std_weights.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+
+        with open("psnr_diffs.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+
+        std_mult = std_mults[-1]
+        print(std_mult)
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
@@ -425,7 +424,7 @@ def train(args, bl=1, adv_mult=0.0):
             best_loss = 0
 
         psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr']))
-        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.05)
+        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.15)
         best_loss = psnr_loss if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
@@ -449,7 +448,7 @@ def train(args, bl=1, adv_mult=0.0):
         # mu_0 = 0.001
         # std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         # std_mults.append(std_mult)
-        mu_0 = 1e-3
+        mu_0 = 1e-2
         std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
@@ -524,10 +523,9 @@ if __name__ == '__main__':
     #         print(e)
     #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
-    vals = [1e-1]
+    vals = [1e-2]
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
     for val in vals:
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
-
         try:
             train(args, bl=0, adv_mult=val)
         except KeyboardInterrupt:
@@ -536,7 +534,6 @@ if __name__ == '__main__':
             print(e)
             send_mail("TRAINING CRASH", "See terminal for failure cause.")
 
-        args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
         try:
             for i in range(6):
                 num = 2 ** i
