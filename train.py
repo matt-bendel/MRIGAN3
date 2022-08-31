@@ -523,7 +523,7 @@ if __name__ == '__main__':
     #         print(e)
     #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
-    vals = [1e-1]
+    vals = [1e-2]
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
     for val in vals:
         try:
