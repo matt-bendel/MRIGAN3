@@ -377,9 +377,6 @@ def train(args, bl=1, adv_mult=0.0):
                         plt.savefig(f'std_dev_gen.png')
                         plt.close()
 
-        psnr_diff = (np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr'])
-        print(f"PSNR DIFF: {psnr_diff:.2f}")
-        print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
 
         best_model = psnr_loss > best_loss
