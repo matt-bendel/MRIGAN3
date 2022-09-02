@@ -240,17 +240,17 @@ def train(args, bl=1, adv_mult=0.0):
 
                 # MAKE PREDICTIONS
                 x_posterior_concat = torch.cat([output_gen_1, output_gen_2], 1)
-                real_pred = discriminator(input=x_expect, y=y)
-                fake_pred = discriminator(input=x_posterior_concat, y=y)
+                real_pred = D(input=x_expect, y=y)
+                fake_pred = D(input=x_posterior_concat, y=y)
 
                 # Gradient penalty
-                gradient_penalty = compute_gradient_penalty(discriminator, x_expect.data,
+                gradient_penalty = compute_gradient_penalty(D, x_expect.data,
                                                             x_posterior_concat.data, args, old_input.data)
                 # Adversarial loss
                 d_loss = fake_pred.mean() - real_pred.mean() + lambda_gp * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
 
                 d_loss.backward()
-                optimizer_D.step()
+                opt_D.step()
 
             for param in G.gen.parameters():
                 param.grad = None
@@ -260,7 +260,7 @@ def train(args, bl=1, adv_mult=0.0):
 
             x_posterior_concat = torch.cat([output_gen_1, output_gen_2], 1)
 
-            fake_pred = discriminator(input=x_posterior_concat, y=y)
+            fake_pred = D(input=x_posterior_concat, y=y)
 
             g_loss = -fake_pred.mean()
 
