@@ -245,7 +245,7 @@ def train(args, bl=1, adv_mult=0.0):
 
                 # Gradient penalty
                 gradient_penalty = compute_gradient_penalty(D, x_expect.data,
-                                                            x_posterior_concat.data, args, old_input.data)
+                                                            x_posterior_concat.data, args, y.data)
                 # Adversarial loss
                 d_loss = fake_pred.mean() - real_pred.mean() + lambda_gp * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
 
