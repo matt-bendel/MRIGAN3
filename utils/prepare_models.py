@@ -29,7 +29,7 @@ def build_discriminator(args):
         ).to(torch.device('cuda'))
     else:
         model = DiscriminatorModel(
-            in_chans=args.in_chans * 2,
+            in_chans=args.in_chans * 2 if not args.adler else args.in_chans * 3,
             out_chans=args.out_chans,
         ).to(torch.device('cuda'))
 
