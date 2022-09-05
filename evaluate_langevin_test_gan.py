@@ -86,8 +86,8 @@ def main(args):
         pin_memory=True
     )
 
-    for i in range(1):
-        num_code = 32
+    for num in vals:
+        num_code = num
 
         print(f"{num_code} CODE VECTORS")
         psnr_vals = []

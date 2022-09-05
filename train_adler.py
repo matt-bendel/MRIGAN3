@@ -208,7 +208,7 @@ def train(args, bl=1, adv_mult=0.0):
     if args.resume:
         start_epoch += 1
 
-    train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
+    train_loader, dev_loader = create_data_loaders(args, big_test=False)
 
     # exit()
 
@@ -293,7 +293,7 @@ def train(args, bl=1, adv_mult=0.0):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 384, 384),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1)
+                    gens[:, z, :, :, :] = G(y, y_true)
 
                 avg = torch.mean(gens, dim=1)
 
