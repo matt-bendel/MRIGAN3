@@ -203,6 +203,7 @@ def main(args):
     )
 
     num_code = 32
+    exceptions = False
 
     for i, data in enumerate(loader):
         with torch.no_grad():
@@ -220,12 +221,8 @@ def main(args):
                 gens_ours[z, :, :, :] = G_ours(y, y_true)[0]
                 gens_adler[z, :, :, :] = G_adler(y, y_true)[0]
 
-            print(gens_ours.shape)
-
             avg_ours = torch.mean(gens_ours, dim=0)
             avg_adler = torch.mean(gens_adler, dim=0)
-
-            print(avg_ours.shape)
 
             temp_gens_ours = torch.zeros(gens_ours.shape, dtype=gens_ours.dtype)
             temp_gens_adler = torch.zeros(gens_adler.shape, dtype=gens_adler.dtype)
@@ -289,7 +286,7 @@ def main(args):
                     new_filename = recon_directory + filename + f'|langevin|slide_idx_{slice}_R=4_sample={j}_outputs.pt'
                     recon_object = torch.load(new_filename)
                 except:
-                    proint(new_filename)
+                    print(new_filename)
                     exceptions = True
                     continue
                 # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
