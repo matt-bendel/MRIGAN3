@@ -97,12 +97,12 @@ from wrappers.our_gen_wrapper import load_best_gan
 #     for i in range(32):
 #         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
-def unnormalize(gen_img, estimated_mvue):
+def normalize(gen_img, estimated_mvue):
     '''
         Estimate mvue from coils and normalize with 99% percentile.
     '''
     scaling = torch.quantile(estimated_mvue.abs(), 0.99)
-    return gen_img / scaling
+    return gen_img * scaling
 
 
 def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=False, disc_num=False):
@@ -385,7 +385,7 @@ def main(args):
                     # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
                     langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
-                    langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
+                    langevin_gt = normalize(recon_object['gt'], recon_object['zfr'])[0][0].abs().cpu().numpy()
 
                 if exceptions:
                     exceptions = False
