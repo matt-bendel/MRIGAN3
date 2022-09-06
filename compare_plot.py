@@ -299,7 +299,7 @@ def main(args):
                     exceptions = False
                     continue
 
-                langevin_avg = np.mean(recons, axis=0)
+                langevin_avg = np.mean(langevin_recons, axis=0)
                 langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
                 langevin_std = np.std(langevin_recons, axis=0)
 
