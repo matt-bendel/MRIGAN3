@@ -14,7 +14,7 @@ from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-
+import imageio as iio
 
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
@@ -327,8 +327,8 @@ def main(args):
                 avg_gen_adler[:, :, :, 1] = avg_adler[j, 8:16, :, :]
 
                 gt = torch.zeros(size=(8, 384, 384, 2), device=args.device)
-                gt[:, :, :, 0] = x[j, 0:8, :, :]
-                gt[:, :, :, 1] = x[j, 8:16, :, :]
+                gt[:, :, :, 0] = x[j, 0:8, :, :] * std[j].to(args.device) + mean[j].to(args.device)
+                gt[:, :, :, 1] = x[j, 8:16, :, :] * std[j].to(args.device) + mean[j].to(args.device)
 
                 new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
