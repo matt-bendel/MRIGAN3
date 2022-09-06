@@ -394,7 +394,7 @@ def main(args):
                 langevin_avg = np.mean(langevin_recons, axis=0)
                 langevin_std = np.std(langevin_recons, axis=0)
 
-                plt.imshow(np.abs(langevin_gt - langevin_avg), cmap='jet')
+                plt.imshow(np.abs(langevin_gt - langevin_recons[0]), cmap='jet')
                 plt.savefig('test.png')
                 exit()
 
