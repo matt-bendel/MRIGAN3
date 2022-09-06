@@ -327,8 +327,8 @@ def main(args):
                 avg_gen_adler[:, :, :, 1] = avg_adler[j, 8:16, :, :]
 
                 gt = torch.zeros(size=(8, 384, 384, 2), device=args.device)
-                gt[:, :, :, 0] = x[j, 0:8, :, :] * std[j].to(args.device) + mean[j].to(args.device)
-                gt[:, :, :, 1] = x[j, 8:16, :, :] * std[j].to(args.device) + mean[j].to(args.device)
+                gt[:, :, :, 0] = x[j, 0:8, :, :]
+                gt[:, :, :, 1] = x[j, 8:16, :, :]
 
                 new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
