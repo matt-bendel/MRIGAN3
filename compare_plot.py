@@ -220,8 +220,12 @@ def main(args):
                 gens_ours[z, :, :, :] = G_ours(y, y_true)[0]
                 gens_adler[z, :, :, :] = G_adler(y, y_true)[0]
 
+            print(gen_ours.shape)
+
             avg_ours = torch.mean(gens_ours, dim=0)
             avg_adler = torch.mean(gens_adler, dim=0)
+
+            print(avg_ours.shape)
 
             temp_gens_ours = torch.zeros(gens_ours.shape, dtype=gens_ours.dtype)
             temp_gens_adler = torch.zeros(gens_adler.shape, dtype=gens_adler.dtype)
