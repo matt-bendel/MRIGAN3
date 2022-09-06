@@ -223,8 +223,8 @@ def main(args):
             avg_ours = torch.mean(gens_ours, dim=0)
             avg_adler = torch.mean(gens_adler, dim=0)
 
-            temp_gens_ours = torch.zeros(gens.shape, dtype=gens.dtype)
-            temp_gens_adler = torch.zeros(gens.shape, dtype=gens.dtype)
+            temp_gens_ours = torch.zeros(gens_ours.shape, dtype=gens.dtype)
+            temp_gens_adler = torch.zeros(gens_adler.shape, dtype=gens.dtype)
             for z in range(num_code):
                 temp_gens_ours[z, :, :, :] = gens[z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:, None, None, None].to(args.device)
                 temp_gens_adler[z, :, :, :] = gens[z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:, None, None, None].to(args.device)
@@ -318,6 +318,8 @@ def main(args):
             }
 
             create_mean_error_plots(avg_dict, std_dict, gt_dict, i)
+
+            exit()
 
 
 
