@@ -385,12 +385,12 @@ def main(args):
                     # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
                     langevin_recons[j] = recon_object['zfr'][0].abs().cpu().numpy()#complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
-                    langevin_gt = recon_object['gt'], recon_object['zfr'][0][0].abs().cpu().numpy()
 
                 if exceptions:
                     exceptions = False
                     continue
 
+                langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
                 langevin_avg = np.mean(langevin_recons, axis=0)
                 langevin_std = np.std(langevin_recons, axis=0)
 
