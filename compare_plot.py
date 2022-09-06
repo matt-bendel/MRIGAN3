@@ -208,6 +208,7 @@ def main(args):
     for i, data in enumerate(loader):
         with torch.no_grad():
             y, x, y_true, mean, std, filename, slice = data
+            print(filename)
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
@@ -284,6 +285,7 @@ def main(args):
             for j in range(num_code):
                 try:
                     new_filename = recon_directory + filename + f'|langevin|slide_idx_{slice}_R=4_sample={j}_outputs.pt'
+                    print(new_filename)
                     recon_object = torch.load(new_filename)
                 except:
                     exceptions = True
