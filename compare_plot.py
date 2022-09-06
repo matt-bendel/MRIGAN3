@@ -384,7 +384,7 @@ def main(args):
                         break
                     # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
-                    langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_recons[l] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
 
                 if exceptions:
                     exceptions = False
@@ -394,7 +394,7 @@ def main(args):
                 langevin_avg = np.mean(langevin_recons, axis=0)
                 langevin_std = np.std(langevin_recons, axis=0)
 
-                plt.imshow(np.abs(langevin_gt - langevin_recons[20]), cmap='jet')
+                plt.imshow(np.abs(langevin_gt - langevin_avg), cmap='jet')
                 plt.savefig('test.png')
                 exit()
 
