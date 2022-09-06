@@ -387,10 +387,6 @@ def main(args):
                 langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
                 langevin_std = np.std(langevin_recons, axis=0)
 
-                plt.imshow(langevin_avg, cmap='gray')
-                plt.savefig('test.png')
-                exit()
-
                 std_dict = {
                     'ours': std_ours_np,
                     'adler': std_adler_np,
