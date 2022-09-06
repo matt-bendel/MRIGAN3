@@ -42,6 +42,9 @@ def create_arg_parser():
                         help='top slices have bigger brain image and less air region')
     parser.add_argument('--use-middle-slices', action='store_true',
                         help='If set, only uses central slice of every data collection')
+    parser.add_argument('--langevin-plots', action='store_true',
+                        help='If set, resume the training from a previous model checkpoint. '
+                             '"--checkpoint" should be set with this')
 
     # LOGISTICAL ARGS
     parser.add_argument('--dynamic-inpaint', action='store_true',
