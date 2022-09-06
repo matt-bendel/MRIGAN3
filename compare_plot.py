@@ -289,6 +289,7 @@ def main(args):
                     new_filename = recon_directory + filename + f'|langevin|slide_idx_{slice}_R=4_sample={j}_outputs.pt'
                     recon_object = torch.load(new_filename)
                 except:
+                    proint(new_filename)
                     exceptions = True
                     continue
                 # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
@@ -296,6 +297,7 @@ def main(args):
                 langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
 
             if exceptions:
+                print("EXCEPTION\n")
                 exceptions = False
                 continue
 
