@@ -63,7 +63,7 @@ recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 # that directory
 
 
-vals = [1, 2, 4, 8, 16, 32]
+vals = [32]
 
 exceptions = False
 count = 0
