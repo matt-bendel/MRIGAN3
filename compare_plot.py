@@ -47,7 +47,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
                 horizontalalignment='right', verticalalignment='center', fontsize='xx-small', color='yellow')
 
     if method == 'Std. Dev':
-        im = ax.imshow(image, cmap='viridis', vmin=0, vmax=5e-6)
+        im = ax.imshow(image, cmap='viridis')
         ax.set_xticks([])
         ax.set_yticks([])
     else:
@@ -162,7 +162,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
         generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
         if i == 0:
             im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
-            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
+            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
         else:
             generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
             generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
