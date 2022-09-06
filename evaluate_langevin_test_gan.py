@@ -64,6 +64,7 @@ def main(args):
 
     vals = [1, 2, 4, 8, 16, 32]
 
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ours"
     G = load_best_gan(args)
     G.update_gen_status(val=True)
     compute_cfid.get_cfid(args, G)
