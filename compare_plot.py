@@ -384,7 +384,7 @@ def main(args):
                         break
                     # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
-                    langevin_recons[j] = recon_object['zfr'][0].abs().cpu().numpy()#complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_recons[j] = recon_object['mvue'][0].abs().cpu().numpy()#complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
 
                 if exceptions:
                     exceptions = False
