@@ -378,24 +378,21 @@ def main(args):
                     try:
                         new_filename = recon_directory + filename[j] + f'|langevin|slide_idx_{slice[j]}_R=4_sample={l}_outputs.pt'
                         recon_object = torch.load(new_filename)
-                    except:
+                    except Exception as e:
+                        print(e)
                         exceptions = True
                         break
-                    temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
+                    # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
-                    langevin_recons[j] = complex_abs(temp_recon[0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_recons[j] = complex_abs(recon_object['zfr'][0].permute(1, 2, 0)).cpu().numpy()
 
                 if exceptions:
-                    print("EXCEPTION\n")
                     exceptions = False
                     continue
 
                 langevin_avg = np.mean(langevin_recons, axis=0)
                 langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
                 langevin_std = np.std(langevin_recons, axis=0)
-
-                print(np.max(langevin_avg))
-                print(np.max(langevin_gt))
 
                 plt.imshow(np.abs(langevin_gt - langevin_avg), cmap='jet')
                 plt.savefig('test.png')
