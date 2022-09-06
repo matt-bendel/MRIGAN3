@@ -97,6 +97,13 @@ from wrappers.our_gen_wrapper import load_best_gan
 #     for i in range(32):
 #         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
+def unnormalize(gen_img, estimated_mvue):
+    '''
+        Estimate mvue from coils and normalize with 99% percentile.
+    '''
+    scaling = torch.quantile(estimated_mvue.abs(), 0.99)
+    return gen_img / scaling
+
 
 def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=False, disc_num=False):
     # rows and cols are both previously defined ints
@@ -297,8 +304,8 @@ def main(args):
                                     device=args.device)
 
             for z in range(num_code):
-                gens_ours[:, z, :, :, :] = G_ours(y, y_true)[0]
-                gens_adler[:, z, :, :, :] = G_adler(y, y_true)[0]
+                gens_ours[:, z, :, :, :] = G_ours(y, y_true)
+                gens_adler[:, z, :, :, :] = G_adler(y, y_true)
 
             avg_ours = torch.mean(gens_ours, dim=1)
             avg_adler = torch.mean(gens_adler, dim=1)
@@ -374,9 +381,9 @@ def main(args):
                     except:
                         exceptions = True
                         break
-                    # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
+                    temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
-                    langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_recons[j] = complex_abs(temp_recon[0].permute(1, 2, 0)).cpu().numpy()
 
                 if exceptions:
                     print("EXCEPTION\n")
