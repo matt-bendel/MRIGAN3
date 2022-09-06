@@ -226,8 +226,8 @@ def main(args):
             temp_gens_ours = torch.zeros(gens_ours.shape, dtype=gens_ours.dtype)
             temp_gens_adler = torch.zeros(gens_adler.shape, dtype=gens_adler.dtype)
             for z in range(num_code):
-                temp_gens_ours[z, :, :, :] = gens[z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:, None, None, None].to(args.device)
-                temp_gens_adler[z, :, :, :] = gens[z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:, None, None, None].to(args.device)
+                temp_gens_ours[z, :, :, :] = gens_ours[z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:, None, None, None].to(args.device)
+                temp_gens_adler[z, :, :, :] = gens_adler[z, :, :, :] * std[:, None, None, None].to(args.device) + mean[:, None, None, None].to(args.device)
 
             new_gens_ours = torch.zeros(num_code, 8, 384, 384, 2)
             new_gens_ours[:, :, :, :, 0] = temp_gens_ours[:, 0:8, :, :]
