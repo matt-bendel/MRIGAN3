@@ -131,7 +131,7 @@ def generate_gif(type):
 #             image = image ** 0.4
 #             target = target ** 0.4
 #         ax.set_title(method, size=10)
-#         im = ax.imshow(np.abs(image), cmap='gray', vmin=0, vmax=np.max(target))
+#         im = ax.imshow(np.abs(image), cmap='gray', vmin=0, vmax=np.max(image))
 #         ax.set_xticks([])
 #         ax.set_yticks([])
 #
@@ -349,8 +349,8 @@ def main(args):
 
                 place = 1
                 for z in range(num_code):
-                    gen_ours = tensor_to_complex_np((new_gens_ours[z] * std[j] + mean[j]).cpu())
-                    gen_adler = tensor_to_complex_np((new_gens_adler[z] * std[j] + mean[j]).cpu())
+                    gen_ours = tensor_to_complex_np((new_gens_ours[z]).cpu())
+                    gen_adler = tensor_to_complex_np((new_gens_adler[z]).cpu())
 
                     ours_samples_np[z] = torch.tensor(S.H * gen_ours).abs().numpy()
                     adler_samples_np[z] = torch.tensor(S.H * gen_adler).abs().numpy()
@@ -388,7 +388,7 @@ def main(args):
                 langevin_std = np.std(langevin_recons, axis=0)
 
                 plt.imshow(langevin_avg, cmap='gray')
-                plst.savefig('test.png')
+                plt.savefig('test.png')
                 exit()
 
                 std_dict = {
