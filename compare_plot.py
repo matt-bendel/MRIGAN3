@@ -207,7 +207,7 @@ def main(args):
 
     for i, data in enumerate(loader):
         with torch.no_grad():
-            y, x, y_true, mean, std, fname, slice = data
+            y, x, y_true, mean, std, filename, slice = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
@@ -286,9 +286,8 @@ def main(args):
                     new_filename = recon_directory + filename + f'|langevin|slide_idx_{slice}_R=4_sample={j}_outputs.pt'
                     recon_object = torch.load(new_filename)
                 except:
-                    print(new_filename)
                     exceptions = True
-                    continue
+                    break
                 # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
                 langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
