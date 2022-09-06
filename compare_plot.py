@@ -22,6 +22,27 @@ from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import load_best_gan
 
+def gif_im(true, gen_im, index, type, disc_num=False):
+    fig = plt.figure()
+
+    generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
+    im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
+
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
+    plt.close()
+
+
+def generate_gif(type):
+    images = []
+    for i in range(32):
+        images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
+
+    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
+
+    for i in range(32):
+        os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
+
+
 def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=False, disc_num=False):
     # rows and cols are both previously defined ints
     ax = fig.add_subplot(rows, cols, image_ind)
@@ -271,12 +292,18 @@ def main(args):
                 ours_samples_np = np.zeros((num_code, 384, 384))
                 adler_samples_np = np.zeros((num_code, 384, 384))
 
+                place = 1
                 for z in range(num_code):
                     gen_ours = tensor_to_complex_np((new_gens_ours[z] * std[j] + mean[j]).cpu())
                     gen_adler = tensor_to_complex_np((new_gens_adler[z] * std[j] + mean[j]).cpu())
 
                     ours_samples_np[z] = torch.tensor(S.H * gen_ours).abs().numpy()
                     adler_samples_np[z] = torch.tensor(S.H * gen_adler).abs().numpy()
+
+                    gif_im(gt_np, ours_samples_np[z], place, 'image')
+                    place += 1
+
+                generate_gif('image')
 
                 std_ours_np = np.std(ours_samples_np, axis=0)
                 std_adler_np = np.std(adler_samples_np, axis=0)
