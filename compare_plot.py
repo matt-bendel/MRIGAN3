@@ -374,7 +374,7 @@ def main(args):
                 langevin_recons = np.zeros((32, 384, 384))
                 recon_object = None
 
-                for l in range(8):
+                for l in range(num_code):
                     try:
                         new_filename = recon_directory + filename[j] + f'|langevin|slide_idx_{slice[j]}_R=4_sample={l}_outputs.pt'
                         recon_object = torch.load(new_filename)
@@ -385,13 +385,13 @@ def main(args):
                     # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
                     langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
 
                 if exceptions:
                     exceptions = False
                     continue
 
                 langevin_avg = np.mean(langevin_recons, axis=0)
-                langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
                 langevin_std = np.std(langevin_recons, axis=0)
 
                 plt.imshow(np.abs(langevin_gt - langevin_avg), cmap='jet')
