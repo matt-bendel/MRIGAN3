@@ -159,18 +159,19 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     avg_keys = ['ours', 'adler', 'langevin']
     for i in range(num_cols - 1):
-        generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 1, num_rows, num_cols)
+        generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
         if i == 0:
-            im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 5, num_rows, num_cols)
+            im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
         else:
-            generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 5, num_rows, num_cols)
-            generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
+            generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
+            generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
 
     get_colorbar(fig, im_er, ax_er, left=True)
     get_colorbar(fig, im_std, ax_std, left=True)
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
+    plt.close()
 
 def main(args):
     args.batch_size = 4
@@ -287,7 +288,6 @@ def main(args):
                 for l in range(num_code):
                     try:
                         new_filename = recon_directory + filename[j] + f'|langevin|slide_idx_{slice[j]}_R=4_sample={l}_outputs.pt'
-                        print(new_filename)
                         recon_object = torch.load(new_filename)
                     except:
                         exceptions = True
@@ -323,7 +323,7 @@ def main(args):
                     'langevin': langevin_gt
                 }
 
-                create_mean_error_plots(avg_dict, std_dict, gt_dict, i)
+                create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
 
                 if i > 0:
                     exit()
