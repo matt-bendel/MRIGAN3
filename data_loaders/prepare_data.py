@@ -83,7 +83,7 @@ class DataTransform:
         final_gt[0:8, :, :] = normalized_gt[:, :, :, 0]
         final_gt[8:16, :, :] = normalized_gt[:, :, :, 1]
 
-        if args.langevin_plots:
+        if self.args.langevin_plots:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice
         else:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float()
