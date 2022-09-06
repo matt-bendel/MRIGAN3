@@ -159,13 +159,13 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     avg_keys = ['ours', 'adler', 'langevin']
     for i in range(num_cols - 1):
-        generate_image(fig, gt, avg[avg_keys[i]], labels[i], i + 1, num_rows, num_cols)
+        generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 1, num_rows, num_cols)
         if i == 0:
-            im_er, ax_er = generate_error_map(fig, gt, avg[avg_keys[i]], i + 5, num_rows, num_cols)
-            im_std, ax_std = generate_image(fig, gt, std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
+            im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 5, num_rows, num_cols)
+            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
         else:
-            generate_error_map(fig, gt, avg[avg_keys[i]], i + 5, num_rows, num_cols)
-            generate_image(fig, gt, std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
+            generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 5, num_rows, num_cols)
+            generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 9, num_rows, num_cols)
 
     get_colorbar(fig, im_er, ax_er, left=True)
     get_colorbar(fig, im_std, ax_std, left=True)
