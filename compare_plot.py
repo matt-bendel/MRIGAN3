@@ -171,7 +171,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
 
 def main(args):
-    args.batch_size = 1
+    args.batch_size = 4
     ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
     # iterate over files in
     # that directory
@@ -213,117 +213,118 @@ def main(args):
             x = x.to(args.device)
             y_true = y_true.to(args.device)
 
-            gens_ours = torch.zeros(size=(num_code, args.in_chans, 384, 384),
+            gens_ours = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
-            gens_adler = torch.zeros(size=(num_code, args.in_chans, 384, 384),
+            gens_adler = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                     device=args.device)
 
             for z in range(num_code):
-                gens_ours[z, :, :, :] = G_ours(y, y_true)[0]
-                gens_adler[z, :, :, :] = G_adler(y, y_true)[0]
+                gens_ours[:, z, :, :, :] = G_ours(y, y_true)[0]
+                gens_adler[:, z, :, :, :] = G_adler(y, y_true)[0]
 
-            avg_ours = torch.mean(gens_ours, dim=0)
-            avg_adler = torch.mean(gens_adler, dim=0)
+            avg_ours = torch.mean(gens_ours, dim=1)
+            avg_adler = torch.mean(gens_adler, dim=1)
 
             temp_gens_ours = torch.zeros(gens_ours.shape, dtype=gens_ours.dtype)
             temp_gens_adler = torch.zeros(gens_adler.shape, dtype=gens_adler.dtype)
-            for z in range(num_code):
-                temp_gens_ours[z, :, :, :] = gens_ours[z, :, :, :] * std[0].to(args.device) + mean[0].to(args.device)
-                temp_gens_adler[z, :, :, :] = gens_adler[z, :, :, :] * std[0].to(args.device) + mean[0].to(args.device)
+            for j in range(y.size(0)):
+                for z in range(num_code):
+                    temp_gens_ours[j, z, :, :, :] = gens_ours[j, z, :, :, :] * std[j].to(args.device) + mean[j].to(args.device)
+                    temp_gens_adler[j, z, :, :, :] = gens_adler[j, z, :, :, :] * std[j].to(args.device) + mean[j].to(args.device)
 
-            new_gens_ours = torch.zeros(num_code, 8, 384, 384, 2)
-            new_gens_ours[:, :, :, :, 0] = temp_gens_ours[:, 0:8, :, :]
-            new_gens_ours[:, :, :, :, 1] = temp_gens_ours[:, 8:16, :, :]
+                new_gens_ours = torch.zeros(num_code, 8, 384, 384, 2)
+                new_gens_ours[:, :, :, :, 0] = temp_gens_ours[j, :, 0:8, :, :]
+                new_gens_ours[:, :, :, :, 1] = temp_gens_ours[j, :, 8:16, :, :]
 
-            new_gens_adler = torch.zeros(num_code, 8, 384, 384, 2)
-            new_gens_adler[:, :, :, :, 0] = temp_gens_adler[:, 0:8, :, :]
-            new_gens_adler[:, :, :, :, 1] = temp_gens_adler[:, 8:16, :, :]
+                new_gens_adler = torch.zeros(num_code, 8, 384, 384, 2)
+                new_gens_adler[:, :, :, :, 0] = temp_gens_adler[j, :, 0:8, :, :]
+                new_gens_adler[:, :, :, :, 1] = temp_gens_adler[j, :, 8:16, :, :]
 
-            avg_gen_ours = torch.zeros(size=(8, 384, 384, 2), device=args.device)
-            avg_gen_ours[:, :, :, 0] = avg_ours[0:8, :, :]
-            avg_gen_ours[:, :, :, 1] = avg_ours[8:16, :, :]
+                avg_gen_ours = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                avg_gen_ours[:, :, :, 0] = avg_ours[j, 0:8, :, :]
+                avg_gen_ours[:, :, :, 1] = avg_ours[j, 8:16, :, :]
 
-            avg_gen_adler = torch.zeros(size=(8, 384, 384, 2), device=args.device)
-            avg_gen_adler[:, :, :, 0] = avg_adler[0:8, :, :]
-            avg_gen_adler[:, :, :, 1] = avg_adler[8:16, :, :]
+                avg_gen_adler = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                avg_gen_adler[:, :, :, 0] = avg_adler[j, 0:8, :, :]
+                avg_gen_adler[:, :, :, 1] = avg_adler[j, 8:16, :, :]
 
-            gt = torch.zeros(size=(8, 384, 384, 2), device=args.device)
-            gt[:, :, :, 0] = x[0, 0:8, :, :]
-            gt[:, :, :, 1] = x[0, 8:16, :, :]
+                gt = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                gt[:, :, :, 0] = x[j, 0:8, :, :]
+                gt[:, :, :, 1] = x[j, 8:16, :, :]
 
-            new_y_true = fft2c_new(ifft2c_new(y_true[0]) * std[0] + mean[0])
-            maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                       device=sp.Device(3), show_pbar=False, crop=0.70,
-                                       kernel_width=6).run().get()
-            S = sp.linop.Multiply((384, 384), maps)
-            gt_ksp, avg_ksp_ours, avg_ksp_adler = tensor_to_complex_np((gt * std[0] + mean[0]).cpu()), tensor_to_complex_np(
-                (avg_gen_ours * std[0] + mean[0]).cpu()), tensor_to_complex_np(
-                (avg_gen_adler * std[0] + mean[0]).cpu())
+                new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
+                maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                           device=sp.Device(3), show_pbar=False, crop=0.70,
+                                           kernel_width=6).run().get()
+                S = sp.linop.Multiply((384, 384), maps)
+                gt_ksp, avg_ksp_ours, avg_ksp_adler = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                    (avg_gen_ours * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                    (avg_gen_adler * std[j] + mean[j]).cpu())
 
-            avg_gen_np_ours = torch.tensor(S.H * avg_ksp_ours).abs().numpy()
-            avg_gen_np_adler = torch.tensor(S.H * avg_ksp_adler).abs().numpy()
+                avg_gen_np_ours = torch.tensor(S.H * avg_ksp_ours).abs().numpy()
+                avg_gen_np_adler = torch.tensor(S.H * avg_ksp_adler).abs().numpy()
 
-            gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
+                gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
-            ours_samples_np = np.zeros((num_code, 384, 384))
-            adler_samples_np = np.zeros((num_code, 384, 384))
+                ours_samples_np = np.zeros((num_code, 384, 384))
+                adler_samples_np = np.zeros((num_code, 384, 384))
 
-            for z in range(num_code):
-                gen_ours = tensor_to_complex_np((new_gens_ours[z] * std[0] + mean[0]).cpu())
-                gen_adler = tensor_to_complex_np((new_gens_adler[z] * std[0] + mean[0]).cpu())
+                for z in range(num_code):
+                    gen_ours = tensor_to_complex_np((new_gens_ours[z] * std[j] + mean[j]).cpu())
+                    gen_adler = tensor_to_complex_np((new_gens_adler[z] * std[j] + mean[j]).cpu())
 
-                ours_samples_np[z] = torch.tensor(S.H * gen_ours).abs().numpy()
-                adler_samples_np[z] = torch.tensor(S.H * gen_adler).abs().numpy()
+                    ours_samples_np[z] = torch.tensor(S.H * gen_ours).abs().numpy()
+                    adler_samples_np[z] = torch.tensor(S.H * gen_adler).abs().numpy()
 
-            std_ours_np = np.std(ours_samples_np, axis=0)
-            std_adler_np = np.std(adler_samples_np, axis=0)
+                std_ours_np = np.std(ours_samples_np, axis=0)
+                std_adler_np = np.std(adler_samples_np, axis=0)
 
-            recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
-            langevin_recons = np.zeros((32, 384, 384))
-            recon_object = None
+                recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
+                langevin_recons = np.zeros((32, 384, 384))
+                recon_object = None
 
-            for j in range(num_code):
-                try:
-                    new_filename = recon_directory + filename + f'|langevin|slide_idx_{slice}_R=4_sample={j}_outputs.pt'
-                    print(new_filename)
-                    recon_object = torch.load(new_filename)
-                except:
-                    exceptions = True
-                    break
-                # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
+                for l in range(num_code):
+                    try:
+                        new_filename = recon_directory + filename[j] + f'|langevin|slide_idx_{slice}_R=4_sample={l}_outputs.pt'
+                        print(new_filename)
+                        recon_object = torch.load(new_filename)
+                    except:
+                        exceptions = True
+                        break
+                    # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
-                langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
 
-            if exceptions:
-                print("EXCEPTION\n")
-                exceptions = False
-                continue
+                if exceptions:
+                    print("EXCEPTION\n")
+                    exceptions = False
+                    continue
 
-            langevin_avg = np.mean(recons, axis=0)
-            langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
-            langevin_std = np.std(langevin_recons, axis=0)
+                langevin_avg = np.mean(recons, axis=0)
+                langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
+                langevin_std = np.std(langevin_recons, axis=0)
 
-            std_dict = {
-                'ours': std_ours_np,
-                'adler': std_adler_np,
-                'langevin': langevin_std
-            }
+                std_dict = {
+                    'ours': std_ours_np,
+                    'adler': std_adler_np,
+                    'langevin': langevin_std
+                }
 
-            avg_dict = {
-                'ours': avg_gen_np_ours,
-                'adler': avg_gen_np_adler,
-                'langevin': langevin_avg
-            }
+                avg_dict = {
+                    'ours': avg_gen_np_ours,
+                    'adler': avg_gen_np_adler,
+                    'langevin': langevin_avg
+                }
 
-            gt_dict = {
-                'ours': gt_np,
-                'adler': gt_np,
-                'langevin': langevin_gt
-            }
+                gt_dict = {
+                    'ours': gt_np,
+                    'adler': gt_np,
+                    'langevin': langevin_gt
+                }
 
-            create_mean_error_plots(avg_dict, std_dict, gt_dict, i)
+                create_mean_error_plots(avg_dict, std_dict, gt_dict, i)
 
-            exit()
+                exit()
 
 
 
