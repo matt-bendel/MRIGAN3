@@ -104,10 +104,10 @@ for k in vals:
             ssim_vals.append(ssim(gt, mean))
 
     print('AVERAGE')
-    print('APSD: ', np.mean(apsd_vals))
-    print('PSNR: ', np.mean(psnr_vals))
-    print('SNR: ', np.mean(snr_vals))
-    print('SSIM: ', np.mean(ssim_vals))
+    print(f'APSD: {np.mean(apsd_vals)} \pm {np.std(apsd_vals) / np.sqrt(len(apsd_vals))}')
+    print(f'PSNR: {np.mean(psnr_vals)} \pm {np.std(psnr_vals) / np.sqrt(len(psnr_vals))}')
+    print(f'SNR: {np.mean(snr_vals)} \pm {np.std(snr_vals) / np.sqrt(len(snr_vals))}')
+    print(f'SSIM: {np.mean(ssim_vals)} \pm {np.std(ssim_vals) / np.sqrt(len(ssim_vals))}')
     print("\n")
 
 print(count)

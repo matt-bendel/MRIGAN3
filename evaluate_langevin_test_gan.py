@@ -95,7 +95,7 @@ def main(args):
         ssim_vals = []
         snr_vals = []
         apsd_vals = []
-
+        times = []
 
 
         for i, data in enumerate(loader):
@@ -109,7 +109,10 @@ def main(args):
                                    device=args.device)
 
                 for z in range(num_code):
+                    start = time.time()
                     gens[:, z, :, :, :] = G(y, y_true)
+                    elapsed = time.time() - start
+                    times.append(elapsed / args.batch_size)
 
                 avg = torch.mean(gens, dim=1)
 
@@ -153,16 +156,17 @@ def main(args):
                     snr_vals.append(snr(gt_np, avg_gen_np))
 
         print('AVERAGE')
-        print('APSD: ', np.mean(apsd_vals))
-        print('PSNR: ', np.mean(psnr_vals))
-        print('SNR: ', np.mean(snr_vals))
-        print('SSIM: ', np.mean(ssim_vals))
+        print(f'APSD: {np.mean(apsd_vals)} \pm {np.std(apsd_vals) / np.sqrt(len(apsd_vals))}')
+        print(f'PSNR: {np.mean(psnr_vals)} \pm {np.std(psnr_vals) / np.sqrt(len(psnr_vals))}')
+        print(f'SNR: {np.mean(snr_vals)} \pm {np.std(snr_vals) / np.sqrt(len(snr_vals))}')
+        print(f'SSIM: {np.mean(ssim_vals)} \pm {np.std(ssim_vals) / np.sqrt(len(ssim_vals))}')
+        print(f'TIME: {np.mean(times)}')
         print("\n")
-        print('MEDIAN')
-        print('APSD: ', np.median(apsd_vals))
-        print('PSNR: ', np.median(psnr_vals))
-        print('SNR: ', np.median(snr_vals))
-        print('SSIM: ', np.median(ssim_vals))
+        # print('MEDIAN')
+        # print('APSD: ', np.median(apsd_vals))
+        # print('PSNR: ', np.median(psnr_vals))
+        # print('SNR: ', np.median(snr_vals))
+        # print('SSIM: ', np.median(ssim_vals))
         print("\n")
 
 
@@ -185,6 +189,10 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ours"
+    main(args)
+
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
     main(args)
 
     # print('MEDIAN')
