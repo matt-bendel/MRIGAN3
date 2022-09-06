@@ -138,7 +138,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
             image = image ** 0.4
             target = target ** 0.4
         ax.set_title(method, size=10)
-        im = ax.imshow(np.abs(image), cmap='gray', vmin=0, vmax=np.max(image))
+        im = ax.imshow(np.abs(image), cmap='gray', vmin=0, vmax=np.max(target))
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -393,6 +393,9 @@ def main(args):
                 langevin_avg = np.mean(langevin_recons, axis=0)
                 langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
                 langevin_std = np.std(langevin_recons, axis=0)
+
+                print(np.max(langevin_avg))
+                print(np.max(langevin_gt))
 
                 plt.imshow(np.abs(langevin_gt - langevin_avg), cmap='jet')
                 plt.savefig('test.png')
