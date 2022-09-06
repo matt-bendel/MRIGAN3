@@ -381,9 +381,9 @@ def main(args):
                     except:
                         exceptions = True
                         break
-                    # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
+                    temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
-                    langevin_recons[j] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
+                    langevin_recons[j] = complex_abs(temp_recon[0].permute(1, 2, 0)).cpu().numpy()
 
                 if exceptions:
                     print("EXCEPTION\n")
