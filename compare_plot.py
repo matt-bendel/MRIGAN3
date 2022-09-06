@@ -130,7 +130,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
                 horizontalalignment='right', verticalalignment='center', fontsize='xx-small', color='yellow')
 
     if method == 'Std. Dev':
-        im = ax.imshow(image, cmap='viridis')
+        im = ax.imshow(image, cmap='viridis', vmin=0, vmax=4e-5)
         ax.set_xticks([])
         ax.set_yticks([])
     else:
@@ -381,7 +381,7 @@ def main(args):
                     except:
                         exceptions = True
                         break
-                    temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
+                    # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
 
                     langevin_recons[j] = complex_abs(temp_recon[0].permute(1, 2, 0)).cpu().numpy()
 
@@ -414,8 +414,8 @@ def main(args):
 
                 create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
 
-                if i > 0:
-                    exit()
+                # if i > 0:
+                #     exit()
 
 
 
