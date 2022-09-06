@@ -1,5 +1,6 @@
 # import required module
 import os
+import time
 import pathlib
 import random
 import torch
@@ -67,7 +68,7 @@ def main(args):
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
     G = load_best_gan(args)
     G.update_gen_status(val=True)
-    compute_cfid.get_cfid(args, G, langevin=True)
+    # compute_cfid.get_cfid(args, G, langevin=True)
 
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',
