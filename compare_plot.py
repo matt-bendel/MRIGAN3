@@ -245,7 +245,9 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
         generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
         if i == 0:
             im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
+            ax_err.set_ylabel('Error Maps')
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
+            ax_std.set_ylabel('Standard Deviation')
         else:
             generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
             generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
