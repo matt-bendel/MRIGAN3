@@ -249,11 +249,11 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
             ax_std.set_ylabel('Standard Deviation')
         else:
-            generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
-            generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
+            im_er, ax_er =  generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
+            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
 
-    get_colorbar(fig, im_er, ax_er, left=True)
-    get_colorbar(fig, im_std, ax_std, left=True)
+    get_colorbar(fig, im_er, ax_er, left=False)
+    get_colorbar(fig, im_std, ax_std, left=False)
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
     plt.close()
