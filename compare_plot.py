@@ -110,7 +110,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
     ax = fig.add_subplot(rows, cols, image_ind)
     if method != 'GT' and method != 'Std. Dev':
         psnr_val = psnr(target, image)
-        snr_val = snr(target, image)
+        # snr_val = snr(target, image)
         ssim_val = ssim(target, image)
         if method != None:
             ax.set_title(method, size=10)
@@ -126,11 +126,11 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         #     va='top',
         #     ha='right',
         # )
-        ax.text(1, 0.8, f'PSNR: {psnr_val:.2f}\nSNR: {snr_val:.2f}\nSSIM: {ssim_val:.4f}', transform=ax.transAxes,
+        ax.text(1, 0.8, f'PSNR: {psnr_val:.2f}\nSSIM: {ssim_val:.4f}', transform=ax.transAxes,
                 horizontalalignment='right', verticalalignment='center', fontsize='xx-small', color='yellow')
 
     if method == 'Std. Dev':
-        im = ax.imshow(image, cmap='viridis', vmin=0, vmax=4e-5)
+        im = ax.imshow(image, cmap='viridis', vmin=0, vmax=3e-5)
         ax.set_xticks([])
         ax.set_yticks([])
     else:
@@ -145,7 +145,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
     return im, ax
 
 
-def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False, k=1, kspace=False, title=None):
+def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False, k=3, kspace=False, title=None):
     # Assume rows and cols are available globally
     # rows and cols are both previously defined ints
     ax = fig.add_subplot(rows, cols, image_ind)  # Add to subplot
@@ -184,7 +184,7 @@ def get_colorbar(fig, im, ax, left=False):
     width = 0.01
     cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
 
-    cbar = fig.colorbar(im, cax=cbar_ax, format='%.2e')  # Generate colorbar
+    cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e')  # Generate colorbar
     cbar.ax.tick_params(labelsize=8)
     cbar.ax.locator_params(nbins=5)
 
@@ -230,27 +230,27 @@ def ssim(
 
 def create_mean_error_plots(avg, std_devs, gt, plot_num):
     num_rows = 3
-    num_cols = 4
+    num_cols = 5
 
     fig = plt.figure()
     fig.subplots_adjust(wspace=0, hspace=0.05)
     generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, num_rows, num_cols)
 
-    labels = ['Ours', 'Adler', 'Langevin']
+    labels = ['Ours', 'Adler', 'Ohayon', 'Langevin']
     im_er, ax_er = None, None
     im_std, ax_std = None, None
 
-    avg_keys = ['ours', 'adler', 'langevin']
+    avg_keys = ['ours', 'adler', 'ohayon', 'langevin']
     for i in range(num_cols - 1):
         generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
         if i == 0:
-            im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
+            im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
             ax_er.set_ylabel('Error')
-            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
+            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
             ax_std.set_ylabel('Std. Deviation')
         else:
             im_er, ax_er =  generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
-            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 10, num_rows, num_cols)
+            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
 
     get_colorbar(fig, im_er, ax_er, left=False)
     get_colorbar(fig, im_std, ax_std, left=False)
@@ -271,6 +271,10 @@ def main(args):
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
     G_adler = load_best_gan(args)
     G_adler.update_gen_status(val=True)
+
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ohayon"
+    G_ohayon = load_best_gan(args)
+    G_ohayon.update_gen_status(val=True)
 
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',
@@ -304,20 +308,26 @@ def main(args):
                                device=args.device)
             gens_adler = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                     device=args.device)
+            gens_ohayon = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
+                                     device=args.device)
 
             for z in range(num_code):
                 gens_ours[:, z, :, :, :] = G_ours(y, y_true)
                 gens_adler[:, z, :, :, :] = G_adler(y, y_true)
+                gens_ohayon[:, z, :, :, :] = G_ohayon(y, y_true)
 
             avg_ours = torch.mean(gens_ours, dim=1)
             avg_adler = torch.mean(gens_adler, dim=1)
+            avg_ohayon = torch.mean(gens_ohayon, dim=1)
 
             temp_gens_ours = torch.zeros(gens_ours.shape, dtype=gens_ours.dtype)
             temp_gens_adler = torch.zeros(gens_adler.shape, dtype=gens_adler.dtype)
+            temp_gens_ohayon = torch.zeros(gens_adler.shape, dtype=gens_ohayon.dtype)
             for j in range(y.size(0)):
                 for z in range(num_code):
                     temp_gens_ours[j, z, :, :, :] = gens_ours[j, z, :, :, :] * std[j].to(args.device) + mean[j].to(args.device)
                     temp_gens_adler[j, z, :, :, :] = gens_adler[j, z, :, :, :] * std[j].to(args.device) + mean[j].to(args.device)
+                    temp_gens_ohayon[j, z, :, :, :] = gens_ohayon[j, z, :, :, :] * std[j].to(args.device) + mean[j].to(args.device)
 
                 new_gens_ours = torch.zeros(num_code, 8, 384, 384, 2)
                 new_gens_ours[:, :, :, :, 0] = temp_gens_ours[j, :, 0:8, :, :]
@@ -327,6 +337,10 @@ def main(args):
                 new_gens_adler[:, :, :, :, 0] = temp_gens_adler[j, :, 0:8, :, :]
                 new_gens_adler[:, :, :, :, 1] = temp_gens_adler[j, :, 8:16, :, :]
 
+                new_gens_ohayon = torch.zeros(num_code, 8, 384, 384, 2)
+                new_gens_ohayon[:, :, :, :, 0] = temp_gens_ohayon[j, :, 0:8, :, :]
+                new_gens_ohayon[:, :, :, :, 1] = temp_gens_ohayon[j, :, 8:16, :, :]
+
                 avg_gen_ours = torch.zeros(size=(8, 384, 384, 2), device=args.device)
                 avg_gen_ours[:, :, :, 0] = avg_ours[j, 0:8, :, :]
                 avg_gen_ours[:, :, :, 1] = avg_ours[j, 8:16, :, :]
@@ -334,6 +348,10 @@ def main(args):
                 avg_gen_adler = torch.zeros(size=(8, 384, 384, 2), device=args.device)
                 avg_gen_adler[:, :, :, 0] = avg_adler[j, 0:8, :, :]
                 avg_gen_adler[:, :, :, 1] = avg_adler[j, 8:16, :, :]
+
+                avg_gen_ohayon = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                avg_gen_ohayon[:, :, :, 0] = avg_ohayon[j, 0:8, :, :]
+                avg_gen_ohayon[:, :, :, 1] = avg_ohayon[j, 8:16, :, :]
 
                 gt = torch.zeros(size=(8, 384, 384, 2), device=args.device)
                 gt[:, :, :, 0] = x[j, 0:8, :, :]
@@ -344,25 +362,30 @@ def main(args):
                                            device=sp.Device(3), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
                 S = sp.linop.Multiply((384, 384), maps)
-                gt_ksp, avg_ksp_ours, avg_ksp_adler = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                gt_ksp, avg_ksp_ours, avg_ksp_adler, avg_ksp_ohayon = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     (avg_gen_ours * std[j] + mean[j]).cpu()), tensor_to_complex_np(
-                    (avg_gen_adler * std[j] + mean[j]).cpu())
+                    (avg_gen_adler * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                    (avg_gen_ohayon * std[j] + mean[j]).cpu())
 
                 avg_gen_np_ours = torch.tensor(S.H * avg_ksp_ours).abs().numpy()
                 avg_gen_np_adler = torch.tensor(S.H * avg_ksp_adler).abs().numpy()
+                avg_gen_np_ohayon = torch.tensor(S.H * avg_ksp_ohayon).abs().numpy()
 
                 gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
                 ours_samples_np = np.zeros((num_code, 384, 384))
                 adler_samples_np = np.zeros((num_code, 384, 384))
+                ohayon_samples_np = np.zeros((num_code, 384, 384))
 
                 place = 1
                 for z in range(num_code):
                     gen_ours = tensor_to_complex_np((new_gens_ours[z]).cpu())
                     gen_adler = tensor_to_complex_np((new_gens_adler[z]).cpu())
+                    gen_ohayon = tensor_to_complex_np((new_gens_ohayon[z]).cpu())
 
                     ours_samples_np[z] = torch.tensor(S.H * gen_ours).abs().numpy()
                     adler_samples_np[z] = torch.tensor(S.H * gen_adler).abs().numpy()
+                    ohayon_samples_np[z] = torch.tensor(S.H * gen_ohayon).abs().numpy()
 
                     # gif_im(gt_np, ours_samples_np[z], place, 'image')
                     # place += 1
@@ -371,6 +394,7 @@ def main(args):
 
                 std_ours_np = np.std(ours_samples_np, axis=0)
                 std_adler_np = np.std(adler_samples_np, axis=0)
+                std_ohayon_np = np.std(ohayon_samples_np, axis=0)
 
                 recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
                 langevin_recons = np.zeros((32, 384, 384))
@@ -403,18 +427,21 @@ def main(args):
                 std_dict = {
                     'ours': std_ours_np,
                     'adler': std_adler_np,
-                    'langevin': langevin_std
+                    'ohayon': std_ohayon_np,
+                    'langevin': langevin_std,
                 }
 
                 avg_dict = {
                     'ours': avg_gen_np_ours,
                     'adler': avg_gen_np_adler,
+                    'ohayon': avg_gen_np_ohayon,
                     'langevin': langevin_avg
                 }
 
                 gt_dict = {
                     'ours': gt_np,
                     'adler': gt_np,
+                    'ohayon': gt_np,
                     'langevin': langevin_gt
                 }
 
