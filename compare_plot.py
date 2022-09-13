@@ -13,7 +13,10 @@ from evaluation_scripts import compute_cfid
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from torch.utils.data import DataLoader
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.rc('text', usetex=True)
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 import imageio as iio
 
 from typing import Optional
