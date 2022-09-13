@@ -146,7 +146,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
     return im, ax
 
 
-def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False, k=3, kspace=False, title=None):
+def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False, k=1.5, kspace=False, title=None):
     # Assume rows and cols are available globally
     # rows and cols are both previously defined ints
     ax = fig.add_subplot(rows, cols, image_ind)  # Add to subplot
@@ -252,13 +252,13 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
             # ax_std.set_ylabel(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i\big)^2}$')
         else:
-            im_er, ax_er =  generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
+            im_er, ax_er =  generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
 
-    cbar_1 = get_colorbar(fig, im_er, ax_er, left=False)
+    cbar_1 = get_colorbar(fig, im_er, ax_er, left=True)
     cbar_1.set_label(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
-    cbar_2 = get_colorbar(fig, im_std, ax_std, left=False)
-    cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i)^2}$')
+    cbar_2 = get_colorbar(fig, im_std, ax_std, left=True)
+    cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P(\hat{\bf{x}_i} - \frac{1}{P}\sum_{i=1}^P \hat{\bf{x}}_i)^2}$')
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
     plt.close()
