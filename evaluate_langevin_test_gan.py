@@ -67,7 +67,7 @@ def main(args):
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
-    # compute_cfid.get_cfid(args, G, langevin=True)
+    compute_cfid.get_cfid(args, G, langevin=True)
 
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',

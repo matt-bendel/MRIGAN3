@@ -192,6 +192,8 @@ def get_colorbar(fig, im, ax, left=False):
         cbar_ax.yaxis.tick_left()
         cbar_ax.yaxis.set_label_position('left')
 
+    return cbar
+
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
 ) -> np.ndarray:
@@ -245,15 +247,17 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
         generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
         if i == 0:
             im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
-            ax_er.set_ylabel('Error')
+            # ax_er.set_ylabel(r'$|\hat{\boldsymbol{x}}_{(P)}-\boldsymbol{x}|$')
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
-            ax_std.set_ylabel('Std. Deviation')
+            # ax_std.set_ylabel(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\boldsymbol{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\boldsymbol{x}}_i\big)^2}$')
         else:
             im_er, ax_er =  generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 6, num_rows, num_cols)
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
 
-    get_colorbar(fig, im_er, ax_er, left=False)
-    get_colorbar(fig, im_std, ax_std, left=False)
+    cbar_1 = get_colorbar(fig, im_er, ax_er, left=False)
+    cbar_1.set_label(r'$|\hat{\boldsymbol{x}}_{(P)}-\boldsymbol{x}|$')
+    cbar_2 = get_colorbar(fig, im_std, ax_std, left=False)
+    cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\boldsymbol{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\boldsymbol{x}}_i\big)^2}$')
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
     plt.close()
