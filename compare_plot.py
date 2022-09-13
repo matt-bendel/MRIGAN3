@@ -252,8 +252,8 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
             im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
             # ax_std.set_ylabel(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i\big)^2}$')
         else:
-            im_er, ax_er =  generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
-            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
+            generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
+            generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
 
     cbar_1 = get_colorbar(fig, im_er, ax_er, left=True)
     cbar_1.set_label(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
@@ -262,7 +262,6 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
     plt.close()
-    exit()
 
 def main(args):
     args.batch_size = 4
