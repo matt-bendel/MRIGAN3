@@ -261,6 +261,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
     plt.close()
+    exit()
 
 def main(args):
     args.batch_size = 4
