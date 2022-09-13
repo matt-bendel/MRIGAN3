@@ -239,7 +239,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     fig.subplots_adjust(wspace=0, hspace=0.05)
     generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, num_rows, num_cols)
 
-    labels = ['Ours', 'Adler', 'Ohayon', 'Langevin']
+    labels = ['Ours', 'Adler', 'Ohayon', 'Jalal']
     im_er, ax_er = None, None
     im_std, ax_std = None, None
 
