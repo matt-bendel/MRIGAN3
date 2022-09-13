@@ -258,7 +258,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     cbar_1 = get_colorbar(fig, im_er, ax_er, left=False)
     cbar_1.set_label(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
     cbar_2 = get_colorbar(fig, im_std, ax_std, left=False)
-    cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i\big)^2}$')
+    cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i)^2}$')
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
     plt.close()
