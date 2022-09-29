@@ -6,6 +6,7 @@ from evaluation_scripts import compute_cfid
 import matplotlib.pyplot as plt
 import imageio as iio
 import sigpy.mri as mr
+import time
 
 from typing import Optional
 from wrappers.our_gen_wrapper import load_best_gan
