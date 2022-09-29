@@ -112,7 +112,7 @@ def main(args):
                     start = time.time()
                     gens[:, z, :, :, :] = G(y, y_true)
                     elapsed = time.time() - start
-                    times.append(elapsed / args.batch_size)
+                    times.append(elapsed)
 
                 avg = torch.mean(gens, dim=1)
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ohayon"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ours"
     main(args)
 
     # args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
