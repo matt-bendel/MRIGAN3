@@ -197,6 +197,7 @@ def get_metrics(args, num_z, is_super=False, std_val=-1):
     for i, data in enumerate(test_loader):
         with torch.no_grad():
             y, x, y_true, mean, std = data
+            print(y.shape)
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
