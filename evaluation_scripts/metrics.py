@@ -205,8 +205,15 @@ def get_metrics(args, num_z, is_super=False, std_val=-1):
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
                                device=args.device)
 
+            times = []
             for z in range(num_code):
+                start = time.time()
                 gens[:, z, :, :, :] = G(y, y_true)
+                elapsed = time.time() - start
+                times.append(elapsed)
+
+            print(np.mean(times))
+            exit()
 
             avg = torch.mean(gens, dim=1)
 
