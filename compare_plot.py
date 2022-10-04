@@ -196,9 +196,9 @@ def get_colorbar(fig, im, ax, left=False, top=False):
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("top", size="7%", pad="2%")
-    cax.xaxis.set_ticks_position("top")
     fig.add_axes(cax)
     cbar = fig.colorbar(im, cax=cax, orientation='horizontal', format='%.0e')
+    cax.xaxis.set_ticks_position("top")
 
     return cbar
 
