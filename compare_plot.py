@@ -139,7 +139,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         if kspace:
             image = image ** 0.4
             target = target ** 0.4
-        ax.set_title(method, size=10)
+        # ax.set_title(method, size=10)
         im = ax.imshow(np.abs(ndimage.rotate(image, 180)), cmap='gray', vmin=0, vmax=np.max(target))
         ax.set_xticks([])
         ax.set_yticks([])
@@ -246,6 +246,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     avg_keys = ['ours', 'adler', 'ohayon', 'langevin']
     fig = plt.figure()
+    fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
     generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, 5, 1)
     generate_image(fig, gt[avg_keys[0]], avg[avg_keys[0]], labels[0], 2, 5, 1)
@@ -257,6 +258,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.close(fig)
 
     fig = plt.figure()
+    fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
     generate_error_map(fig, gt[avg_keys[0]], avg[avg_keys[0]], 1, 5, 1)
     generate_error_map(fig, gt[avg_keys[1]], avg[avg_keys[1]], 2, 5, 1)
@@ -268,6 +270,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.close(fig)
 
     fig = plt.figure()
+    fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
     generate_image(fig, gt[avg_keys[0]], std_devs[avg_keys[0]], 'Std. Dev', 2, 5, 1)
     generate_image(fig, gt[avg_keys[1]], std_devs[avg_keys[1]], 'Std. Dev', 3, 5, 1)
