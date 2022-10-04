@@ -176,31 +176,31 @@ def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False
 
 
 def get_colorbar(fig, im, ax, left=False, top=False):
-    # fig.subplots_adjust(right=0.85)  # Make room for colorbar
+    fig.subplots_adjust(right=0.85)  # Make room for colorbar
 
     # Get position of final error map axis
-    # [[x10, y10], [x11, y11]] = ax.get_position().get_points()
+    [[x10, y10], [x11, y11]] = ax.get_position().get_points()
 
     # cax = fig.add_axes([0, 1, 1, 0.05])
 
     # Appropriately rescale final axis so that colorbar does not effect formatting
-    # pad = 0.01
-    # height = 0.01
-    # cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
+    pad = 0.01
+    height = 0.01
+    cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
     #
-    # cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e')  # Generate colorbar
-    # cbar.ax.locator_params(nbins=5)
+    cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e')  # Generate colorbar
+    cbar.ax.locator_params(nbins=5)
     #
     # if left:
     #     cbar_ax.yaxis.tick_left()
     #     cbar_ax.yaxis.set_label_position('left')
 
-    divider = make_axes_locatable(ax)
-    cax = divider.new_vertical(size="8%", pad=0.02, pack_start=True)
-    fig.add_axes(cax)
-    cbar = fig.colorbar(im, cax=cax, orientation='horizontal', format='%.0e')
-    cax.xaxis.set_ticks_position("top")
-    cbar.ax.tick_params(labelsize=8)
+    # divider = make_axes_locatable(ax)
+    # cax = divider.new_vertical(size="8%", pad=0.02, pack_start=True)
+    # fig.add_axes(cax)
+    # cbar = fig.colorbar(im, cax=cax, orientation='horizontal', format='%.0e')
+    # cax.xaxis.set_ticks_position("top")
+    # cbar.ax.tick_params(labelsize=8)
 
     return cbar
 
@@ -254,7 +254,6 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     avg_keys = ['ours', 'adler', 'ohayon', 'langevin']
     fig = plt.figure()
-    fig.set_tight_layout(True)
     fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
     generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, 5, 1)
@@ -267,7 +266,6 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.close(fig)
 
     fig = plt.figure()
-    fig.set_tight_layout(True)
     fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
     im_er, ax_er = generate_error_map(fig, gt[avg_keys[0]], avg[avg_keys[0]], 1, 4, 1)
@@ -281,7 +279,6 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.close(fig)
 
     fig = plt.figure()
-    fig.set_tight_layout(True)
     fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
     im_std, ax_std = generate_image(fig, gt[avg_keys[0]], std_devs[avg_keys[0]], 'Std. Dev', 1, 4, 1)
