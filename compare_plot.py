@@ -176,7 +176,7 @@ def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False
 
 
 def get_colorbar(fig, im, ax, left=False, top=False):
-    fig.subplots_adjust(right=0.85)  # Make room for colorbar
+    # fig.subplots_adjust(right=0.85)  # Make room for colorbar
 
     # Get position of final error map axis
     [[x10, y10], [x11, y11]] = ax.get_position().get_points()
@@ -185,11 +185,11 @@ def get_colorbar(fig, im, ax, left=False, top=False):
 
     # Appropriately rescale final axis so that colorbar does not effect formatting
     pad = 0.01
-    width = 0.01
-    cbar_ax = fig.add_axes([x10, y11 + pad, x11 - x10, width]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
+    width = 0.02
+    cbar_ax = fig.add_axes([x10, y11 + pad, x11 - x10, width]) #if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
     #
     cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e', orientation='horizontal')  # Generate colorbar
-    cbar.ax.locator_params(nbins=3)
+    cbar.ax.locator_params(nbins=2)
     cbar.ax.xaxis.set_ticks_position("top")
     cbar.ax.tick_params(labelsize=8)
 
