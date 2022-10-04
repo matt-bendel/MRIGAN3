@@ -189,9 +189,9 @@ def get_colorbar(fig, im, ax, left=False, top=False):
     cbar_ax = fig.add_axes([x10, y11 + pad, x11 - x10, width]) #if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
     #
     cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e', orientation='horizontal')  # Generate colorbar
-    cbar.ax.locator_params(nbins=2)
+    cbar.ax.locator_params(nbins=3)
     cbar.ax.xaxis.set_ticks_position("top")
-    cbar.ax.tick_params(labelsize=8)
+    cbar.ax.tick_params(labelsize=6)
 
     #
     # if left:
