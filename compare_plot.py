@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader
 import matplotlib
 import matplotlib.pyplot as plt
 import imageio as iio
-
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from scipy import ndimage
