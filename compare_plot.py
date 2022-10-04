@@ -128,8 +128,8 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         #     va='top',
         #     ha='right',
         # )
-        ax.text(0, 0, f'PSNR: {psnr_val:.2f}  SSIM: {ssim_val:.4f}',
-                horizontalalignment='center', verticalalignment='center', fontsize=8, color='yellow', transform=ax.transAxes)
+        ax.text(0.15, 0.1, f'PSNR: {psnr_val:.2f}  SSIM: {ssim_val:.4f}',
+                horizontalalignment='center', verticalalignment='center', fontsize=4, color='yellow', transform=ax.transAxes)
 
     if method == 'Std. Dev':
         im = ax.imshow(ndimage.rotate(image, 180), cmap='viridis', vmin=0, vmax=3e-5)
@@ -265,7 +265,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     generate_error_map(fig, gt[avg_keys[2]], avg[avg_keys[2]], 3, 4, 1)
     generate_error_map(fig, gt[avg_keys[3]], avg[avg_keys[3]], 4, 4, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/errors_{plot_num}', bbox_inches='tight')
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/errors_{plot_num}', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
     fig = plt.figure()
