@@ -420,11 +420,11 @@ def train(args, bl=1, adv_mult=0.0):
         print(f"PSNR DIFF: {psnr_diff:.2f}")
         print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
-        # if epoch + 1 == 112:
-        #     best_loss = 0
+
+        #CFID = compute_cfid.get_cfid(args, G)
 
         psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr']))
-        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.15)
+        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.25)
         best_loss = psnr_loss if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
@@ -437,18 +437,10 @@ def train(args, bl=1, adv_mult=0.0):
 
         send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
 
-        # if adv_weight < 1.5 and psnr_diff > 0:
-        #     save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
-        #     save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
-        # elif adv_weight > 1.4:
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        # if (epoch + 1) % 2 == 0:
-        # mu_0 = 0.001
-        # std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
-        # std_mults.append(std_mult)
-        mu_0 = 1e-2
+        mu_0 = 2e-2
         std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))

@@ -19,6 +19,7 @@ import imageio as iio
 
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from scipy import ndimage
 
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import load_best_gan
@@ -113,8 +114,8 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         psnr_val = psnr(target, image)
         # snr_val = snr(target, image)
         ssim_val = ssim(target, image)
-        if method != None:
-            ax.set_title(method, size=10)
+        # if method != None:
+            # ax.set_title(method, size=10)
 
         # padding = 5
         # ax.annotate(
@@ -131,7 +132,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
                 horizontalalignment='right', verticalalignment='center', fontsize='xx-small', color='yellow')
 
     if method == 'Std. Dev':
-        im = ax.imshow(image, cmap='viridis', vmin=0, vmax=3e-5)
+        im = ax.imshow(ndimage.rotate(image, 180), cmap='viridis', vmin=0, vmax=3e-5)
         ax.set_xticks([])
         ax.set_yticks([])
     else:
@@ -139,7 +140,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
             image = image ** 0.4
             target = target ** 0.4
         ax.set_title(method, size=10)
-        im = ax.imshow(np.abs(image), cmap='gray', vmin=0, vmax=np.max(target))
+        im = ax.imshow(np.abs(ndimage.rotate(image, 180)), cmap='gray', vmin=0, vmax=np.max(target))
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -162,7 +163,7 @@ def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False
         im = ax.imshow(k * error, cmap='bwr', origin='lower', vmin=-0.0001, vmax=0.0001)  # Plot image
         plt.gca().invert_yaxis()
     else:
-        im = ax.imshow(k * error, cmap='jet', vmax=1) if kspace else ax.imshow(k * error, cmap='jet', vmin=0, vmax=0.0001)
+        im = ax.imshow(ndimage.rotate(k * error, 180), cmap='jet', vmax=1) if kspace else ax.imshow(k * error, cmap='jet', vmin=0, vmax=0.0001)
 
     if title != None:
         ax.set_title(title, size=10)
@@ -235,33 +236,66 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     num_rows = 3
     num_cols = 5
 
-    fig = plt.figure()
-    fig.subplots_adjust(wspace=0, hspace=0.05)
-    generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, num_rows, num_cols)
+    # fig = plt.figure()
+    # fig.subplots_adjust(wspace=0, hspace=0.05)
+    # generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, num_rows, num_cols)
 
     labels = ['Ours', 'Adler', 'Ohayon', 'Jalal']
     im_er, ax_er = None, None
     im_std, ax_std = None, None
 
     avg_keys = ['ours', 'adler', 'ohayon', 'langevin']
-    for i in range(num_cols - 1):
-        generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
-        if i == 0:
-            im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
-            # ax_er.set_ylabel(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
-            im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
-            # ax_std.set_ylabel(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i\big)^2}$')
-        else:
-            generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
-            generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
+    fig = plt.figure()
+    plt.axis('off')
+    generate_image(fig, gt['ours'], gt['ours'], 'GT', 1, 5, 1)
+    generate_image(fig, gt[avg_keys[0]], avg[avg_keys[0]], labels[0], 2, 5, 1)
+    generate_image(fig, gt[avg_keys[1]], avg[avg_keys[1]], labels[1], 3, 5, 1)
+    generate_image(fig, gt[avg_keys[2]], avg[avg_keys[2]], labels[2], 4, 5, 1)
+    generate_image(fig, gt[avg_keys[3]], avg[avg_keys[3]], labels[3], 5, 5, 1)
 
-    cbar_1 = get_colorbar(fig, im_er, ax_er, left=True)
-    cbar_1.set_label(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
-    cbar_2 = get_colorbar(fig, im_std, ax_std, left=True)
-    cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P(\hat{\bf{x}_i} - \frac{1}{P}\sum_{i=1}^P \hat{\bf{x}}_i)^2}$')
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/recons_{plot_num}', bbox_inches='tight', dpi=300)
+    plt.close(fig)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/asilomar_plots/mean_error_{plot_num}.png', bbox_inches='tight')
-    plt.close()
+    fig = plt.figure()
+    plt.axis('off')
+    generate_error_map(fig, gt[avg_keys[0]], avg[avg_keys[0]], 1, 5, 1)
+    generate_error_map(fig, gt[avg_keys[1]], avg[avg_keys[1]], 2, 5, 1)
+    generate_error_map(fig, gt[avg_keys[2]], avg[avg_keys[2]], 3, 5, 1)
+    generate_error_map(fig, gt[avg_keys[3]], avg[avg_keys[3]], 4, 5, 1)
+
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/errors_{plot_num}',
+                bbox_inches='tight', dpi=300)
+    plt.close(fig)
+
+    fig = plt.figure()
+    plt.axis('off')
+    generate_image(fig, gt[avg_keys[0]], std_devs[avg_keys[0]], 'Std. Dev', 2, 5, 1)
+    generate_image(fig, gt[avg_keys[1]], std_devs[avg_keys[1]], 'Std. Dev', 3, 5, 1)
+    generate_image(fig, gt[avg_keys[2]], std_devs[avg_keys[2]], 'Std. Dev', 4, 5, 1)
+    generate_image(fig, gt[avg_keys[3]], std_devs[avg_keys[3]], 'Std. Dev', 5, 5, 1)
+
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/std_devs_{plot_num}', bbox_inches='tight', dpi=300)
+    plt.close(fig)
+
+
+    # for i in range(num_cols - 1):
+    #     generate_image(fig, gt[avg_keys[i]], avg[avg_keys[i]], labels[i], i + 2, num_rows, num_cols)
+    #     if i == 0:
+    #         im_er, ax_er = generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
+    #         # ax_er.set_ylabel(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
+    #         im_std, ax_std = generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
+    #         # ax_std.set_ylabel(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P\big(\hat{\bf{x}_i} - \frac{1}{P}\sum{i=1}^P \hat{\bf{x}}_i\big)^2}$')
+    #     else:
+    #         generate_error_map(fig, gt[avg_keys[i]], avg[avg_keys[i]], i + 7, num_rows, num_cols)
+    #         generate_image(fig, gt[avg_keys[i]], std_devs[avg_keys[i]], 'Std. Dev', i + 12, num_rows, num_cols)
+    #
+    # cbar_1 = get_colorbar(fig, im_er, ax_er, left=True)
+    # cbar_1.set_label(r'$|\hat{\bf{x}}_{(P)}-\bf{x}|$')
+    # cbar_2 = get_colorbar(fig, im_std, ax_std, left=True)
+    # cbar_2.set_label(r'$\sqrt{\frac{1}{P}\sum_{i=1}^P(\hat{\bf{x}_i} - \frac{1}{P}\sum_{i=1}^P \hat{\bf{x}}_i)^2}$')
+    #
+    # plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/mean_error_{plot_num}.png', bbox_inches='tight')
+    # plt.close()
 
 def main(args):
     args.batch_size = 4
