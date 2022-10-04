@@ -179,8 +179,6 @@ def get_colorbar(fig, im, ax, left=False, top=False):
     fig.subplots_adjust(right=0.85)  # Make room for colorbar
 
     # Get position of final error map axis
-    print(ax.get_position().get_points())
-    exit()
     [[x10, y10], [x11, y11]] = ax.get_position().get_points()
 
     # cax = fig.add_axes([0, 1, 1, 0.05])
