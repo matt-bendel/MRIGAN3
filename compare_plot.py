@@ -190,7 +190,7 @@ def get_colorbar(fig, im, ax, left=False, top=False):
     #
     cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e', orientation='horizontal')  # Generate colorbar
     cbar.ax.locator_params(nbins=3)
-    cbar.xaxis.set_ticks_position("top")
+    cbar.ax.xaxis.set_ticks_position("top")
     cbar.ax.tick_params(labelsize=8)
 
     #
