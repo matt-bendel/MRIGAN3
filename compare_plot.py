@@ -129,7 +129,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         #     ha='right',
         # )
         ax.text(0, 0, f'PSNR: {psnr_val:.2f}  SSIM: {ssim_val:.4f}', transform=ax.transAxes,
-                horizontalalignment='center', verticalalignment='center', fontsize='xxx-small', color='yellow')
+                horizontalalignment='center', verticalalignment='center', fontsize='xx-small', color='yellow')
 
     if method == 'Std. Dev':
         im = ax.imshow(ndimage.rotate(image, 180), cmap='viridis', vmin=0, vmax=3e-5)
