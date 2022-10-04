@@ -128,7 +128,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         #     va='top',
         #     ha='right',
         # )
-        ax.text(0.15, 0.1, f'PSNR: {psnr_val:.2f}  SSIM: {ssim_val:.4f}',
+        ax.text(0.3, 0.05, f'PSNR: {psnr_val:.2f}  SSIM: {ssim_val:.4f}',
                 horizontalalignment='center', verticalalignment='center', fontsize=4, color='yellow', transform=ax.transAxes)
 
     if method == 'Std. Dev':
