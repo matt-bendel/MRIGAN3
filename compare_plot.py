@@ -175,24 +175,29 @@ def generate_error_map(fig, target, recon, image_ind, rows, cols, relative=False
     return im, ax
 
 
-def get_colorbar(fig, im, ax, left=False):
+def get_colorbar(fig, im, ax, left=False, top=False):
     fig.subplots_adjust(right=0.85)  # Make room for colorbar
 
     # Get position of final error map axis
     [[x10, y10], [x11, y11]] = ax.get_position().get_points()
 
     # Appropriately rescale final axis so that colorbar does not effect formatting
-    pad = 0.01
-    width = 0.01
-    cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
+    # pad = 0.01
+    # height = 0.01
+    # cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
+    #
+    # cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e')  # Generate colorbar
+    # cbar.ax.tick_params(labelsize=8)
+    # cbar.ax.locator_params(nbins=5)
+    #
+    # if left:
+    #     cbar_ax.yaxis.tick_left()
+    #     cbar_ax.yaxis.set_label_position('left')
 
-    cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e')  # Generate colorbar
-    cbar.ax.tick_params(labelsize=8)
-    cbar.ax.locator_params(nbins=5)
-
-    if left:
-        cbar_ax.yaxis.tick_left()
-        cbar_ax.yaxis.set_label_position('left')
+    divider = make_axes_locatable(ax)
+    cax = divider.new_vertical(size='5%', pad=0.5)
+    fig.add_axes(cax)
+    cbar = fig.colorbar(im, cax=cax, orientation='horizontal', format='%.0e')
 
     return cbar
 
