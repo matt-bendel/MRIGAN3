@@ -186,7 +186,7 @@ def get_colorbar(fig, im, ax, left=False, top=False):
     # Appropriately rescale final axis so that colorbar does not effect formatting
     pad = 0.01
     width = 0.01
-    cbar_ax = fig.add_axes([x10 + pad, y11 + pad, x11 - x10, width]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
+    cbar_ax = fig.add_axes([x10 + pad, y11, x11 - x10, width]) if not left else fig.add_axes([x10 - 2*pad, y10, width, y11 - y10])
     #
     cbar = fig.colorbar(im, cax=cbar_ax, format='%.0e', orientation='horizontal')  # Generate colorbar
     cbar.ax.locator_params(nbins=3)
