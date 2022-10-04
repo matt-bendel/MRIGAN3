@@ -129,7 +129,7 @@ def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=Fal
         #     ha='right',
         # )
         ax.text(0, 0, f'PSNR: {psnr_val:.2f}  SSIM: {ssim_val:.4f}',
-                horizontalalignment='center', verticalalignment='center', fontsize='xx-small', color='yellow')
+                horizontalalignment='center', verticalalignment='center', fontsize=8, color='yellow', transform=ax.transAxes)
 
     if method == 'Std. Dev':
         im = ax.imshow(ndimage.rotate(image, 180), cmap='viridis', vmin=0, vmax=3e-5)
@@ -254,7 +254,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     generate_image(fig, gt[avg_keys[2]], avg[avg_keys[2]], labels[2], 4, 5, 1)
     generate_image(fig, gt[avg_keys[3]], avg[avg_keys[3]], labels[3], 5, 5, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/recons_{plot_num}', pad_inches = 0, bbox_inches='tight', dpi=300)
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/recons_{plot_num}', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
     fig = plt.figure()
@@ -265,7 +265,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     generate_error_map(fig, gt[avg_keys[2]], avg[avg_keys[2]], 3, 4, 1)
     generate_error_map(fig, gt[avg_keys[3]], avg[avg_keys[3]], 4, 4, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/errors_{plot_num}', pad_inches = 0, bbox_inches='tight', dpi=300)
+    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/errors_{plot_num}', bbox_inches='tight')
     plt.close(fig)
 
     fig = plt.figure()
