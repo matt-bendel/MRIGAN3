@@ -192,6 +192,7 @@ def get_colorbar(fig, im, ax, left=False, top=False):
     cbar.ax.locator_params(nbins=3)
     cbar.ax.xaxis.set_ticks_position("top")
     cbar.ax.tick_params(labelsize=6)
+    cbar.ax.set_xticklabels(cbar.ax.get_xticklabels(), rotation='vertical')
 
     #
     # if left:
