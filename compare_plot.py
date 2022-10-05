@@ -193,6 +193,11 @@ def get_colorbar(fig, im, ax, left=False, top=False):
     cbar.ax.xaxis.set_ticks_position("top")
     cbar.ax.tick_params(labelsize=6)
     cbar.ax.tick_params(rotation=90)
+    tl = cbar.ax.get_xticklabels()
+
+    # set the alignment for the first and the last
+    tl[0].set_horizontalalignment('left')
+    tl[-1].set_horizontalalignment('right')
 
     #
     # if left:
