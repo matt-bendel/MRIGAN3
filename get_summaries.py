@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
-    send_mail("G Summary", summary(G))
-    send_mail("D Summary", summary(D))
+    send_mail("G Summary", summary(G, (18, 384, 384)))
+    send_mail("D Summary", summary(D, (32, 384, 384)))
 
     exit()
