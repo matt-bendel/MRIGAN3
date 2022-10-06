@@ -203,10 +203,13 @@ def train(args, bl=1, adv_mult=0.0):
     std_mult = 1
     std_mults = [std_mult]
     psnr_diffs = []
+    cfids = []
 
     if args.resume:
         std_mults = []
         psnr_diffs = []
+        cfids = []
+
         with open("std_weights.txt", "r") as file1:
             for line in file1.readlines():
                 for i in line.split(","):
@@ -216,6 +219,11 @@ def train(args, bl=1, adv_mult=0.0):
             for line in file1.readlines():
                 for i in line.split(","):
                     psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+
+        with open("cfids.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    cfids.append(float(i.strip().replace('array(', '').replace(')', '').replace('[', '').replace(']', '').replace(' ', '')))
 
         std_mult = std_mults[-1]
         print(std_mult)
@@ -421,11 +429,11 @@ def train(args, bl=1, adv_mult=0.0):
         print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
 
-        #CFID = compute_cfid.get_cfid(args, G)
+        CFID = compute_cfid.get_cfid(args, G, dev_loader)
+        cfids.append(CFID)
 
-        psnr_frac_diff = np.abs((np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr']))
-        best_model = psnr_loss > best_loss and  (psnr_frac_diff < 0.25)
-        best_loss = psnr_loss if best_model else best_loss
+        best_model = cfid < best_loss and (psnr_diff <= 0.25)
+        best_loss = CFID if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
@@ -435,7 +443,7 @@ def train(args, bl=1, adv_mult=0.0):
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
 
-        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
+        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}", file_name="variation_gif.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
@@ -459,6 +467,13 @@ def train(args, bl=1, adv_mult=0.0):
         file.write(content)
         file.close()
 
+        file = open("cfids.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(cfids)
+        file.write(content)
+        file.close()
+
     std_mult_str = ""
     for val in std_mults:
         std_mult_str += f"{val},"
@@ -467,7 +482,11 @@ def train(args, bl=1, adv_mult=0.0):
     for val in psnr_diffs:
         psnr_diff_str += f"{val},"
 
-    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}")
+    cfid_str = ""
+    for val in cfids:
+        cfid_str += f"{val},"
+
+    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}\n\n\n{cfid_str}")
 
 
 if __name__ == '__main__':

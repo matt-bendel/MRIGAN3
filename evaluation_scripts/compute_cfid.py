@@ -28,12 +28,13 @@ def get_lang_data_loaders(args):
 
     return None, loader
 
-def get_cfid(args, G, langevin=False):
+def get_cfid(args, G, langevin=False, loader=False):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
     print("GETTING DATA LOADERS")
-    _, loader = create_data_loaders(args, val_only=True, big_test=True) if not langevin else get_lang_data_loaders(args)
+    if not loader:
+        _, loader = create_data_loaders(args, val_only=True, big_test=True) if not langevin else get_lang_data_loaders(args)
 
     cfid_metric = CFIDMetric(gan=G,
                              loader=loader,
