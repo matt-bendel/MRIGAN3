@@ -55,7 +55,7 @@ if __name__ == '__main__':
         input_nc=args.in_chans * 2
     ).to(torch.device('cuda'))
 
-    send_mail("G Summary", summary(G, (18, 384, 384)))
-    send_mail("D Summary", summary(D, (32, 384, 384)))
+    summary(G, (18, 384, 384))
+    summary(D, (32, 384, 384))
 
     exit()
