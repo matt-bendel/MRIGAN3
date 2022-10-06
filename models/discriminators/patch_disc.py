@@ -52,6 +52,6 @@ class PatchDisc(nn.Module):
         sequence += [nn.Conv2d(ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)]  # output 1 channel prediction map
         self.model = nn.Sequential(*sequence)
 
-    def forward(self, input, y):
+    def forward(self, input):
         """Standard forward."""
-        return self.model(torch.cat([input, y], dim=1))
+        return self.model(input, dim=1)
