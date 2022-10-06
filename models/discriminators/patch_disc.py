@@ -54,4 +54,4 @@ class PatchDisc(nn.Module):
 
     def forward(self, input):
         """Standard forward."""
-        return self.model(input, dim=1)
+        return self.model(input)
