@@ -23,6 +23,8 @@ from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
 from torchsummary import summary
+from models.generators.our_gen import GeneratorModel
+from models.discriminators.patch_disc import PatchDisc
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
@@ -44,7 +46,14 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
+    G = GeneratorModel(
+        in_chans=args.in_chans + 2,
+        out_chans=args.out_chans,
+    ).to(torch.device('cuda'))
+
+    D = PatchDisc(
+        input_nc=args.in_chans * 2
+    ).to(torch.device('cuda'))
 
     send_mail("G Summary", summary(G, (18, 384, 384)))
     send_mail("D Summary", summary(D, (32, 384, 384)))
