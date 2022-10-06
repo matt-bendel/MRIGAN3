@@ -22,6 +22,7 @@ from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
+from torchsummary import summary
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
@@ -45,7 +46,7 @@ if __name__ == '__main__':
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
-    summary(G)
-    summary(D)
+    send_mail("G Summary", summary(G))
+    send_mail("D Summary", summary(D))
 
     exit()
