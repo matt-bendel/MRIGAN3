@@ -230,11 +230,11 @@ def train(args, bl=1, adv_mult=0.0):
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
     #
-    if bl == 0:
-        best_loss = 0
 
     if args.resume:
         start_epoch += 1
+    else:
+        best_loss = 100000
 
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
@@ -302,7 +302,7 @@ def train(args, bl=1, adv_mult=0.0):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = adv_mult
+            adv_weight = 1e-2
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
@@ -432,7 +432,7 @@ def train(args, bl=1, adv_mult=0.0):
         CFID = compute_cfid.get_cfid(args, G, dev_loader)
         cfids.append(CFID)
 
-        best_model = cfid < best_loss and (psnr_diff <= 0.25)
+        best_model = CFID < best_loss and (psnr_diff <= 0.25)
         best_loss = CFID if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
