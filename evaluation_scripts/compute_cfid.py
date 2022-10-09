@@ -46,4 +46,4 @@ def get_cfid(args, G, langevin=False, loader=False):
     cfids = cfid_metric.get_cfid_torch()
     print(f'CFID: {np.mean(cfids)} \\pm {np.std(cfids) / np.sqrt(33)}')
 
-    return f'CFID: {np.mean(cfids)} \\pm {np.std(cfids) / np.sqrt(33)}'
+    return np.mean(cfids)
