@@ -23,6 +23,7 @@ from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
+from evaluation_scripts import compute_cfid
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
