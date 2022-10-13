@@ -176,33 +176,34 @@ class CFIDMetric:
             maps = []
 
             with torch.no_grad():
-                recon = self.gan(condition, true_cond)
+                for l in range(32):
+                    recon = self.gan(condition, true_cond)
 
-                for j in range(condition.shape[0]):
-                    new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
-                    s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                               device=sp.Device(3), show_pbar=False, crop=0.70,
-                                               kernel_width=6).run().get()
-                    S = sp.linop.Multiply((384, 384), s_maps)
+                    for j in range(condition.shape[0]):
+                        new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
+                        s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                                   device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                   kernel_width=6).run().get()
+                        S = sp.linop.Multiply((384, 384), s_maps)
 
-                    maps.append(S)
+                        maps.append(S)
 
-                image = self._get_embed_im(recon, mean, std, maps)
-                condition_im = self._get_embed_im(condition, mean, std, maps)
-                true_im = self._get_embed_im(gt, mean, std, maps)
+                    image = self._get_embed_im(recon, mean, std, maps)
+                    condition_im = self._get_embed_im(condition, mean, std, maps)
+                    true_im = self._get_embed_im(gt, mean, std, maps)
 
-                img_e = self.image_embedding(image)
-                cond_e = self.condition_embedding(condition_im)
-                true_e = self.image_embedding(true_im)
+                    img_e = self.image_embedding(image)
+                    cond_e = self.condition_embedding(condition_im)
+                    true_e = self.image_embedding(true_im)
 
-                if self.cuda:
-                    true_embed.append(true_e.to('cuda:2'))
-                    image_embed.append(img_e.to('cuda:1'))
-                    cond_embed.append(cond_e.to('cuda:1'))
-                else:
-                    true_embed.append(true_e.cpu().numpy())
-                    image_embed.append(img_e.cpu().numpy())
-                    cond_embed.append(cond_e.cpu().numpy())
+                    if self.cuda:
+                        true_embed.append(true_e.to('cuda:2'))
+                        image_embed.append(img_e.to('cuda:1'))
+                        cond_embed.append(cond_e.to('cuda:1'))
+                    else:
+                        true_embed.append(true_e.cpu().numpy())
+                        image_embed.append(img_e.cpu().numpy())
+                        cond_embed.append(cond_e.cpu().numpy())
 
         if self.cuda:
             true_embed = torch.cat(true_embed, dim=0)
