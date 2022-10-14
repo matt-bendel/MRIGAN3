@@ -217,11 +217,18 @@ class CFIDMetric:
         return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
             dtype=torch.float64)
 
-    def get_cfid_torch(self, resample=True):
-        y_predict_full, x_true_full, y_true_full = self._get_generated_distribution()
-        cfids = []
+    def get_cfid_debug(self):
+        y_predict, x_true, y_true = self._get_generated_distribution()
 
-        y_predict, x_true, y_true = y_predict_full, x_true_full, y_true_full
+        cfid = self.get_cfid_torch(y_predict=y_predict, x_true=x_true, y_true=y_true)
+        print(cfid)
+        cfid = self.get_cfid_torch_pinv(y_predict=y_predict, x_true=x_true, y_true=y_true)
+        print(cfid)
+
+
+    def get_cfid_torch(self, resample=True,y_predict=None, x_true=None, y_true = None):
+        if y_true is None:
+            y_predict, x_true, y_true = self._get_generated_distribution()
 
         # y_predict, x_true, y_true = y_predict_full[i * 72:(i + 1) * 72, :], x_true_full[i * 72:(i + 1) * 72,
         #                                                                     :], y_true_full[i * 72:(i + 1) * 72, :]
@@ -252,6 +259,53 @@ class CFIDMetric:
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
         cfid = m_dist + c_dist_1 + c_dist_2
+
+        return cfid.cpu().numpy()
+
+    def get_cfid_torch_pinv(self, resample=True, y_predict=None, x_true=None, y_true=None):
+        if y_true is None:
+            y_predict, x_true, y_true = self._get_generated_distribution()
+
+        # mean estimations
+        y_true = y_true.to(x_true.device)
+        m_y_predict = torch.mean(y_predict, dim=0)
+        m_x_true = torch.mean(x_true, dim=0)
+        m_y_true = torch.mean(y_true, dim=0)
+
+        no_m_y_true = y_true - m_y_true
+        no_m_y_pred = y_predict - m_y_predict
+        no_m_x_true = x_true - m_x_true
+
+        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true) / y_predict.shape[0]
+        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_pred) / y_predict.shape[0]
+        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred) / y_predict.shape[0]
+
+        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true) / y_predict.shape[0]
+        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true) / y_predict.shape[0]
+        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_predict.shape[0]
+
+        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true) / y_predict.shape[0])
+
+        c_y_true_given_x_true = c_y_true_y_true - torch.matmul(c_y_true_x_true,
+                                                               torch.matmul(inv_c_x_true_x_true, c_x_true_y_true))
+        c_y_predict_given_x_true = c_y_predict_y_predict - torch.matmul(c_y_predict_x_true,
+                                                                        torch.matmul(inv_c_x_true_x_true,
+                                                                                     c_x_true_y_predict))
+        c_y_true_x_true_minus_c_y_predict_x_true = c_y_true_x_true - c_y_predict_x_true
+        c_x_true_y_true_minus_c_x_true_y_predict = c_x_true_y_true - c_x_true_y_predict
+
+        # Distance between Gaussians
+        m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
+        c_dist1 = torch.trace(
+            torch.matmul(torch.matmul(c_y_true_x_true_minus_c_y_predict_x_true, inv_c_x_true_x_true),
+                         c_x_true_y_true_minus_c_x_true_y_predict))
+        c_dist_2_1 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true)
+        c_dist_2_2 = - 2 * trace_sqrt_product_torch(
+            c_y_predict_given_x_true, c_y_true_given_x_true)
+
+        c_dist2 = c_dist_2_1 + c_dist_2_2
+
+        cfid = m_dist + c_dist1 + c_dist2
 
         return cfid.cpu().numpy()
 
