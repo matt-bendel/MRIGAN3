@@ -225,7 +225,6 @@ class CFIDMetric:
         cfid = self.get_cfid_torch_pinv(y_predict=y_predict, x_true=x_true, y_true=y_true)
         print(cfid)
 
-
     def get_cfid_torch(self, resample=True,y_predict=None, x_true=None, y_true = None):
         if y_true is None:
             y_predict, x_true, y_true = self._get_generated_distribution()
