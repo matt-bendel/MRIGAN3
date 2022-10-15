@@ -176,7 +176,7 @@ class CFIDMetric:
             maps = []
 
             with torch.no_grad():
-                for l in range(32):
+                for l in range(1):
                     recon = self.gan(condition, true_cond)
 
                     for j in range(condition.shape[0]):
