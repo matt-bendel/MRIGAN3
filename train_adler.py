@@ -23,6 +23,7 @@ from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
+from evaluation_scripts import compute_cfid
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
@@ -207,6 +208,8 @@ def train(args, bl=1, adv_mult=0.0):
 
     if args.resume:
         start_epoch += 1
+    else:
+        best_loss = 100000
 
     train_loader, dev_loader = create_data_loaders(args, big_test=False)
 
@@ -378,9 +381,10 @@ def train(args, bl=1, adv_mult=0.0):
                         plt.close()
 
         psnr_loss = np.mean(losses['psnr'])
+        CFID = compute_cfid.get_cfid(args, G, dev_loader)
 
-        best_model = psnr_loss > best_loss
-        best_loss = psnr_loss if best_model else best_loss
+        best_model = CFID < best_loss
+        best_loss = CFID if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
@@ -390,7 +394,7 @@ def train(args, bl=1, adv_mult=0.0):
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
 
-        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
+        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}", file_name="variation_gif.gif")
 
         # if adv_weight < 1.5 and psnr_diff > 0:
         #     save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
