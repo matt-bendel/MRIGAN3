@@ -202,9 +202,6 @@ def train(args, bl=1, adv_mult=0.0):
     args.out_chans = 16
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
-    #
-    if bl == 0:
-        best_loss = 0
 
     if args.resume:
         start_epoch += 1
@@ -427,21 +424,21 @@ if __name__ == '__main__':
 
     vals = [1]
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
-    # for val in vals:
-        # try:
-        #     train(args, bl=0, adv_mult=val)
-        # except KeyboardInterrupt:
-        #     exit()
-        # except Exception as e:
-        #     print(e)
-        #     send_mail("TRAINING CRASH", "See terminal for failure cause.")
+    for val in vals:
+        try:
+            train(args, bl=0, adv_mult=val)
+        except KeyboardInterrupt:
+            exit()
+        except Exception as e:
+            print(e)
+            send_mail("TRAINING CRASH", "See terminal for failure cause.")
 
-    try:
-        for i in range(6):
-            num = 2 ** i
-            get_metrics(args, num, is_super=True, std_val=1)
-    except KeyboardInterrupt:
-        exit()
-    except Exception as e:
-        print(e)
-        send_mail("TESTING FAILED", "See terminal for failure cause.")
+    # try:
+    #     for i in range(6):
+    #         num = 2 ** i
+    #         get_metrics(args, num, is_super=True, std_val=1)
+    # except KeyboardInterrupt:
+    #     exit()
+    # except Exception as e:
+    #     print(e)
+    #     send_mail("TESTING FAILED", "See terminal for failure cause.")
