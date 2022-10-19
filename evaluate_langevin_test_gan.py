@@ -63,7 +63,8 @@ def main(args):
     # iterate over files in
     # that directory
 
-    vals = [1, 2, 4, 8, 16, 32]
+    # vals = [1, 2, 4, 8, 16, 32]
+    vals = [32]
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
