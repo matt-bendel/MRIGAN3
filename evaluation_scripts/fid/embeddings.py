@@ -116,12 +116,12 @@ class WrapVGG(nn.Module):
         self.features = list(net.features)
         self.features = nn.Sequential(*self.features)
         # Extract VGG-16 Average Pooling Layer
-        self.pooling = net.avgpool
+        self.pooling = F.adaptive_avg_pool2d(x, 1).view(x.size(0), -1)
         # Convert the image into one-dimensional vector
-        self.flatten = nn.Flatten()
+        # self.flatten = nn.Flatten()
         # Extract the first part of fully-connected layer from VGG16
-        self.fc = net.classifier[0:4]
-        print(self.fc)
+        # self.fc = net.classifier[0:4]
+        # print(self.fc)
 
         # net.classifier = net.classifier[:-1]
         self.net = net
@@ -141,6 +141,6 @@ class WrapVGG(nn.Module):
 
         out = self.features(x)
         out = self.pooling(out)
-        out = self.flatten(out)
-        out = self.fc(out)
+        # out = self.flatten(out)
+        # out = self.fc(out)
         return out
