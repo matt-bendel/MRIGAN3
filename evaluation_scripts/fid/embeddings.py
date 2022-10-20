@@ -5,6 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Parameter as P
 from torchvision.models.inception import inception_v3
+from torchvision.models.vgg16 import vgg16
+
 
 
 class IdentityEmbedding:
@@ -94,3 +96,34 @@ class WrapInception(nn.Module):
         pool = F.adaptive_avg_pool2d(x, 1).view(x.size(0), -1)
         # 1 x 1 x 2048
         return pool
+
+class VGG16Embedding(nn.Module):
+    def __init__(self, parallel=False):
+        # Expects inputs to be in range [-1, 1]
+        vgg_model = vgg16(pretrained=True, transform_input=False)
+        vgg_model = WrapVGG(vgg_model.eval()).cuda()
+        if parallel:
+            vgg_model = nn.DataParallel(vgg_model)
+        self.vgg_model = torch.nn.Sequential(*list(vgg_model.children())[:-1])
+        print(self.vgg_model)
+
+    def __call__(self, x):
+        return self.vgg_model(x)
+
+class WrapVGG(nn.Module):
+    def __init__(self, net):
+        super(WrapVGG, self).__init__()
+        self.net = net
+        self.mean = P(torch.tensor([0.485, 0.456, 0.406]).view(1, -1, 1, 1),
+                      requires_grad=False)
+        self.std = P(torch.tensor([0.229, 0.224, 0.225]).view(1, -1, 1, 1),
+                     requires_grad=False)
+
+    def forward(self, x):
+        # Normalize x
+        x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
+        x = (x - self.mean) / self.std
+        # Upsample if necessary
+        if x.shape[2] != 256 or x.shape[3] != 256:
+            x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=True)
+        return self.net(x)
