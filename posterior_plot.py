@@ -305,14 +305,15 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 def create_posterior_sample_plots(sample, gt, plot_num):
     fig, ax2 = plt.subplots(ncols=1)
     fig.subplots_adjust(wspace=0, hspace=0.05)
-    plt.axis('off')
+    # plt.axis('off')
 
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
-    ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt), origin='upper')
 
-    axins2 = zoomed_inset_axes(ax2, zoom=3, loc=1)
-    axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    axins2 = zoomed_inset_axes(ax2, zoom=4, loc=1)
+    # axins2.axis('off')
+    axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt), origin='upper')
 
     # sub region of the original image
     x1, x2, y1, y2 = 100, 150, 100, 150
