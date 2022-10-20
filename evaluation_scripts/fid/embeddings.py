@@ -100,7 +100,7 @@ class WrapInception(nn.Module):
 class VGG16Embedding(nn.Module):
     def __init__(self, parallel=False):
         # Expects inputs to be in range [-1, 1]
-        vgg_model = vgg16(pretrained=True, transform_input=False)
+        vgg_model = vgg16(pretrained=True)
         vgg_model = WrapVGG(vgg_model.eval()).cuda()
         if parallel:
             vgg_model = nn.DataParallel(vgg_model)

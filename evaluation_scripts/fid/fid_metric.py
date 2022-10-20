@@ -331,16 +331,16 @@ class FIDMetric:
             mu1, mu2 = np.copy(mu1), np.copy(mu2)
             sigma1, sigma2 = np.copy(sigma1), np.copy(sigma2)
 
-        mu1[2048:] = mu1[2048:] * alpha
-        mu2[2048:] = mu2[2048:] * alpha
+        mu1[4096:] = mu1[4096:] * alpha
+        mu2[4096:] = mu2[4096:] * alpha
 
-        sigma1[2048:, 2048:] = sigma1[2048:, 2048:] * alpha ** 2
-        sigma1[2048:, :2048] = sigma1[2048:, :2048] * alpha
-        sigma1[:2048, 2048:] = sigma1[:2048, 2048:] * alpha
+        sigma1[4096:, 4096:] = sigma1[4096:, 4096:] * alpha ** 2
+        sigma1[4096:, :4096] = sigma1[4096:, :4096] * alpha
+        sigma1[:4096, 4096:] = sigma1[:4096, 4096:] * alpha
 
-        sigma2[2048:, 2048:] = sigma2[2048:, 2048:] * alpha ** 2
-        sigma2[2048:, :2048] = sigma2[2048:, :2048] * alpha
-        sigma2[:2048, 2048:] = sigma2[:2048, 2048:] * alpha
+        sigma2[4096:, 4096:] = sigma2[4096:, 4096:] * alpha ** 2
+        sigma2[4096:, :4096] = sigma2[4096:, :4096] * alpha
+        sigma2[:4096, 4096:] = sigma2[:4096, 4096:] * alpha
 
         return mu1, sigma1, mu2, sigma2
 
