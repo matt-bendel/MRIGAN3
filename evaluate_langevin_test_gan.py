@@ -86,7 +86,7 @@ def main(args):
 
     loader = DataLoader(
         dataset=data,
-        batch_size=40,
+        batch_size=4,
         num_workers=16,
         pin_memory=True,
         drop_last=True
