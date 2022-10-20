@@ -113,7 +113,16 @@ class VGG16Embedding:
 class WrapVGG(nn.Module):
     def __init__(self, net):
         super(WrapVGG, self).__init__()
-        net.classifier = net.classifier[:-1]
+        self.features = list(net.features)
+        self.features = nn.Sequential(*self.features)
+        # Extract VGG-16 Average Pooling Layer
+        self.pooling = net.avgpool
+        # Convert the image into one-dimensional vector
+        self.flatten = nn.Flatten()
+        # Extract the first part of fully-connected layer from VGG16
+        self.fc = net.classifier[0]
+
+        # net.classifier = net.classifier[:-1]
         self.net = net
         self.mean = P(torch.tensor([0.485, 0.456, 0.406]).view(1, -1, 1, 1),
                       requires_grad=False)
@@ -127,4 +136,9 @@ class WrapVGG(nn.Module):
         # Upsample if necessary
         if x.shape[2] != 256 or x.shape[3] != 256:
             x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=True)
-        return self.net(x)
+
+        out = self.features(x)
+        out = self.pooling(out)
+        out = self.flatten(out)
+        out = self.fc(out)
+        return out
