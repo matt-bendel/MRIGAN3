@@ -153,12 +153,12 @@ class FIDMetric:
 
         return mu, sigma
 
-    def _save_activation_statistics(self, mu, sigma):
+    def _save_activation_statistics(self, mu, sigma, alpha):
         if self.cuda:
             mu = mu.cpu().numpy()
             sigma = sigma.cpu().numpy()
 
-        np.savez('/storage/fastMRI/ref_stats.npz', mu=mu, sigma=sigma)
+        np.savez('/storage/fastMRI/ref_stats.npz', mu=mu, sigma=sigma, alpha = alpha)
 
     def _calculate_alpha(self, image_embed, cond_embed):
         self.alpha = calculate_alpha(image_embed, cond_embed, cuda=self.cuda)
@@ -243,27 +243,28 @@ class FIDMetric:
         assert path.endswith('.npz'), 'Invalid filepath "{}". Should be .npz'.format(path)
 
         f = np.load(path)
-        mu, sigma = f['mu'][:], f['sigma'][:]
+        mu, sigma, alpha = f['mu'][:], f['sigma'][:], f['alpha']
         f.close()
 
         if self.cuda:
             mu = torch.tensor(mu).cuda()
             sigma = torch.tensor(sigma).cuda()
+            alpha = torch.tensor(alpha).cuda()
 
-        return mu.to('cuda:3'), sigma.to('cuda:3')
+        return mu.to('cuda:3'), sigma.to('cuda:3'), alpha.to('cuda:3')
 
     def _get_reference_distribution(self):
         if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
             stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
-            mu_real, sigma_real = stats
+            mu_real, sigma_real, alpha = stats
         else:
             mu_real, sigma_real = self._compute_reference_distribution()
-            self._save_activation_statistics(mu_real, sigma_real)
+            self._save_activation_statistics(mu_real, sigma_real, self.alpha)
 
 
-        self.mu_real, self.sigma_real = mu_real.to('cuda:3'), sigma_real.to('cuda:3')
+        self.mu_real, self.sigma_real, self.alpha = mu_real.to('cuda:3'), sigma_real.to('cuda:3'), alpha.to('cuda:3')
 
-        return mu_real, sigma_real
+        return mu_real, sigma_real, alpha
 
     def _compute_reference_distribution(self, cfid=False):
         image_embed = []
@@ -362,6 +363,8 @@ class FIDMetric:
         if alpha is None:
             alpha = self.alpha
 
+        # alpha = self._calculate_alpha()
+
         m1, s1, m2, s2 = self._scale_statistics(self.mu_real,
                                                 self.sigma_real,
                                                 self.mu_fake,
@@ -379,7 +382,7 @@ class FIDMetric:
             FID value.
         """
         fid = self.get_fjd(alpha=0., resample=False)
-        fjd = self.get_fjd(alpha=1, resample=False)
+        fjd = self.get_fjd(alpha=self.alpha, resample=False)
         print(f"FID: {fid}")
         print(f"FJD: {fjd}")
 
@@ -525,6 +528,16 @@ def numpy_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
     out = diff.dot(diff) + np.trace(sigma1) + np.trace(sigma2) - 2 * tr_covmean
     return out
 
+def calculate_alpha(image_embed, cond_embed, cuda=False):
+    if cuda:
+        image_norm = torch.mean(torch.norm(image_embed, dim=1))
+        cond_norm = torch.mean(torch.norm(cond_embed, dim=1))
+        alpha = (image_norm / cond_norm).item()
+    else:
+        image_norm = np.mean(linalg.norm(image_embed, axis=1))
+        cond_norm = np.mean(linalg.norm(cond_embed, axis=1))
+        alpha = image_norm / cond_norm
+    return alpha
 
 # PyTorch implementation of Frechet distance, from Andrew Brock (modified slightly)
 # https://github.com/ajbrock/BigGAN-PyTorch/blob/master/inception_utils.py
@@ -568,5 +581,13 @@ def torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
     covmean = sqrt_newton_schulz(sigma1.mm(sigma2).unsqueeze(0), 50).squeeze()
     tr_covmean = torch.trace(covmean)
 
-    out = diff.dot(diff) + torch.trace(sigma1) + torch.trace(sigma2) - 2 * tr_covmean
+    m1 = diff.dot(diff)
+    m2 = torch.trace(sigma1)
+    m3 = torch.trace(sigma2)
+
+    print(m1)
+    print(m2)
+    print(m3)
+
+    out = m1 + m2 + m3 - 2 * tr_covmean
     return out
