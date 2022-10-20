@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Parameter as P
 from torchvision.models.inception import inception_v3
-from torchvision.models.vgg16 import vgg16
+from torchvision.models import vgg16
 
 
 
