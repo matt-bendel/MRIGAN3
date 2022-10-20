@@ -201,7 +201,7 @@ class FIDMetric:
             maps = []
 
             with torch.no_grad():
-                for j in range(32):
+                for j in range(1):
                     recon = self.gan(condition, true_cond)
 
                     for j in range(condition.shape[0]):
