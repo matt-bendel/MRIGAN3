@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.nn import Parameter as P
 from torchvision.models.inception import inception_v3
 from torchvision.models import vgg16
-
+import torchvision.transforms.functional as TF
 
 
 class IdentityEmbedding:
@@ -132,9 +132,10 @@ class WrapVGG(nn.Module):
 
     def forward(self, x):
         if x.shape[2] != 256 or x.shape[3] != 256:
-            x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=True)
+            # x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=True)
+            x = TF.resize(x, 256)
 
-        x = F.center_crop(x, 224)
+        x = TF.center_crop(x, 224)
 
         # Normalize x
         x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
