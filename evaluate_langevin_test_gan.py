@@ -70,10 +70,11 @@ def main(args):
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
+    args.batch_size = 40
+
     train_loader, _ = create_data_loaders(args, big_test=False)
     # compute_cfid.get_cfid(args, G, langevin=True)
 
-    args.batch_size = 40
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',
         transform=DataTransform(args, test=True),
