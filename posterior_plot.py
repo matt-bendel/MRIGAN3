@@ -20,6 +20,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from scipy import ndimage
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes, mark_inset
 
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import load_best_gan
