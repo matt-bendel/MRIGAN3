@@ -311,7 +311,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
-    axins2 = zoomed_inset_axes(ax2, zoom=4, loc=1)
+    axins2 = zoomed_inset_axes(ax2, zoom=5, loc=1)
     axins2.axis('off')
     axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
@@ -326,7 +326,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     # draw a bbox of the region of the inset axes in the parent axes and
     # connecting lines between the bbox and the inset axes area
-    mark_inset(ax2, axins2, loc1=3, loc2=1, ec="red")
+    mark_inset(ax2, axins2, loc1=2, loc2=4, ec="red")
     plt.savefig('posterior_plot_test.png')
 
 def main(args):
