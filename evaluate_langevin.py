@@ -5,6 +5,7 @@ import torch
 import numpy as np
 from utils.math import complex_abs
 from utils.parse_args import create_arg_parser
+from evaluation_scripts.fid.embeddings import VGG16Embedding
 
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
@@ -12,15 +13,15 @@ from evaluation_scripts.fid.fid_metric_langevin import FIDMetric
 
 def get_fid(args, G, ref_loader, cond_loader):
     print("GETTING INCEPTION EMBEDDING")
-    inception_embedding = InceptionEmbedding(parallel=True)
+    vgg_embedding = VGG16Embedding(parallel=True)
 
     print("GETTING DATA LOADERS")
 
     fid_metric = FIDMetric(gan=None,
                            ref_loader=ref_loader,
                            loader=None,
-                           image_embedding=inception_embedding,
-                           condition_embedding=inception_embedding,
+                           image_embedding=vgg_embedding,
+                           condition_embedding=vgg_embedding,
                            cuda=True,
                            args=args)
 
