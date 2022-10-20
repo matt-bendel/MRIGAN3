@@ -327,15 +327,15 @@ def main(args):
     # iterate over files in
     # that directory
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ours"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/cvpr_ours"
     G_ours = load_best_gan(args)
     G_ours.update_gen_status(val=True)
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/cvpr_adler"
     G_adler = load_best_gan(args)
     G_adler.update_gen_status(val=True)
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ohayon"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/cvpr_ohayon"
     G_ohayon = load_best_gan(args)
     G_ohayon.update_gen_status(val=True)
 

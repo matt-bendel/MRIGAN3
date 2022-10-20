@@ -254,7 +254,7 @@ class FIDMetric:
 
     def _get_reference_distribution(self):
         if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
-            stats = self._get_statistics_from_file(self.reference_stats_path)
+            stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
             mu_real, sigma_real = stats
         else:
             mu_real, sigma_real = self._compute_reference_distribution()

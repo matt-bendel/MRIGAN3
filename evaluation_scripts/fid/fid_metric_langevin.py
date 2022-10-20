@@ -218,8 +218,23 @@ class FIDMetric:
         self.mu_fake, self.sigma_fake = mu_fake, sigma_fake
         return mu_fake, sigma_fake
 
+    def _get_statistics_from_file(self, path):
+        print('Loading reference statistics from {}'.format(path))
+        assert path.endswith('.npz'), 'Invalid filepath "{}". Should be .npz'.format(path)
+
+        f = np.load(path)
+        mu, sigma = f['mu'][:], f['sigma'][:]
+        f.close()
+
+        if self.cuda:
+            mu = torch.tensor(mu).cuda()
+            sigma = torch.tensor(sigma).cuda()
+
+        return mu.to('cuda:3'), sigma.to('cuda:3')
+
     def _get_reference_distribution(self):
-        mu_real, sigma_real = self._compute_reference_distribution()
+        stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
+        mu_real, sigma_real = stats
 
         self.mu_real, self.sigma_real = mu_real.to('cuda:3'), sigma_real.to('cuda:3')
 
