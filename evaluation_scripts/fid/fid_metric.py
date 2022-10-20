@@ -260,7 +260,7 @@ class FIDMetric:
             stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
             mu_real, sigma_real, alpha = stats
         else:
-            mu_real, sigma_real = self._compute_reference_distribution()
+            mu_real, sigma_real, alpha = self._compute_reference_distribution()
             self._save_activation_statistics(mu_real, sigma_real, self.alpha)
 
 
@@ -312,12 +312,12 @@ class FIDMetric:
             image_embed = np.concatenate(image_embed, axis=0)
             cond_embed = np.concatenate(cond_embed, axis=0)
 
-        self._calculate_alpha(image_embed, cond_embed)
+        alpha = self._calculate_alpha(image_embed, cond_embed)
         mu_real, sigma_real = self._get_joint_statistics(image_embed, cond_embed)
         del image_embed
         del cond_embed
 
-        return mu_real, sigma_real
+        return mu_real, sigma_real, alpha
 
     def _scale_statistics(self, mu1, sigma1, mu2, sigma2, alpha):
         # Perform scaling operations directly on the precomputed mean and
