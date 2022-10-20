@@ -137,6 +137,10 @@ class WrapVGG(nn.Module):
 
         x = TF.center_crop(x, 224)
 
+        print(torch.max(x))
+        print(torch.min(x))
+        exit()
+
         # Normalize x
         x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
         x = (x - self.mean) / self.std

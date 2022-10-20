@@ -185,9 +185,6 @@ class FIDMetric:
             embed_ims[i, 1, :, :] = im
             embed_ims[i, 2, :, :] = im
 
-        print(torch.max(embed_ims))
-        print(torch.min(embed_ims))
-
         return embed_ims
 
     def _get_generated_distribution(self):
