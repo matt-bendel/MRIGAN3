@@ -261,6 +261,7 @@ class FIDMetric:
             mu_real, sigma_real, alpha = stats
         else:
             mu_real, sigma_real, alpha = self._compute_reference_distribution()
+            alpha = torch.tensor(alpha).cuda()
             self._save_activation_statistics(mu_real, sigma_real, self.alpha)
 
 
