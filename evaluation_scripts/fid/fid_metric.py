@@ -124,7 +124,8 @@ class FIDMetric:
                  args=None,
                  eps=1e-6,
                  truncation=None,
-                 truncation_latent=None):
+                 truncation_latent=None,
+                 load_stats=False):
 
         self.gan = gan
         self.args = args
@@ -137,6 +138,7 @@ class FIDMetric:
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
         self.truncation = truncation
         self.truncation_latent = truncation_latent
+        self.load_stats = load_stats
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -150,6 +152,13 @@ class FIDMetric:
         mu, sigma = get_embedding_statistics(joint_embed, cuda=self.cuda)
 
         return mu, sigma
+
+    def _save_activation_statistics(self, mu, sigma):
+        if self.cuda:
+            mu = mu.cpu().numpy()
+            sigma = sigma.cpu().numpy()
+
+        np.savez('/storage/fastMRI/ref_stats.npz', mu=mu, sigma=sigma)
 
     def _calculate_alpha(self, image_embed, cond_embed):
         self.alpha = calculate_alpha(image_embed, cond_embed, cuda=self.cuda)
@@ -229,8 +238,28 @@ class FIDMetric:
         self.mu_fake, self.sigma_fake = mu_fake, sigma_fake
         return mu_fake, sigma_fake
 
+    def _get_statistics_from_file(self, path):
+        print('Loading reference statistics from {}'.format(path))
+        assert path.endswith('.npz'), 'Invalid filepath "{}". Should be .npz'.format(path)
+
+        f = np.load(path)
+        mu, sigma = f['mu'][:], f['sigma'][:]
+        f.close()
+
+        if self.cuda:
+            mu = torch.tensor(mu).cuda()
+            sigma = torch.tensor(sigma).cuda()
+
+        return mu.to('cuda:3'), sigma.to('cuda:3')
+
     def _get_reference_distribution(self):
-        mu_real, sigma_real = self._compute_reference_distribution()
+        if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
+            stats = self._get_statistics_from_file(self.reference_stats_path)
+            mu_real, sigma_real = stats
+        else:
+            mu_real, sigma_real = self._compute_reference_distribution()
+            self._save_activation_statistics(mu_real, sigma_real)
+
 
         self.mu_real, self.sigma_real = mu_real.to('cuda:3'), sigma_real.to('cuda:3')
 
