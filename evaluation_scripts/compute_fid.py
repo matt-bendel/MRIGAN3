@@ -14,7 +14,7 @@ def get_fid(args, G, ref_loader, cond_loader):
     print("GETTING DATA LOADERS")
 
     fid_metric = FIDMetric(gan=G,
-                           ref_loader=train_loader,
+                           ref_loader=ref_loader,
                            loader=cond_loader,
                            image_embedding=inception_embedding,
                            condition_embedding=inception_embedding,

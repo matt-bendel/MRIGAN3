@@ -206,14 +206,6 @@ class FIDMetric:
                         print(filename)
                         continue
 
-        for i in range(1000):
-            with torch.no_grad():
-                for j in range(32):
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
-                    x_hat = recon_object['x_hat'].cuda()
-                    y = recon_object['masked'].cuda()
-
-
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)
             cond_embed = torch.cat(cond_embed, dim=0)
