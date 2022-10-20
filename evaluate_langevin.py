@@ -4,10 +4,27 @@ import pathlib
 import torch
 import numpy as np
 from utils.math import complex_abs
+from utils.parse_args import create_arg_parser
 
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from evaluation_scripts.fid.fid_metric_langevin import FIDMetric
 
+def get_fid(args, G, ref_loader, cond_loader):
+    print("GETTING INCEPTION EMBEDDING")
+    inception_embedding = InceptionEmbedding(parallel=True)
+
+    print("GETTING DATA LOADERS")
+
+    fid_metric = FIDMetric(gan=None,
+                           ref_loader=ref_loader,
+                           loader=None,
+                           image_embedding=inception_embedding,
+                           condition_embedding=inception_embedding,
+                           cuda=True,
+                           args=args)
+
+    fid_metric.get_fid()
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -62,6 +79,11 @@ recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 # iterate over files in
 # that directory
 
+args = create_arg_parser().parse_args()
+
+train_loader, _ = create_data_loaders(args, big_test=False)
+get_fid(args, None, train_loader, None)
+exit()
 
 vals = [32]
 
