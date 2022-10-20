@@ -104,8 +104,7 @@ class VGG16Embedding(nn.Module):
         vgg_model = WrapVGG(vgg_model.eval()).cuda()
         if parallel:
             vgg_model = nn.DataParallel(vgg_model)
-        self.vgg_model = torch.nn.Sequential(*list(vgg_model.children())[:-1])
-        print(self.vgg_model)
+        self.vgg_model = vgg_model
 
     def __call__(self, x):
         return self.vgg_model(x)
@@ -113,7 +112,8 @@ class VGG16Embedding(nn.Module):
 class WrapVGG(nn.Module):
     def __init__(self, net):
         super(WrapVGG, self).__init__()
-        self.net = net
+        self.net = torch.nn.Sequential(*list(net.children())[:-1])
+        print(self.net)
         self.mean = P(torch.tensor([0.485, 0.456, 0.406]).view(1, -1, 1, 1),
                       requires_grad=False)
         self.std = P(torch.tensor([0.229, 0.224, 0.225]).view(1, -1, 1, 1),
