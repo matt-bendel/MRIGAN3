@@ -120,7 +120,7 @@ class WrapVGG(nn.Module):
         # Convert the image into one-dimensional vector
         self.flatten = nn.Flatten()
         # Extract the first part of fully-connected layer from VGG16
-        self.fc = net.classifier[0]
+        self.fc = net.classifier[0:4]
 
         # net.classifier = net.classifier[:-1]
         self.net = net
