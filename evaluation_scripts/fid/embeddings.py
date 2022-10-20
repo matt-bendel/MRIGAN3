@@ -97,13 +97,14 @@ class WrapInception(nn.Module):
         # 1 x 1 x 2048
         return pool
 
-class VGG16Embedding(nn.Module):
+class VGG16Embedding:
     def __init__(self, parallel=False):
         # Expects inputs to be in range [-1, 1]
         vgg_model = vgg16(pretrained=True)
         vgg_model = WrapVGG(vgg_model.eval()).cuda()
         if parallel:
             vgg_model = nn.DataParallel(vgg_model)
+
         self.vgg_model = vgg_model
 
     def __call__(self, x):
@@ -112,7 +113,8 @@ class VGG16Embedding(nn.Module):
 class WrapVGG(nn.Module):
     def __init__(self, net):
         super(WrapVGG, self).__init__()
-        self.net = torch.nn.Sequential(*list(net.children())[:-1])
+        net.classifier = net.classifier[:-1]
+        self.net = net
         print(self.net)
         self.mean = P(torch.tensor([0.485, 0.456, 0.406]).view(1, -1, 1, 1),
                       requires_grad=False)
