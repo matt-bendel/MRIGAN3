@@ -132,11 +132,11 @@ class WrapVGG(nn.Module):
     def forward(self, x):
         # Normalize x
         x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
-        # Upsample if necessary
-        if x.shape[2] != 224 or x.shape[3] != 224:
-            x = F.interpolate(x, size=(224, 224), mode='bilinear', align_corners=True)
-
         x = (x - self.mean) / self.std
+
+        # Upsample if necessary
+        # if x.shape[2] != 224 or x.shape[3] != 224:
+        #     x = F.interpolate(x, size=(224, 224), mode='bilinear', align_corners=True)
 
         out = self.features(x)
         out = self.pooling(out)
