@@ -11,9 +11,11 @@ import sigpy.mri as mr
 from data.mri_data import SelectiveSliceData_Val
 from data_loaders.prepare_data import DataTransform
 from evaluation_scripts import compute_cfid
+from evaluation_scripts import compute_fid
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from torch.utils.data import DataLoader
+from data_loaders.prepare_data import create_data_loaders
 
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
@@ -68,6 +70,7 @@ def main(args):
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
+    train_loader, _ = create_data_loaders(args, big_test=False)
     # compute_cfid.get_cfid(args, G, langevin=True)
 
     data = SelectiveSliceData_Val(
@@ -88,6 +91,9 @@ def main(args):
         pin_memory=True,
         drop_last=True
     )
+
+    compute_fid.get_fid(args, G, train_loader, loader)
+    exit()
 
     for num in vals:
         num_code = num
@@ -191,11 +197,16 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/cvpr_ours"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
     main(args)
 
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_adler"
-    # main(args)
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ohayon"
+    main(args)
+
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/asilomar_ours"
+    main(args)
+
+
 
     # print('MEDIAN')
     # print('APSD: ', np.median(apsd_vals))
