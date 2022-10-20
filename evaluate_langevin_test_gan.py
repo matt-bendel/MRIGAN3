@@ -73,6 +73,7 @@ def main(args):
     train_loader, _ = create_data_loaders(args, big_test=False)
     # compute_cfid.get_cfid(args, G, langevin=True)
 
+    args.batch_size = 40
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',
         transform=DataTransform(args, test=True),
@@ -86,7 +87,7 @@ def main(args):
 
     loader = DataLoader(
         dataset=data,
-        batch_size=4,
+        batch_size=16,
         num_workers=16,
         pin_memory=True,
         drop_last=True

@@ -137,21 +137,9 @@ class WrapVGG(nn.Module):
 
         x = TF.center_crop(x, 224)
 
-        print("SHAPE")
-        print(x.shape)
-
-        print("PRE")
-        print(torch.max(x))
-        print(torch.min(x))
-
         # Normalize x
         x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
         x = (x - self.mean) / self.std
-
-        print("POST")
-        print(torch.max(x))
-        print(torch.min(x))
-        exit()
 
         # Upsample if necessary
         # if x.shape[2] != 224 or x.shape[3] != 224:
