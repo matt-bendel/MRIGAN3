@@ -65,8 +65,8 @@ def main(args):
     # iterate over files in
     # that directory
 
-    vals = [1, 2, 4, 8, 16, 32]
-    # vals = [32]
+    # vals = [1, 2, 4, 8, 16, 32]
+    vals = [32]
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
@@ -92,8 +92,9 @@ def main(args):
         drop_last=True
     )
 
-    # compute_fid.get_fid(args, G, train_loader, loader)
+    compute_fid.get_fid(args, G, train_loader, loader)
     # exit()
+    return
 
     for num in vals:
         num_code = num
@@ -197,11 +198,11 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
-    # main(args)
-    #
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
-    # main(args)
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
+    main(args)
+
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
+    main(args)
 
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
     main(args)
