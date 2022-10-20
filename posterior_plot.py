@@ -309,14 +309,14 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
-    ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt), origin='upper')
+    ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
     axins2 = zoomed_inset_axes(ax2, zoom=4, loc=1)
     axins2.axis('off')
-    axins2.imshow(ndimage.rotate(rotated_gt, 90), cmap='gray', vmin=0, vmax=np.max(rotated_gt), origin='upper')
+    axins2.imshow(ndimage.rotate(rotated_gt, 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
     # sub region of the original image
-    x1, x2, y1, y2 = 100, 150, 200, 250
+    x1, x2, y1, y2 = 100, 150, 250, 200
     axins2.set_xlim(x1, x2)
     axins2.set_ylim(y1, y2)
     # # fix the number of ticks on the inset axes
