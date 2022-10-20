@@ -326,7 +326,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     # draw a bbox of the region of the inset axes in the parent axes and
     # connecting lines between the bbox and the inset axes area
-    mark_inset(ax2, axins2, loc1=2, loc2=4, fc="red", ec="red")
+    mark_inset(ax2, axins2, loc1=3, loc2=1, ec="red")
     plt.savefig('posterior_plot_test.png')
 
 def main(args):
