@@ -223,20 +223,21 @@ class FIDMetric:
         assert path.endswith('.npz'), 'Invalid filepath "{}". Should be .npz'.format(path)
 
         f = np.load(path)
-        mu, sigma = f['mu'][:], f['sigma'][:]
+        mu, sigma, alpha = f['mu'][:], f['sigma'][:], f['alpha']
         f.close()
 
         if self.cuda:
             mu = torch.tensor(mu).cuda()
             sigma = torch.tensor(sigma).cuda()
+            alpha = torch.tensor(alpha).cuda()
 
-        return mu.to('cuda:3'), sigma.to('cuda:3')
+        return mu.to('cuda:3'), sigma.to('cuda:3'), alpha.to('cuda:3')
 
     def _get_reference_distribution(self):
         stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
-        mu_real, sigma_real = stats
+        mu_real, sigma_real, alpha = stats
 
-        self.mu_real, self.sigma_real = mu_real.to('cuda:3'), sigma_real.to('cuda:3')
+        self.mu_real, self.sigma_real, self.alpha = mu_real.to('cuda:3'), sigma_real.to('cuda:3'), alpha.to('cuda:3')
 
         return mu_real, sigma_real
 
@@ -407,11 +408,11 @@ def calculate_alpha(image_embed, cond_embed, cuda=False):
 
 
 def calculate_fd(mu1, sigma1, mu2, sigma2, cuda=False, eps=1e-6):
-    if cuda:
+    if False:
         fid = torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=eps)
         fid = fid.cpu().numpy()
     else:
-        fid = numpy_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=eps)
+        fid = numpy_calculate_frechet_distance(mu1.cpu().numpy(), sigma1.cpu().numpy(), mu2.cpu().numpy(), sigma2.cpu().numpy(), eps=eps)
     return fid
 
 

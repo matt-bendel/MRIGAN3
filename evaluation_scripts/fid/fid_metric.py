@@ -201,7 +201,7 @@ class FIDMetric:
             maps = []
 
             with torch.no_grad():
-                for j in range(1):
+                for j in range(32):
                     recon = self.gan(condition, true_cond)
 
                     for j in range(condition.shape[0]):
@@ -413,11 +413,11 @@ def calculate_alpha(image_embed, cond_embed, cuda=False):
 
 
 def calculate_fd(mu1, sigma1, mu2, sigma2, cuda=False, eps=1e-6):
-    if cuda:
+    if False:
         fid = torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=eps)
         fid = fid.cpu().numpy()
     else:
-        fid = numpy_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=eps)
+        fid = numpy_calculate_frechet_distance(mu1.cpu().numpy(), sigma1.cpu().numpy(), mu2.cpu().numpy(), sigma2.cpu().numpy(), eps=eps)
     return fid
 
 
