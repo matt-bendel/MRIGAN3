@@ -92,8 +92,8 @@ def main(args):
         drop_last=True
     )
 
-    compute_fid.get_fid(args, G, train_loader, loader)
-    exit()
+    # compute_fid.get_fid(args, G, train_loader, loader)
+    # exit()
 
     for num in vals:
         num_code = num
@@ -197,13 +197,13 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/asilomar_adler"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
     main(args)
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/asilomar_ohayon"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
     main(args)
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/asilomar_ours"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
     main(args)
 
 
