@@ -313,7 +313,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     axins2 = zoomed_inset_axes(ax2, zoom=4, loc=1)
     axins2.axis('off')
-    axins2.imshow(ndimage.rotate(rotated_gt, 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
     # sub region of the original image
     x1, x2, y1, y2 = 100, 150, 250, 200
