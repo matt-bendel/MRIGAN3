@@ -213,7 +213,7 @@ class FIDMetric:
                             image_embed.append(img_e.cpu().numpy())
                             cond_embed.append(cond_e.cpu().numpy())
                     except:
-                        print(filename)
+                        print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
                         break
 
         if self.cuda:
