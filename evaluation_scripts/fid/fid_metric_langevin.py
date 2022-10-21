@@ -214,7 +214,7 @@ class FIDMetric:
                             cond_embed.append(cond_e.cpu().numpy())
                     except:
                         print(filename)
-                        continue
+                        break
 
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)
