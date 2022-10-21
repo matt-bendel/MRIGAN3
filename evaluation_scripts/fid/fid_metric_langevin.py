@@ -204,8 +204,8 @@ class FIDMetric:
                         image = self._get_embed_im(recon)
                         condition_im = self._get_embed_im(zfr)
 
-                        img_e = self.image_embedding(self.transform(image))
-                        cond_e = self.condition_embedding(self.transform(condition_im))
+                        img_e = self.image_embedding(self.transforms(image))
+                        cond_e = self.condition_embedding(self.transforms(condition_im))
 
                         if self.cuda:
                             image_embed.append(img_e)
