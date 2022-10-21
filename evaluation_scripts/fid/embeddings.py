@@ -6,7 +6,6 @@ import torch.nn.functional as F
 from torch.nn import Parameter as P
 from torchvision.models.inception import inception_v3
 from torchvision.models import vgg16
-import torchvision.transforms.functional as TF
 
 
 class IdentityEmbedding:
