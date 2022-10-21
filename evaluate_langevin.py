@@ -10,6 +10,7 @@ from evaluation_scripts.fid.embeddings import VGG16Embedding
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from evaluation_scripts.fid.fid_metric_langevin import FIDMetric
+from data_loaders.prepare_data import create_data_loaders
 
 def get_fid(args, G, ref_loader, cond_loader):
     print("GETTING INCEPTION EMBEDDING")
