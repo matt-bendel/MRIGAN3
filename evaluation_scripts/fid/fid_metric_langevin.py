@@ -212,7 +212,8 @@ class FIDMetric:
                         else:
                             image_embed.append(img_e.cpu().numpy())
                             cond_embed.append(cond_e.cpu().numpy())
-                    except:
+                    except Exception as e:
+                        print(e)
                         print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
                         break
 
