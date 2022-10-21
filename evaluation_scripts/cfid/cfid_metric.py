@@ -356,13 +356,13 @@ class CFIDMetric:
         c_dist1 = torch.trace(
             torch.matmul(torch.matmul(c_y_true_x_true_minus_c_y_predict_x_true, inv_c_x_true_x_true),
                          c_x_true_y_true_minus_c_x_true_y_predict))
-        c_dist_2_1 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true)
-        c_dist_2_2 = - 2 * trace_sqrt_product_torch(
-            c_y_predict_given_x_true, c_y_true_given_x_true)
-
         c_dist2 = c_dist_2_1 + c_dist_2_2
 
         cfid = m_dist + c_dist1 + c_dist2
+
+        c_dist = c_dist_1 + c_dist_2
+        print(f"M: {m_dist.cpu().numpy()}")
+        print(f"C: {c_dist.cpu().numpy()}")
 
         return cfid.cpu().numpy()
 
