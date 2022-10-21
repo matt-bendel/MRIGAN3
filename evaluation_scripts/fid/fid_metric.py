@@ -149,7 +149,7 @@ class FIDMetric:
             # transforms.Resize(256),
             # transforms.Resize(224),
             # transforms.CenterCrop(224),
-            transforms.ConvertImageDtype(torch.float),
+            # transforms.ConvertImageDtype(torch.float),
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         )
 
@@ -187,7 +187,7 @@ class FIDMetric:
 
             im = torch.tensor(maps[i].H * unnormal_im).abs()
 
-            # im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
+            im = (im - torch.min(im)) / (torch.max(im) - torch.min(im))
 
             embed_ims[i, 0, :, :] = im
             embed_ims[i, 1, :, :] = im
