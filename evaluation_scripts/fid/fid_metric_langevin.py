@@ -216,6 +216,7 @@ class FIDMetric:
                     except KeyboardInterrupt:
                         exit()
                     except Exception as e:
+                        print(e)
                         print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
                         break
 
