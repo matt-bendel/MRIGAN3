@@ -100,8 +100,8 @@ class WrapInception(nn.Module):
 class VGG16Embedding:
     def __init__(self, parallel=False):
         # Expects inputs to be in range [-1, 1]
-        vgg_model = vgg16(pretrained=True)
-        vgg_model = WrapVGG(vgg_model.eval()).cuda()
+        vgg_model = vgg16(pretrained=True).eval()
+        vgg_model = WrapVGG(vgg_model).cuda()
         if parallel:
             vgg_model = nn.DataParallel(vgg_model)
 
@@ -120,7 +120,7 @@ class WrapVGG(nn.Module):
         # Convert the image into one-dimensional vector
         self.flatten = nn.Flatten()
         # Extract the first part of fully-connected layer from VGG16
-        self.fc = net.classifier[0]
+        self.fc = net.classifier[:-2]
         print(self.fc)
 
         # net.classifier = net.classifier[:-1]
