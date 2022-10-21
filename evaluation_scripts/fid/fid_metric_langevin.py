@@ -241,7 +241,7 @@ class FIDMetric:
             sigma = torch.tensor(sigma).cuda()
             alpha = torch.tensor(alpha).cuda()
 
-        return mu.to('cuda:3'), sigma.to('cuda:3'), alpha.to('cuda:3')
+        return mu, sigma, alpha
 
     def _get_reference_distribution(self):
         stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
