@@ -423,7 +423,7 @@ def calculate_alpha(image_embed, cond_embed, cuda=False):
 
 
 def calculate_fd(mu1, sigma1, mu2, sigma2, cuda=False, eps=1e-6):
-    if False:
+    if True:
         fid = torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=eps)
         fid = fid.cpu().numpy()
     else:
