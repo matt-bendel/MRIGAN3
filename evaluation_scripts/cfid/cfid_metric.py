@@ -364,7 +364,7 @@ class CFIDMetric:
 
         cfid = m_dist + c_dist1 + c_dist2
 
-        c_dist = c_dist_1 + c_dist_2
+        c_dist = c_dist1 + c_dist2
         print(f"M: {m_dist.cpu().numpy()}")
         print(f"C: {c_dist.cpu().numpy()}")
 
