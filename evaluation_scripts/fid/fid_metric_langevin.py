@@ -194,36 +194,33 @@ class FIDMetric:
             for i in range(6):
                 print(i)
                 recon_object = None
-                for j in range(32):
-                    try:
-                        new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt'
-                        recon_object = torch.load(new_filename)
+                with torch.no_grad():
+                    for j in range(32):
+                        try:
+                            new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt'
+                            recon_object = torch.load(new_filename)
 
-                        recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
-                        zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
+                            recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
+                            zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
 
-                        del recon_object
-                        image = self._get_embed_im(recon)
-                        condition_im = self._get_embed_im(zfr)
+                            image = self._get_embed_im(recon)
+                            condition_im = self._get_embed_im(zfr)
 
-                        img_e = self.image_embedding(self.transforms(image))
-                        cond_e = self.condition_embedding(self.transforms(condition_im))
+                            img_e = self.image_embedding(self.transforms(image))
+                            cond_e = self.condition_embedding(self.transforms(condition_im))
 
-                        del image
-                        del condition_im
-
-                        if self.cuda:
-                            image_embed.append(img_e)
-                            cond_embed.append(cond_e)
-                        else:
-                            image_embed.append(img_e.cpu().numpy())
-                            cond_embed.append(cond_e.cpu().numpy())
-                    except KeyboardInterrupt:
-                        exit()
-                    except Exception as e:
-                        print(e)
-                        print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
-                        break
+                            if self.cuda:
+                                image_embed.append(img_e)
+                                cond_embed.append(cond_e)
+                            else:
+                                image_embed.append(img_e.cpu().numpy())
+                                cond_embed.append(cond_e.cpu().numpy())
+                        except KeyboardInterrupt:
+                            exit()
+                        except Exception as e:
+                            print(e)
+                            print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
+                            break
 
         print("WE GOT EMBEDDINGS BABY")
         if self.cuda:
