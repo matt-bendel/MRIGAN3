@@ -10,7 +10,7 @@ from scipy import linalg
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from tqdm import tqdm
-
+from torchvision.models import VGG16_Weights
 
 def symmetric_matrix_square_root_torch(mat, eps=1e-10):
     """Compute square root of a symmetric matrix.
@@ -179,7 +179,7 @@ class FIDMetric:
 
             im = torch.tensor(maps[i].H * unnormal_im).abs()
 
-            im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
+            # im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
 
             embed_ims[i, 0, :, :] = im
             embed_ims[i, 1, :, :] = im
@@ -218,8 +218,8 @@ class FIDMetric:
                     image = self._get_embed_im(recon, mean, std, maps)
                     condition_im = self._get_embed_im(condition, mean, std, maps)
 
-                    img_e = self.image_embedding(image)
-                    cond_e = self.condition_embedding(condition_im)
+                    img_e = self.image_embedding(VGG16_Weights.DEFAULT.transforms(image))
+                    cond_e = self.condition_embedding(VGG16_Weights.DEFAULT.transforms(condition_im))
 
                     if self.cuda:
                         image_embed.append(img_e.to('cuda:1'))
@@ -296,8 +296,8 @@ class FIDMetric:
                 image = self._get_embed_im(gt, mean, std, maps)
                 condition_im = self._get_embed_im(condition, mean, std, maps)
 
-                img_e = self.image_embedding(image)
-                cond_e = self.condition_embedding(condition_im)
+                img_e = self.image_embedding(VGG16_Weights.DEFAULT.transforms(image))
+                cond_e = self.condition_embedding(VGG16_Weights.DEFAULT.transforms(condition_im))
 
                 if self.cuda:
                     image_embed.append(img_e)
