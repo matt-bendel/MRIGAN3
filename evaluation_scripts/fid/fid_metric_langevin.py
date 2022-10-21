@@ -199,8 +199,10 @@ class FIDMetric:
                         new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt'
                         recon_object = torch.load(new_filename)
 
-                        recon = recon_object['mvue'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
+                        recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
+                        print(recon.shape)
                         zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
+                        print(zfr.shape)
                         image = self._get_embed_im(recon)
                         condition_im = self._get_embed_im(zfr)
 
