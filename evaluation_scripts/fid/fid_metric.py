@@ -127,7 +127,9 @@ class FIDMetric:
                  eps=1e-6,
                  truncation=None,
                  truncation_latent=None,
-                 load_stats=False):
+                 load_stats=False,
+                 num_samps=32,
+                 use_train=False):
 
         self.gan = gan
         self.args = args
@@ -141,6 +143,8 @@ class FIDMetric:
         self.truncation = truncation
         self.truncation_latent = truncation_latent
         self.load_stats = load_stats
+        self.num_samps = num_samps
+        self.use_train = use_train
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -220,7 +224,7 @@ class FIDMetric:
 
                     maps.append(S)
 
-                for k in range(32):
+                for k in range(self.num_samps):
                     recon = self.gan(condition, true_cond)
 
                     image = self._get_embed_im(recon, mean, std, maps)
@@ -235,6 +239,44 @@ class FIDMetric:
                     else:
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
+
+        if self.use_train:
+            for i, data in tqdm(enumerate(self.ref_loader),
+                                desc='Computing generated distribution',
+                                total=len(self.ref_loader)):
+                condition, gt, true_cond, mean, std = data
+                condition = condition.cuda()
+                gt = gt.cuda()
+                true_cond = true_cond.cuda()
+                mean = mean.cuda()
+                std = std.cuda()
+                maps = []
+
+                with torch.no_grad():
+                    for j in range(condition.shape[0]):
+                        new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
+                        s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                                     device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                     kernel_width=6).run().get()
+                        S = sp.linop.Multiply((384, 384), s_maps)
+
+                        maps.append(S)
+
+                    for k in range(self.num_samps):
+                        recon = self.gan(condition, true_cond)
+
+                        image = self._get_embed_im(recon, mean, std, maps)
+                        condition_im = self._get_embed_im(condition, mean, std, maps)
+
+                        img_e = self.image_embedding(self.transforms(image))
+                        cond_e = self.condition_embedding(self.transforms(condition_im))
+
+                        if self.cuda:
+                            image_embed.append(img_e.to('cuda:1'))
+                            cond_embed.append(cond_e.to('cuda:1'))
+                        else:
+                            image_embed.append(img_e.cpu().numpy())
+                            cond_embed.append(cond_e.cpu().numpy())
 
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)

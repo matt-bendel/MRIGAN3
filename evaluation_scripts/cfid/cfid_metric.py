@@ -122,7 +122,9 @@ class CFIDMetric:
                  condition_embedding,
                  cuda=False,
                  args=None,
-                 eps=1e-6):
+                 eps=1e-6,
+                 ref_loader=False,
+                 num_samps=1):
 
         self.gan = gan
         self.args = args
@@ -132,6 +134,15 @@ class CFIDMetric:
         self.cuda = cuda
         self.eps = eps
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
+        self.num_samps = num_samps
+        self.ref_loader = ref_loader
+        self.transforms = torch.nn.Sequential(
+            # transforms.Resize(256),
+            # transforms.Resize(224),
+            # transforms.CenterCrop(224),
+            # transforms.ConvertImageDtype(torch.float),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        )
 
     def _get_mvue(self, kspace, s_maps):
         return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(
@@ -150,7 +161,7 @@ class CFIDMetric:
 
             im = torch.tensor(maps[i].H * unnormal_im).abs()
 
-            im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
+            im = (im - torch.min(im)) / (torch.max(im) - torch.min(im))
 
             embed_ims[i, 0, :, :] = im
             embed_ims[i, 1, :, :] = im
@@ -176,7 +187,7 @@ class CFIDMetric:
             maps = []
 
             with torch.no_grad():
-                for l in range(1):
+                for l in range(self.num_samps):
                     recon = self.gan(condition, true_cond)
 
                     for j in range(condition.shape[0]):
@@ -204,6 +215,48 @@ class CFIDMetric:
                         true_embed.append(true_e.cpu().numpy())
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
+
+        if self.ref_loader is not None:
+            for i, data in tqdm(enumerate(self.ref_loader),
+                                desc='Computing generated distribution',
+                                total=len(self.ref_loader)):
+                condition, gt, true_cond, mean, std = data
+                condition = condition.cuda()
+                gt = gt.cuda()
+                true_cond = true_cond.cuda()
+                mean = mean.cuda()
+                std = std.cuda()
+                maps = []
+
+                with torch.no_grad():
+                    for l in range(self.num_samps):
+                        recon = self.gan(condition, true_cond)
+
+                        for j in range(condition.shape[0]):
+                            new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
+                            s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                                         device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                         kernel_width=6).run().get()
+                            S = sp.linop.Multiply((384, 384), s_maps)
+
+                            maps.append(S)
+
+                        image = self._get_embed_im(recon, mean, std, maps)
+                        condition_im = self._get_embed_im(condition, mean, std, maps)
+                        true_im = self._get_embed_im(gt, mean, std, maps)
+
+                        img_e = self.image_embedding(image)
+                        cond_e = self.condition_embedding(condition_im)
+                        true_e = self.image_embedding(true_im)
+
+                        if self.cuda:
+                            true_embed.append(true_e.to('cuda:2'))
+                            image_embed.append(img_e.to('cuda:1'))
+                            cond_embed.append(cond_e.to('cuda:1'))
+                        else:
+                            true_embed.append(true_e.cpu().numpy())
+                            image_embed.append(img_e.cpu().numpy())
+                            cond_embed.append(cond_e.cpu().numpy())
 
         if self.cuda:
             true_embed = torch.cat(true_embed, dim=0)

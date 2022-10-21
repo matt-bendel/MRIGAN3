@@ -140,9 +140,7 @@ class FIDMetric:
 
         self.transforms = torch.nn.Sequential(
             # transforms.Resize(256),
-            transforms.Resize(224),
             # transforms.CenterCrop(224),
-            transforms.ConvertImageDtype(torch.float),
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         )
 
@@ -165,7 +163,7 @@ class FIDMetric:
                                 device=self.args.device)
         for i in range(inp.size(0)):
             im = inp[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]
-            im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
+            im = (im - torch.min(im)) / (torch.max(im) - torch.min(im))
             embed_ims[i, :, :, :] = im
 
         return embed_ims
@@ -175,6 +173,7 @@ class FIDMetric:
                                 device=self.args.device)
         for i in range(inp.size(0)):
             im = inp[i]
+            im = (im - torch.min(im)) / (torch.max(im) - torch.min(im))
 
             # im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
 
