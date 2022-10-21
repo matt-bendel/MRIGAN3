@@ -203,9 +203,9 @@ class CFIDMetric:
                     condition_im = self._get_embed_im(condition, mean, std, maps)
                     true_im = self._get_embed_im(gt, mean, std, maps)
 
-                    img_e = self.image_embedding(image)
-                    cond_e = self.condition_embedding(condition_im)
-                    true_e = self.image_embedding(true_im)
+                    img_e = self.image_embedding(self.transforms(image))
+                    cond_e = self.condition_embedding(self.transforms(condition_im))
+                    true_e = self.image_embedding(self.transforms(true_im))
 
                     if self.cuda:
                         true_embed.append(true_e.to('cuda:2'))
@@ -216,7 +216,7 @@ class CFIDMetric:
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
 
-        if self.ref_loader is not None:
+        if self.ref_loader:
             for i, data in tqdm(enumerate(self.ref_loader),
                                 desc='Computing generated distribution',
                                 total=len(self.ref_loader)):
@@ -245,9 +245,9 @@ class CFIDMetric:
                         condition_im = self._get_embed_im(condition, mean, std, maps)
                         true_im = self._get_embed_im(gt, mean, std, maps)
 
-                        img_e = self.image_embedding(image)
-                        cond_e = self.condition_embedding(condition_im)
-                        true_e = self.image_embedding(true_im)
+                        img_e = self.image_embedding(self.transforms(image))
+                        cond_e = self.condition_embedding(self.transforms(condition_im))
+                        true_e = self.image_embedding(self.transforms(true_im))
 
                         if self.cuda:
                             true_embed.append(true_e.to('cuda:2'))
@@ -309,6 +309,10 @@ class CFIDMetric:
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
+
+        c_dist = c_dist_1 + c_dist_2
+        print(f"M: {m_dist.cpu().numpy()}")
+        print(f"C: {c_dist.cpu().numpy()}")
 
         cfid = m_dist + c_dist_1 + c_dist_2
 

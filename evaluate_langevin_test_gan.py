@@ -93,7 +93,11 @@ def main(args):
         drop_last=True
     )
 
-    compute_fid.get_fid(args, G, train_loader, loader)
+    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
+    compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=8)
+    compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
+
+    # compute_fid.get_fid(args, G, train_loader, loader)
     # exit()
     return
 

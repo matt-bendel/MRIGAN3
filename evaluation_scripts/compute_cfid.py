@@ -1,5 +1,5 @@
 from data.mri_data import SelectiveSliceData_Val
-from evaluation_scripts.cfid.embeddings import InceptionEmbedding
+from evaluation_scripts.fid.embeddings import VGG16Embedding
 from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders, DataTransform
 from data_loaders.prepare_data_ls import create_data_loaders_ls
@@ -28,22 +28,20 @@ def get_lang_data_loaders(args):
 
     return None, loader
 
-def get_cfid(args, G, langevin=False, loader=False):
+def get_cfid(args, G, langevin=False, loader=False, ref_loader=False, num_samps=32):
     print("GETTING INCEPTION EMBEDDING")
-    inception_embedding = InceptionEmbedding(parallel=True)
-
-    print("GETTING DATA LOADERS")
-    if not loader:
-        _, loader = create_data_loaders(args, val_only=True, big_test=True) if not langevin else get_lang_data_loaders(args)
+    inception_embedding = VGG16Embedding(parallel=True)
 
     cfid_metric = CFIDMetric(gan=G,
                              loader=loader,
                              image_embedding=inception_embedding,
                              condition_embedding=inception_embedding,
                              cuda=True,
-                             args=args)
+                             args=args,
+                             ref_loader=ref_loader,
+                             num_samps=num_samps)
 
     cfids = cfid_metric.get_cfid_torch()
-    print(f'CFID: {np.mean(cfids)} \\pm {np.std(cfids) / np.sqrt(33)}')
+    print(f'CFID: {cfids}')
 
     return np.mean(cfids)
