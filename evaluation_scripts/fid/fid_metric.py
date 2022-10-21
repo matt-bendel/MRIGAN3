@@ -193,9 +193,6 @@ class FIDMetric:
             embed_ims[i, 1, :, :] = im
             embed_ims[i, 2, :, :] = im
 
-            print(embed_ims.max())
-            print(embed_ims.min())
-
         return embed_ims
 
     def _get_generated_distribution(self):
