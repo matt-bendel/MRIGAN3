@@ -201,11 +201,16 @@ class FIDMetric:
 
                         recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
                         zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
+
+                        del recon_object
                         image = self._get_embed_im(recon)
                         condition_im = self._get_embed_im(zfr)
 
                         img_e = self.image_embedding(self.transforms(image))
                         cond_e = self.condition_embedding(self.transforms(condition_im))
+
+                        del image
+                        del condition_im
 
                         if self.cuda:
                             image_embed.append(img_e)
@@ -220,6 +225,7 @@ class FIDMetric:
                         print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
                         break
 
+        print("WE GOT EMBEDDINGS BABY")
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)
             cond_embed = torch.cat(cond_embed, dim=0)
