@@ -192,7 +192,6 @@ class FIDMetric:
 
         for filename in os.listdir(ref_directory):
             for i in range(6):
-                print(i)
                 recon_object = None
                 with torch.no_grad():
                     for j in range(32):
