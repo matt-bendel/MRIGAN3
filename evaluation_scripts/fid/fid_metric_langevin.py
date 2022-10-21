@@ -5,6 +5,7 @@ import torch
 import numpy as np
 import sigpy as sp
 from scipy import linalg
+from utils.math import complex_abs
 
 from tqdm import tqdm
 import torchvision.transforms as transforms
@@ -212,8 +213,9 @@ class FIDMetric:
                         else:
                             image_embed.append(img_e.cpu().numpy())
                             cond_embed.append(cond_e.cpu().numpy())
+                    except KeyboardInterrupt:
+                        exit()
                     except Exception as e:
-                        print(e)
                         print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
                         break
 
