@@ -116,7 +116,9 @@ class WrapVGG(nn.Module):
         self.features = list(net.features)
         self.features = nn.Sequential(*self.features)
         # Extract VGG-16 Average Pooling Layer
-        self.pooling = net.avgpool
+        # self.pooling = net.avgpool
+        self.pooling = nn.AdaptiveAvgPool2d((1, 1))
+
         # Convert the image into one-dimensional vector
         self.flatten = nn.Flatten()
         # Extract the first part of fully-connected layer from VGG16
@@ -129,10 +131,6 @@ class WrapVGG(nn.Module):
                       requires_grad=False)
         self.std = P(torch.tensor([0.229, 0.224, 0.225]).view(1, -1, 1, 1),
                      requires_grad=False)
-        # self.mean = P(torch.tensor([0.48235, 0.45882, 0.40784]).view(1, -1, 1, 1),
-        #               requires_grad=False)
-        # self.std = P(torch.tensor([0.00392156862745098, 0.00392156862745098, 0.00392156862745098]).view(1, -1, 1, 1),
-        #              requires_grad=False)
 
     def forward(self, x):
         # Normalize x
@@ -151,7 +149,8 @@ class WrapVGG(nn.Module):
         #     x = F.interpolate(x, size=(224, 224), mode='bilinear', align_corners=True)
 
         out = self.features(x)
-        out = self.pooling(out)
-        out = self.flatten(out)
-        out = self.fc(out)
+        # out = self.pooling(out)
+        out = self.pooling(out).view(x.size(0), -1)
+        # out = self.flatten(out)
+        # out = self.fc(out)
         return out

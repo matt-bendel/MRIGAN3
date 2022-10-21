@@ -193,6 +193,9 @@ class FIDMetric:
             embed_ims[i, 1, :, :] = im
             embed_ims[i, 2, :, :] = im
 
+            print(embed_ims.max())
+            print(embed_ims.min())
+
         return embed_ims
 
     def _get_generated_distribution(self):
@@ -340,16 +343,16 @@ class FIDMetric:
             mu1, mu2 = np.copy(mu1), np.copy(mu2)
             sigma1, sigma2 = np.copy(sigma1), np.copy(sigma2)
 
-        mu1[4096:] = mu1[4096:] * alpha
-        mu2[4096:] = mu2[4096:] * alpha
+        mu1[512:] = mu1[512:] * alpha
+        mu2[512:] = mu2[512:] * alpha
 
-        sigma1[4096:, 4096:] = sigma1[4096:, 4096:] * alpha ** 2
-        sigma1[4096:, :4096] = sigma1[4096:, :4096] * alpha
-        sigma1[:4096, 4096:] = sigma1[:4096, 4096:] * alpha
+        sigma1[512:, 512:] = sigma1[512:, 512:] * alpha ** 2
+        sigma1[512:, :512] = sigma1[512:, :512] * alpha
+        sigma1[:512, 512:] = sigma1[:512, 512:] * alpha
 
-        sigma2[4096:, 4096:] = sigma2[4096:, 4096:] * alpha ** 2
-        sigma2[4096:, :4096] = sigma2[4096:, :4096] * alpha
-        sigma2[:4096, 4096:] = sigma2[:4096, 4096:] * alpha
+        sigma2[512:, 512:] = sigma2[512:, 512:] * alpha ** 2
+        sigma2[512:, :512] = sigma2[512:, :512] * alpha
+        sigma2[:512, 512:] = sigma2[:512, 512:] * alpha
 
         return mu1, sigma1, mu2, sigma2
 
