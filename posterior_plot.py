@@ -327,7 +327,32 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     # draw a bbox of the region of the inset axes in the parent axes and
     # connecting lines between the bbox and the inset axes area
     mark_inset(ax2, axins2, loc1=2, loc2=4, ec="red")
-    plt.savefig('posterior_plot_test.png')
+    plt.savefig('posterior_plot_test.png', bbox_inches='tight', dpi=300)
+    plt.close(fig)
+
+    x1, x2, y1, y2 = 100, 150, 200, 250
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(ncols=4)
+    fig.subplots_adjust(wspace=0, hspace=0.05)
+    plt.axis('off')
+
+    ax1.imshow(ndimage.rotate(gt['ours'][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax1.set_xlim(x1, x2)
+    ax1.set_ylim(y1, y2)
+
+    ax2.imshow(ndimage.rotate(gt['ours'][1], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax2.set_xlim(x1, x2)
+    ax2.set_ylim(y1, y2)
+
+    ax3.imshow(ndimage.rotate(gt['ours'][2], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax3.set_xlim(x1, x2)
+    ax3.set_ylim(y1, y2)
+
+    ax4.imshow(ndimage.rotate(gt['ours'][3], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax4.set_xlim(x1, x2)
+    ax4.set_ylim(y1, y2)
+
+    plt.savefig('posterior_samps_ours.png', bbox_inches='tight', dpi=300)
+    plt.close(fig)
 
 def main(args):
     args.batch_size = 4
