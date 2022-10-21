@@ -136,6 +136,13 @@ class FIDMetric:
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
 
+        self.transforms = torch.nn.Sequential(
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ConvertImageDtype(torch.float),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        )
+
     def _get_joint_statistics(self, image_embed, cond_embed):
         if self.cuda:
             joint_embed = torch.cat([image_embed, cond_embed], dim=1).to('cuda:3')
@@ -163,10 +170,10 @@ class FIDMetric:
     def _get_embed_im(self, inp):
         embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 384, 384),
                                 device=self.args.device)
-        for i in range(multi_coil_inp.size(0)):
+        for i in range(inp.size(0)):
             im = inp[i]
 
-            im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
+            # im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
 
             embed_ims[i, 0, :, :] = im
             embed_ims[i, 1, :, :] = im
@@ -183,6 +190,7 @@ class FIDMetric:
 
         for filename in os.listdir(ref_directory):
             for i in range(6):
+                print(i)
                 recon_object = None
                 for j in range(32):
                     try:
@@ -194,8 +202,8 @@ class FIDMetric:
                         image = self._get_embed_im(recon)
                         condition_im = self._get_embed_im(zfr)
 
-                        img_e = self.image_embedding(image)
-                        cond_e = self.condition_embedding(condition_im)
+                        img_e = self.image_embedding(self.transform(image))
+                        cond_e = self.condition_embedding(self.transform(condition_im))
 
                         if self.cuda:
                             image_embed.append(img_e.to('cuda:1'))
@@ -377,7 +385,7 @@ class FIDMetric:
             FID value.
         """
         fid = self.get_fjd(alpha=0., resample=False)
-        fjd = self.get_fjd(alpha=1, resample=False)
+        fjd = self.get_fjd(alpha=self.alpha, resample=False)
 
         print(f"FID: {fid}")
         print(f"FJD: {fjd}")
@@ -387,7 +395,7 @@ class FIDMetric:
 
 def get_embedding_statistics(embeddings, cuda=False):
     if cuda:
-        embeddings = embeddings  # More precision = more stable
+        embeddings = embeddings.double()  # More precision = more stable
         mu = torch.mean(embeddings, 0)
         sigma = torch_cov(embeddings, rowvar=False)
     else:
@@ -409,7 +417,7 @@ def calculate_alpha(image_embed, cond_embed, cuda=False):
 
 
 def calculate_fd(mu1, sigma1, mu2, sigma2, cuda=False, eps=1e-6):
-    if False:
+    if True:
         fid = torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=eps)
         fid = fid.cpu().numpy()
     else:
