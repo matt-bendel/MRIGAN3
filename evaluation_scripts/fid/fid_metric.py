@@ -10,7 +10,7 @@ from scipy import linalg
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from tqdm import tqdm
-import torchvision.models as tm
+import torchvision.transforms as transforms
 
 def symmetric_matrix_square_root_torch(mat, eps=1e-10):
     """Compute square root of a symmetric matrix.
@@ -145,6 +145,13 @@ class FIDMetric:
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
 
+        self.transforms = torch.nn.Sequential(
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ConvertImageDtype(torch.float),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        )
+
     def _get_joint_statistics(self, image_embed, cond_embed):
         if self.cuda:
             joint_embed = torch.cat([image_embed, cond_embed], dim=1).to('cuda:3')
@@ -218,8 +225,8 @@ class FIDMetric:
                     image = self._get_embed_im(recon, mean, std, maps)
                     condition_im = self._get_embed_im(condition, mean, std, maps)
 
-                    img_e = self.image_embedding(tm.VGG16_Weights.DEFAULT.transforms(image))
-                    cond_e = self.condition_embedding(tm.VGG16_Weights.DEFAULT.transforms(condition_im))
+                    img_e = self.image_embedding(self.transforms(image))
+                    cond_e = self.condition_embedding(self.transforms(condition_im))
 
                     if self.cuda:
                         image_embed.append(img_e.to('cuda:1'))
@@ -296,8 +303,8 @@ class FIDMetric:
                 image = self._get_embed_im(gt, mean, std, maps)
                 condition_im = self._get_embed_im(condition, mean, std, maps)
 
-                img_e = self.image_embedding(tm.VGG16_Weights.DEFAULT.transforms(image))
-                cond_e = self.condition_embedding(tm.VGG16_Weights.DEFAULT.transforms(condition_im))
+                img_e = self.image_embedding(self.transforms(image))
+                cond_e = self.condition_embedding(self.transforms(condition_im))
 
                 if self.cuda:
                     image_embed.append(img_e)
