@@ -72,7 +72,7 @@ def main(args):
     G.update_gen_status(val=True)
     args.batch_size = 40
 
-    train_loader, _ = create_data_loaders(args, big_test=False)
+    train_loader, dev_loader = create_data_loaders(args, big_test=False)
     # compute_cfid.get_cfid(args, G, langevin=True)
 
     data = SelectiveSliceData_Val(
