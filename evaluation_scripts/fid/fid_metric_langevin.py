@@ -170,7 +170,7 @@ class FIDMetric:
         return embed_ims
 
     def _get_embed_im(self, inp):
-        embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 384, 384),
+        embed_ims = torch.zeros(size=(inp.size(0), 3, 384, 384),
                                 device=self.args.device)
         for i in range(inp.size(0)):
             im = inp[i]
