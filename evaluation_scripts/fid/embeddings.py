@@ -136,15 +136,15 @@ class WrapVGG(nn.Module):
 
     def forward(self, x):
         # Normalize x
-        x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
+        # x = (x + 1.) / 2.0  # assume the input is normalized to [-1, 1], reset it to [0, 1]
 
-        if x.shape[2] != 256 or x.shape[3] != 256:
-            # x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=True)
-            x = TF.resize(x, 256)
-
-        x = TF.center_crop(x, 224)
-
-        x = (x - self.mean) / self.std
+        # if x.shape[2] != 256 or x.shape[3] != 256:
+        #     x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=True)
+            # x = TF.resize(x, 256)
+        #
+        # x = TF.center_crop(x, 224)
+        #
+        # x = (x - self.mean) / self.std
 
         # Upsample if necessary
         # if x.shape[2] != 224 or x.shape[3] != 224:
