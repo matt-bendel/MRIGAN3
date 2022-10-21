@@ -146,7 +146,7 @@ class FIDMetric:
 
     def _get_joint_statistics(self, image_embed, cond_embed):
         if self.cuda:
-            joint_embed = torch.cat([image_embed, cond_embed], dim=1).to('cuda:3')
+            joint_embed = torch.cat([image_embed, cond_embed], dim=1)
         else:
             joint_embed = np.concatenate([image_embed, cond_embed], axis=1)
         print(joint_embed.shape)
@@ -199,7 +199,7 @@ class FIDMetric:
                         recon_object = torch.load(new_filename)
 
                         recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
-                        zfr = recon_object['zfr'][0].unsqueeze(0).unsqueeze(0)
+                        zfr = recon_object['zfr'][0].cuda().unsqueeze(0).unsqueeze(0)
                         image = self._get_embed_im(recon)
                         condition_im = self._get_embed_im(zfr)
 
@@ -207,8 +207,8 @@ class FIDMetric:
                         cond_e = self.condition_embedding(self.transform(condition_im))
 
                         if self.cuda:
-                            image_embed.append(img_e.to('cuda:1'))
-                            cond_embed.append(cond_e.to('cuda:1'))
+                            image_embed.append(img_e)
+                            cond_embed.append(cond_e)
                         else:
                             image_embed.append(img_e.cpu().numpy())
                             cond_embed.append(cond_e.cpu().numpy())
@@ -247,7 +247,7 @@ class FIDMetric:
         stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
         mu_real, sigma_real, alpha = stats
 
-        self.mu_real, self.sigma_real, self.alpha = mu_real.to('cuda:3'), sigma_real.to('cuda:3'), alpha.to('cuda:3')
+        self.mu_real, self.sigma_real, self.alpha = mu_real, sigma_real, alpha
 
         return mu_real, sigma_real
 
