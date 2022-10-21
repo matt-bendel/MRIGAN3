@@ -401,7 +401,7 @@ class FIDMetric:
 
 def get_embedding_statistics(embeddings, cuda=False):
     if cuda:
-        embeddings = embeddings  # More precision = more stable
+        embeddings = embeddings.double()  # More precision = more stable
         mu = torch.mean(embeddings, 0)
         sigma = torch_cov(embeddings, rowvar=False)
     else:
