@@ -397,7 +397,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     ax5.set_ylim(y1, y2)
     ax5.axis('off')
 
-    plt.savefig('posterior_samps_ours.png', bbox_inches='tight', dpi=300)
+    plt.savefig('posterior_samps_ours_error.png', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
 def main(args):
