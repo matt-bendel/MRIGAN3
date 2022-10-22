@@ -336,7 +336,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.close(fig)
 
     x1, x2, y1, y2 = 60, 160, 200, 100
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(ncols=4)
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(nrows=4)
     fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
 
