@@ -327,8 +327,8 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     # draw a bbox of the region of the inset axes in the parent axes and
     # connecting lines between the bbox and the inset axes area
     patch, pp1, pp2 = mark_inset(ax2, axins2, loc1=3, loc2=2, ec="red")
-    pp1.loc1 = 1  # inset_axes connector at lower left
-    pp1.loc2 = 3
+    pp1.loc1 = 2  # inset_axes connector at lower left
+    pp1.loc2 = 4
     pp2.loc1 = 3
     pp2.loc2 = 1
 
