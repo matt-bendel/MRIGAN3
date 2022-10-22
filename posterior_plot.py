@@ -336,7 +336,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.close(fig)
 
     methods = ['ours', 'adler', 'ohayon', 'langevin']
-
+    return
     for method in methods:
         x1, x2, y1, y2 = 110, 145, 150, 105
         fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
@@ -597,12 +597,12 @@ def main(args):
                     'langevin': langevin_gt
                 }
 
-                if i + j < 6:
-                    continue
-                elif i + j == 6:
-                    create_posterior_sample_plots(samps_dict, gt_dict, i+j)
-                else:
-                    exit()
+                # if i + j < 6:
+                #     continue
+                # elif i + j == 6:
+                create_posterior_sample_plots(samps_dict, gt_dict, i+j)
+                # else:
+                #     exit()
                 # create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
 
                 # if i > 0:
