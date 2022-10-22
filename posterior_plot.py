@@ -305,18 +305,18 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 def create_posterior_sample_plots(sample, gt, plot_num):
     fig, (ax2, axins2) = plt.subplots(ncols=2)
     fig.subplots_adjust(wspace=0.05, hspace=0.05)
-
+    plt.axis('off')
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
     ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-    ax2.axis('off')
 
     # axins2 = zoomed_inset_axes(ax2, zoom=2, loc=1)
     axins2.axis('off')
     axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax2.axis('off')
 
     # sub region of the original image
-    x1, x2, y1, y2 = 60, 160, 200, 100
+    x1, x2, y1, y2 = 110, 145, 150, 105
     axins2.set_xlim(x1, x2)
     axins2.set_ylim(y1, y2)
     # # fix the number of ticks on the inset axes
@@ -338,7 +338,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     methods = ['ours', 'adler', 'ohayon', 'langevin']
 
     for method in methods:
-        x1, x2, y1, y2 = 60, 160, 200, 100
+        x1, x2, y1, y2 = 110, 145, 150, 105
         fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
         fig.subplots_adjust(wspace=0.05, hspace=0.05)
         plt.axis('off')
@@ -597,7 +597,12 @@ def main(args):
                     'langevin': langevin_gt
                 }
 
-                create_posterior_sample_plots(samps_dict, gt_dict, i+j)
+                if i + j < 6:
+                    continue
+                elif i + j == 6:
+                    create_posterior_sample_plots(samps_dict, gt_dict, i+j)
+                else:
+                    exit()
                 # create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
 
                 # if i > 0:
