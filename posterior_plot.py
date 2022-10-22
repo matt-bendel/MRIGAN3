@@ -304,7 +304,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
 def create_posterior_sample_plots(sample, gt, plot_num):
     fig, (ax2, axins2) = plt.subplots(ncols=2)
-    fig.subplots_adjust(wspace=0, hspace=0.05)
+    fig.subplots_adjust(wspace=0.05, hspace=0.05)
     plt.axis('off')
 
     rotated_gt = ndimage.rotate(gt['ours'], 180)
@@ -327,8 +327,8 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     # draw a bbox of the region of the inset axes in the parent axes and
     # connecting lines between the bbox and the inset axes area
     patch, pp1, pp2 = mark_inset(ax2, axins2, loc1=3, loc2=2, ec="red")
-    pp1.loc1 = 3  # inset_axes connector at lower left
-    pp1.loc2 = 1
+    pp1.loc1 = 4  # inset_axes connector at lower left
+    pp1.loc2 = 2
     pp2.loc1 = 3
     pp2.loc2 = 1
 
