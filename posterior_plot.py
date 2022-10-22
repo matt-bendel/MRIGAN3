@@ -305,11 +305,11 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 def create_posterior_sample_plots(sample, gt, plot_num):
     fig, (ax2, axins2) = plt.subplots(ncols=2)
     fig.subplots_adjust(wspace=0.05, hspace=0.05)
-    plt.axis('off')
 
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
     ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax2.axis('off')
 
     # axins2 = zoomed_inset_axes(ax2, zoom=2, loc=1)
     axins2.axis('off')
