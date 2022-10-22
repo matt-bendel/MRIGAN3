@@ -606,7 +606,8 @@ def main(args):
                 # if i + j < 6:
                 #     continue
                 # elif i + j == 6:
-                create_posterior_sample_plots(samps_dict, gt_dict, i+j)
+                if i + j == 6:
+                    create_posterior_sample_plots(samps_dict, gt_dict, i+j)
                 # else:
                 #     exit()
                 # create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
