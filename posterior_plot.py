@@ -311,12 +311,12 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
-    axins2 = zoomed_inset_axes(ax2, zoom=2, loc=1)
+    axins2 = zoomed_inset_axes(ax2, zoom=3, loc=1)
     axins2.axis('off')
     axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
     # sub region of the original image
-    x1, x2, y1, y2 = 100, 200, 300, 200
+    x1, x2, y1, y2 = 75, 150, 175, 100
     axins2.set_xlim(x1, x2)
     axins2.set_ylim(y1, y2)
     # # fix the number of ticks on the inset axes
@@ -326,11 +326,17 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     # draw a bbox of the region of the inset axes in the parent axes and
     # connecting lines between the bbox and the inset axes area
-    mark_inset(ax2, axins2, loc1=2, loc2=4, ec="red")
+    mark_inset(ax2, axins2, loc1=1, loc2=3, ec="red")
+    patch, pp1, pp2 = mark_inset(ax2, axins2, loc1=2, loc2=4, ec="red")
+    pp1.loc1 = 3  # inset_axes connector at lower left
+    pp1.loc2 = 3
+    pp2.loc1 = 1
+    pp2.loc1 = 1
+
     plt.savefig('posterior_plot_test.png', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
-    x1, x2, y1, y2 = 100, 200, 200, 300
+    x1, x2, y1, y2 = 75, 150, 175, 100
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(ncols=4)
     fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
