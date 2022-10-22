@@ -311,7 +311,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
-    axins2 = zoomed_inset_axes(ax2, zoom=5, loc=1)
+    axins2 = zoomed_inset_axes(ax2, zoom=2, loc=1)
     axins2.axis('off')
     axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
@@ -335,19 +335,19 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     fig.subplots_adjust(wspace=0, hspace=0.05)
     plt.axis('off')
 
-    ax1.imshow(ndimage.rotate(gt['ours'][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax1.imshow(ndimage.rotate(sample['ours'][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     ax1.set_xlim(x1, x2)
     ax1.set_ylim(y1, y2)
 
-    ax2.imshow(ndimage.rotate(gt['ours'][1], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax2.imshow(ndimage.rotate(sample['ours'][1], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     ax2.set_xlim(x1, x2)
     ax2.set_ylim(y1, y2)
 
-    ax3.imshow(ndimage.rotate(gt['ours'][2], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax3.imshow(ndimage.rotate(sample['ours'][2], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     ax3.set_xlim(x1, x2)
     ax3.set_ylim(y1, y2)
 
-    ax4.imshow(ndimage.rotate(gt['ours'][3], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax4.imshow(ndimage.rotate(sample['ours'][3], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     ax4.set_xlim(x1, x2)
     ax4.set_ylim(y1, y2)
 
