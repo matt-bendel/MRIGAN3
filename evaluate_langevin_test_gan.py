@@ -93,8 +93,8 @@ def main(args):
         drop_last=True
     )
 
-    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
-    compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=8)
+    # compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
+    # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=8)
     compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
 
     # compute_fid.get_fid(args, G, train_loader, loader)
@@ -203,12 +203,12 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
-    main(args)
-
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
-    main(args)
-
+    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
+    # main(args)
+    #
+    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
+    # main(args)
+    #
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
     main(args)
 
