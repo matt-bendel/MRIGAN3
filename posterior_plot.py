@@ -311,7 +311,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
-    axins2 = zoomed_inset_axes(ax2, zoom=3, loc=2)
+    axins2 = zoomed_inset_axes(ax2, zoom=2, loc=1)
     axins2.axis('off')
     axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
 
