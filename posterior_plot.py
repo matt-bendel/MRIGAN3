@@ -368,7 +368,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
         ax5.set_ylim(y1, y2)
         ax5.axis('off')
 
-        plt.savefig(f'posterior_samp_plots/posterior_samps_{method}.png_{plot_num}', bbox_inches='tight', dpi=300)
+        plt.savefig(f'posterior_samp_plots/posterior_samps_{method}_{plot_num}.png', bbox_inches='tight', dpi=300)
         plt.close(fig)
 
         fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
