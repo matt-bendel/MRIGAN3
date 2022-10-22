@@ -336,8 +336,8 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.close(fig)
 
     x1, x2, y1, y2 = 60, 160, 200, 100
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(nrows=4)
-    fig.subplots_adjust(wspace=0, hspace=0.05)
+    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
+    fig.subplots_adjust(wspace=0.05, hspace=0.05)
     plt.axis('off')
 
     ax1.imshow(ndimage.rotate(sample['ours'][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
@@ -359,6 +359,11 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     ax4.set_xlim(x1, x2)
     ax4.set_ylim(y1, y2)
     ax4.axis('off')
+
+    ax5.imshow(ndimage.rotate(sample['ours'][4], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    ax5.set_xlim(x1, x2)
+    ax5.set_ylim(y1, y2)
+    ax5.axis('off')
 
     plt.savefig('posterior_samps_ours.png', bbox_inches='tight', dpi=300)
     plt.close(fig)
@@ -537,10 +542,10 @@ def main(args):
                 }
 
                 samps_dict = {
-                    'ours': ours_samples_np[0:4, :, :],
-                    'adler': adler_samples_np[0:4, :, :],
-                    'ohayon': ohayon_samples_np[0:4, :, :],
-                    'langevin': langevin_recons[0:4, :, :],
+                    'ours': ours_samples_np[0:6, :, :],
+                    'adler': adler_samples_np[0:6, :, :],
+                    'ohayon': ohayon_samples_np[0:6, :, :],
+                    'langevin': langevin_recons[0:6, :, :],
                 }
 
                 avg_dict = {
