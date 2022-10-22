@@ -368,6 +368,38 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.savefig('posterior_samps_ours.png', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
+    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
+    fig.subplots_adjust(wspace=0.05, hspace=0.05)
+    plt.axis('off')
+
+    ax1.imshow(ndimage.rotate(1.5*np.abs(sample['ours'][0] - gt['ours'], 180)), cmap='jet', vmin=0, vmax=0.0001)
+    ax1.set_xlim(x1, x2)
+    ax1.set_ylim(y1, y2)
+    ax1.axis('off')
+
+    ax2.imshow(ndimage.rotate(1.5 * np.abs(sample['ours'][1] - gt['ours'], 180)), cmap='jet', vmin=0, vmax=0.0001)
+    ax2.set_xlim(x1, x2)
+    ax2.set_ylim(y1, y2)
+    ax2.axis('off')
+
+    ax3.imshow(ndimage.rotate(1.5 * np.abs(sample['ours'][2] - gt['ours'], 180)), cmap='jet', vmin=0, vmax=0.0001)
+    ax3.set_xlim(x1, x2)
+    ax3.set_ylim(y1, y2)
+    ax3.axis('off')
+
+    ax4.imshow(ndimage.rotate(1.5 * np.abs(sample['ours'][3] - gt['ours'], 180)), cmap='jet', vmin=0, vmax=0.0001)
+    ax4.set_xlim(x1, x2)
+    ax4.set_ylim(y1, y2)
+    ax4.axis('off')
+
+    ax5.imshow(ndimage.rotate(1.5 * np.abs(sample['ours'][4] - gt['ours'], 180)), cmap='jet', vmin=0, vmax=0.0001)
+    ax5.set_xlim(x1, x2)
+    ax5.set_ylim(y1, y2)
+    ax5.axis('off')
+
+    plt.savefig('posterior_samps_ours.png', bbox_inches='tight', dpi=300)
+    plt.close(fig)
+
 def main(args):
     args.batch_size = 4
     ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
