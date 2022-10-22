@@ -328,8 +328,8 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     # connecting lines between the bbox and the inset axes area
     mark_inset(ax2, axins2, loc1=1, loc2=2, ec="red")
     patch, pp1, pp2 = mark_inset(ax2, axins2, loc1=3, loc2=2, ec="red")
-    pp1.loc1 = 1  # inset_axes connector at lower left
-    pp1.loc2 = 2
+    pp1.loc1 = 3  # inset_axes connector at lower left
+    pp1.loc2 = 1
 
     plt.savefig('posterior_plot_test.png', bbox_inches='tight', dpi=300)
     plt.close(fig)
