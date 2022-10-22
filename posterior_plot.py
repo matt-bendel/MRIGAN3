@@ -316,7 +316,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     ax2.axis('off')
 
     # sub region of the original image
-    x1, x2, y1, y2 = 110, 145, 150, 105
+    x1, x2, y1, y2 = 60, 160, 200, 100
     axins2.set_xlim(x1, x2)
     axins2.set_ylim(y1, y2)
     # # fix the number of ticks on the inset axes
@@ -338,7 +338,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     methods = ['ours', 'adler', 'ohayon', 'langevin']
     return
     for method in methods:
-        x1, x2, y1, y2 = 110, 145, 150, 105
+        x1, x2, y1, y2 = 60, 160, 200, 100
         fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
         fig.subplots_adjust(wspace=0.05, hspace=0.05)
         plt.axis('off')
