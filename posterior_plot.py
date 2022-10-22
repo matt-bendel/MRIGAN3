@@ -337,34 +337,39 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.close(fig)
 
     methods = ['ours', 'adler', 'ohayon', 'langevin']
-    return
+
     for method in methods:
-        x1, x2, y1, y2 = 90, 160, 170, 100
+        x1, x2, y1, y2 = 100, 160, 200, 140
         fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
         fig.subplots_adjust(wspace=0.05, hspace=0.05)
         plt.axis('off')
 
         ax1.imshow(ndimage.rotate(sample[method][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+        ax1.arrow(x1 + 10, y2 + 20, 15, 15, color="yellow", head_width=2.5)
         ax1.set_xlim(x1, x2)
         ax1.set_ylim(y1, y2)
         ax1.axis('off')
 
         ax2.imshow(ndimage.rotate(sample[method][1], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+        ax2.arrow(x1 + 10, y2 + 20, 15, 15, color="yellow", head_width=2.5)
         ax2.set_xlim(x1, x2)
         ax2.set_ylim(y1, y2)
         ax2.axis('off')
 
         ax3.imshow(ndimage.rotate(sample[method][2], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+        ax3.arrow(x1 + 10, y2 + 20, 15, 15, color="yellow", head_width=2.5)
         ax3.set_xlim(x1, x2)
         ax3.set_ylim(y1, y2)
         ax3.axis('off')
 
         ax4.imshow(ndimage.rotate(sample[method][3], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+        ax4.arrow(x1 + 10, y2 + 20, 15, 15, color="yellow", head_width=2.5)
         ax4.set_xlim(x1, x2)
         ax4.set_ylim(y1, y2)
         ax4.axis('off')
 
         ax5.imshow(ndimage.rotate(sample[method][4], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+        ax5.arrow(x1 + 10, y2 + 20, 15, 15, color="yellow", head_width=2.5)
         ax5.set_xlim(x1, x2)
         ax5.set_ylim(y1, y2)
         ax5.axis('off')
