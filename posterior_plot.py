@@ -598,7 +598,6 @@ def main(args):
                 }
 
                 create_posterior_sample_plots(samps_dict, gt_dict, i+j)
-                exit()
                 # create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
 
                 # if i > 0:
