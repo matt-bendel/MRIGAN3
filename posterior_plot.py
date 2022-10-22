@@ -317,7 +317,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     # sub region of the original image
     x1, x2, y1, y2 = 100, 160, 200, 140
-    ax2.arrow(0.1, 0.1, 0.1, 0.1, color="yellow")
+    ax2.arrow(x1, y2, 10, -10, color="yellow", width=0.01)
     axins2.set_xlim(x1, x2)
     axins2.set_ylim(y1, y2)
     # # fix the number of ticks on the inset axes
