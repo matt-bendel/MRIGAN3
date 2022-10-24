@@ -317,7 +317,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     # sub region of the original image
     x1, x2, y1, y2 = 100, 160, 200, 140
-    axins2.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
+    # axins2.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
     axins2.set_xlim(x1, x2)
     axins2.set_ylim(y1, y2)
     # # fix the number of ticks on the inset axes
@@ -345,31 +345,31 @@ def create_posterior_sample_plots(sample, gt, plot_num):
         plt.axis('off')
 
         ax1.imshow(ndimage.rotate(sample[method][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        ax1.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
+        # ax1.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
         ax1.set_xlim(x1, x2)
         ax1.set_ylim(y1, y2)
         ax1.axis('off')
 
         ax2.imshow(ndimage.rotate(sample[method][1], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        ax2.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
+        # ax2.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
         ax2.set_xlim(x1, x2)
         ax2.set_ylim(y1, y2)
         ax2.axis('off')
 
         ax3.imshow(ndimage.rotate(sample[method][2], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        ax3.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
+        # ax3.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
         ax3.set_xlim(x1, x2)
         ax3.set_ylim(y1, y2)
         ax3.axis('off')
 
         ax4.imshow(ndimage.rotate(sample[method][3], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        ax4.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
+        # ax4.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
         ax4.set_xlim(x1, x2)
         ax4.set_ylim(y1, y2)
         ax4.axis('off')
 
         ax5.imshow(ndimage.rotate(sample[method][4], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        ax5.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
+        # ax5.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
         ax5.set_xlim(x1, x2)
         ax5.set_ylim(y1, y2)
         ax5.axis('off')
