@@ -303,111 +303,29 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.close(fig)
 
 def create_posterior_sample_plots(sample, gt, plot_num):
-    fig, (ax2, axins2) = plt.subplots(ncols=2)
-    fig.subplots_adjust(wspace=0.05, hspace=0.05)
-    plt.axis('off')
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
-    ax2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-
-    # axins2 = zoomed_inset_axes(ax2, zoom=2, loc=1)
-    axins2.axis('off')
-    axins2.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-    ax2.axis('off')
-
-    # sub region of the original image
-    x1, x2, y1, y2 = 100, 160, 200, 140
-    # axins2.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
-    axins2.set_xlim(x1, x2)
-    axins2.set_ylim(y1, y2)
-    # # fix the number of ticks on the inset axes
-    # axins2.yaxis.get_major_locator().set_params(nbins=7)
-    # axins2.xaxis.get_major_locator().set_params(nbins=7)
-    # axins2.tick_params(labelleft=False, labelbottom=False)
-
-    # draw a bbox of the region of the inset axes in the parent axes and
-    # connecting lines between the bbox and the inset axes area
-    patch, pp1, pp2 = mark_inset(ax2, axins2, loc1=3, loc2=2, ec="red")
-    pp1.loc1 = 2  # inset_axes connector at lower left
-    pp1.loc2 = 4
-    pp2.loc1 = 3
-    pp2.loc2 = 1
-
-    plt.savefig(f'posterior_samp_plots/posterior_plot_gt_{plot_num}.png', bbox_inches='tight', dpi=300)
+    plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    plt.axis('off')
+    plt.savefig(f'prof_ahmad_plots/gt/gt_{plot_num}.png')
     plt.close(fig)
 
     methods = ['ours', 'adler', 'ohayon', 'langevin']
 
     for method in methods:
-        x1, x2, y1, y2 = 100, 160, 200, 140
-        fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
-        fig.subplots_adjust(wspace=0.05, hspace=0.05)
-        plt.axis('off')
+        for z in range(32):
+            plt.figure()
+            plt.imshow(ndimage.rotate(sample[method][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+            plt.axis('off')
+            plt.savefig(f'prof_ahmad_plots/{method}/recon_{method}_{plot_num}_sample_{z}.png')
+            plt.close()
 
-        ax1.imshow(ndimage.rotate(sample[method][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        # ax1.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
-        ax1.set_xlim(x1, x2)
-        ax1.set_ylim(y1, y2)
-        ax1.axis('off')
+            plt.figure()
+            plt.imshow(ndimage.rotate(1.5 * np.abs(sample[method][4] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
+            plt.axis('off')
+            plt.savefig(f'prof_ahmad_plots/{method}/recon_{method}_{plot_num}_sample_{z}_error.png')
+            plt.close()
 
-        ax2.imshow(ndimage.rotate(sample[method][1], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        # ax2.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
-        ax2.set_xlim(x1, x2)
-        ax2.set_ylim(y1, y2)
-        ax2.axis('off')
-
-        ax3.imshow(ndimage.rotate(sample[method][2], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        # ax3.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
-        ax3.set_xlim(x1, x2)
-        ax3.set_ylim(y1, y2)
-        ax3.axis('off')
-
-        ax4.imshow(ndimage.rotate(sample[method][3], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        # ax4.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
-        ax4.set_xlim(x1, x2)
-        ax4.set_ylim(y1, y2)
-        ax4.axis('off')
-
-        ax5.imshow(ndimage.rotate(sample[method][4], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-        # ax5.arrow(x1 + 18, y2 + 28, 7, 7, color="yellow", width= 1e-5, head_width=1.5)
-        ax5.set_xlim(x1, x2)
-        ax5.set_ylim(y1, y2)
-        ax5.axis('off')
-
-        plt.savefig(f'posterior_samp_plots/posterior_samps_{method}_{plot_num}.png', bbox_inches='tight', dpi=300)
-        plt.close(fig)
-
-        fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, ncols=1)
-        fig.subplots_adjust(wspace=0.05, hspace=0.05)
-        plt.axis('off')
-
-        ax1.imshow(ndimage.rotate(1.5*np.abs(sample[method][0] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
-        ax1.set_xlim(x1, x2)
-        ax1.set_ylim(y1, y2)
-        ax1.axis('off')
-
-        ax2.imshow(ndimage.rotate(1.5 * np.abs(sample[method][1] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
-        ax2.set_xlim(x1, x2)
-        ax2.set_ylim(y1, y2)
-        ax2.axis('off')
-
-        ax3.imshow(ndimage.rotate(1.5 * np.abs(sample[method][2] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
-        ax3.set_xlim(x1, x2)
-        ax3.set_ylim(y1, y2)
-        ax3.axis('off')
-
-        ax4.imshow(ndimage.rotate(1.5 * np.abs(sample[method][3] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
-        ax4.set_xlim(x1, x2)
-        ax4.set_ylim(y1, y2)
-        ax4.axis('off')
-
-        ax5.imshow(ndimage.rotate(1.5 * np.abs(sample[method][4] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
-        ax5.set_xlim(x1, x2)
-        ax5.set_ylim(y1, y2)
-        ax5.axis('off')
-
-        plt.savefig(f'posterior_samp_plots/posterior_samps_{method}_error_{plot_num}.png', bbox_inches='tight', dpi=300)
-        plt.close(fig)
 
 def main(args):
     args.batch_size = 4
@@ -606,7 +524,7 @@ def main(args):
                 # if i + j < 6:
                 #     continue
                 # elif i + j == 6:
-                if i + j == 6:
+                if i + j == 6 or i +j == 10 or i + j == 8 or i + j== 15 or i + j == 16:
                     create_posterior_sample_plots(samps_dict, gt_dict, i+j)
                 # else:
                 #     exit()
