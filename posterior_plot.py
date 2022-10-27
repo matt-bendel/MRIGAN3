@@ -502,10 +502,10 @@ def main(args):
                 }
 
                 samps_dict = {
-                    'ours': ours_samples_np[0:6, :, :],
-                    'adler': adler_samples_np[0:6, :, :],
-                    'ohayon': ohayon_samples_np[0:6, :, :],
-                    'langevin': langevin_recons[0:6, :, :],
+                    'ours': ours_samples_np,
+                    'adler': adler_samples_np,
+                    'ohayon': ohayon_samples_np,
+                    'langevin': langevin_recons,
                 }
 
                 avg_dict = {
