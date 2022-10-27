@@ -307,7 +307,7 @@ def create_posterior_sample_plots(sample, gt, plot_num):
 
     plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     plt.axis('off')
-    plt.savefig(f'prof_ahmad_plots/gt/gt_{plot_num}.png')
+    plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/gt_{plot_num}.png')
     plt.close(fig)
 
     methods = ['ours', 'adler', 'ohayon', 'langevin']
@@ -317,13 +317,13 @@ def create_posterior_sample_plots(sample, gt, plot_num):
             plt.figure()
             plt.imshow(ndimage.rotate(sample[method][0], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
             plt.axis('off')
-            plt.savefig(f'prof_ahmad_plots/{method}/recon_{method}_{plot_num}_sample_{z}.png')
+            plt.savefig(f'prof_ahmad_plots/{plot_num}/{method}/recon_{method}_{plot_num}_sample_{z}.png')
             plt.close()
 
             plt.figure()
             plt.imshow(ndimage.rotate(1.5 * np.abs(sample[method][4] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
             plt.axis('off')
-            plt.savefig(f'prof_ahmad_plots/{method}/recon_{method}_{plot_num}_sample_{z}_error.png')
+            plt.savefig(f'prof_ahmad_plots/{plot_num}/{method}/recon_{method}_{plot_num}_sample_{z}_error.png')
             plt.close()
 
 
