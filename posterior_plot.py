@@ -305,10 +305,11 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 def create_posterior_sample_plots(sample, gt, plot_num):
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
+    plt.figure()
     plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     plt.axis('off')
     plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/gt_{plot_num}.png')
-    plt.close(fig)
+    plt.close()
 
     methods = ['ours', 'adler', 'ohayon', 'langevin']
 
