@@ -538,13 +538,13 @@ if __name__ == '__main__':
     vals = [1e-2]
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
     for val in vals:
-        try:
-            train(args, bl=0, adv_mult=val)
-        except KeyboardInterrupt:
-            exit()
-        except Exception as e:
-            print(e)
-            send_mail("TRAINING CRASH", "See terminal for failure cause.")
+        # try:
+        train(args, bl=0, adv_mult=val)
+        # except KeyboardInterrupt:
+        #     exit()
+        # except Exception as e:
+        #     print(e)
+        #     send_mail("TRAINING CRASH", "See terminal for failure cause.")
 
         try:
             for i in range(6):
