@@ -311,6 +311,13 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/gt_{plot_num}.png')
     plt.close()
 
+    rotated_zfr = ndimage.rotate(gt['zfr'], 180)
+    plt.figure()
+    plt.imshow(rotated_zfr, cmap='gray', vmin=0, vmax=np.max(rotated_zfr))
+    plt.axis('off')
+    plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/zfr_{plot_num}.png')
+    plt.close()
+
     methods = ['ours', 'adler', 'ohayon', 'langevin']
 
     for method in methods:
@@ -437,9 +444,12 @@ def main(args):
                     (avg_gen_adler * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     (avg_gen_ohayon * std[j] + mean[j]).cpu())
 
+                zfr_ours = tensor_to_complex_np((ifft2c_new(y_true[j]) * std[j] + mean[j]).cpu())
+
                 avg_gen_np_ours = torch.tensor(S.H * avg_ksp_ours).abs().numpy()
                 avg_gen_np_adler = torch.tensor(S.H * avg_ksp_adler).abs().numpy()
                 avg_gen_np_ohayon = torch.tensor(S.H * avg_ksp_ohayon).abs().numpy()
+                zfr_ours_np = torch.tensor(S.H * zfr_ours).abs().numpy()
 
                 gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
@@ -519,7 +529,8 @@ def main(args):
                     'ours': gt_np,
                     'adler': gt_np,
                     'ohayon': gt_np,
-                    'langevin': langevin_gt
+                    'langevin': langevin_gt,
+                    'zfr': zfr_ours_np
                 }
 
                 # if i + j < 6:

@@ -430,9 +430,12 @@ def main(args):
                     (avg_gen_adler * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     (avg_gen_ohayon * std[j] + mean[j]).cpu())
 
+                zfr_ours = tensor_to_complex_np((ifft2c_new(y_true[j]) * std[j] + mean[j]).cpu())
+
                 avg_gen_np_ours = torch.tensor(S.H * avg_ksp_ours).abs().numpy()
                 avg_gen_np_adler = torch.tensor(S.H * avg_ksp_adler).abs().numpy()
                 avg_gen_np_ohayon = torch.tensor(S.H * avg_ksp_ohayon).abs().numpy()
+                zfr_ours_np = torch.tensor(S.H * zfr_ours).abs().numpy()
 
                 gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
@@ -498,7 +501,8 @@ def main(args):
                     'ours': avg_gen_np_ours,
                     'adler': avg_gen_np_adler,
                     'ohayon': avg_gen_np_ohayon,
-                    'langevin': langevin_avg
+                    'langevin': langevin_avg,
+                    'ours_zfr': zfr_ours_np
                 }
 
                 gt_dict = {
