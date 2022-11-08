@@ -430,7 +430,7 @@ def train(args, bl=1, adv_mult=0.0):
         print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
 
-        CFID = compute_cfid.get_cfid(args, G, dev_loader)
+        CFID = compute_cfid.get_cfid(args, G, dev_loader, num_samps=1)
         cfids.append(CFID)
 
         best_model = CFID < best_loss and (psnr_diff <= 0.25)
