@@ -358,7 +358,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 200
+    args.batch_size = 100
     args.in_chans = 16
     args.out_chans = 16
 
