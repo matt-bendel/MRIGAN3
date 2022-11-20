@@ -299,32 +299,31 @@ def train(args):
             print(f"EPOCH: {epoch+1} | BATCH: {i+1}/{len(train_loader)} | TIME: {epoch_end_hr:.2f} | LOSS: {accum_loss}")
             optimiser.step()
 
-        exit()
         # TODO: This, one full sampling trajectory for arbitrary batch element
-        ind = 2
-        with torch.no_grad():
-            for i, data in enumerate(dev_loader):
-                zf, gt, kspace, gt_mean, gt_std, mask = data
-                zf = zf[ind].cuda().unsqueeze(0)
-                gt = gt[ind].cuda().unsqueeze(0)
-                kspace = kspace[ind].cuda().unsqueeze(0)
-                gt_mean = gt_mean[ind].cuda().unsqueeze(0)
-                gt_std = gt_std[ind].cuda().unsqueeze(0)
-                mask = mask[ind].cuda().unsqueeze(0)
-
-                recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-                for step in range(24):
-                    policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
-                    var_recons = torch.var(recons, dim=1)
-                    policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
-                    policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
-
-                    policy, probs = get_policy_probs(model, policy_in, mask)
-                    action = policy.sample()
-                    print(action)
-                    exit()
-
-                break
+        # ind = 2
+        # with torch.no_grad():
+        #     for i, data in enumerate(dev_loader):
+        #         zf, gt, kspace, gt_mean, gt_std, mask = data
+        #         zf = zf[ind].cuda().unsqueeze(0)
+        #         gt = gt[ind].cuda().unsqueeze(0)
+        #         kspace = kspace[ind].cuda().unsqueeze(0)
+        #         gt_mean = gt_mean[ind].cuda().unsqueeze(0)
+        #         gt_std = gt_std[ind].cuda().unsqueeze(0)
+        #         mask = mask[ind].cuda().unsqueeze(0)
+        #
+        #         recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+        #         for step in range(24):
+        #             policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
+        #             var_recons = torch.var(recons, dim=1)
+        #             policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
+        #             policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
+        #
+        #             policy, probs = get_policy_probs(model, policy_in, mask)
+        #             action = policy.sample()
+        #             print(action)
+        #             exit()
+        #
+        #         break
 
         # scheduler.step()
 
@@ -340,7 +339,7 @@ def train(args):
             },
             f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'policy_model.pt'
         )
-
+        exit()
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
