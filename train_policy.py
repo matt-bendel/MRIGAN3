@@ -244,7 +244,7 @@ def train(args):
             optimiser.zero_grad()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
-            for step in range(48):
+            for step in range(24):
                 print(f"STEP: {step+1}")
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
@@ -358,7 +358,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 100
+    args.batch_size = 150
     args.in_chans = 16
     args.out_chans = 16
 
