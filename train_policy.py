@@ -270,24 +270,25 @@ def train(args):
                 var_scores = torch.mean(torch.var(complex_abs(recons), dim=1), dim=(1, 2, 3))
                 # batch x num_trajectories
                 action_rewards = base_score - var_scores
-                print(action_rewards.shape)
-                exit()
                 base_score = var_scores
                 # batch x 1
-                avg_reward = torch.mean(action_rewards, dim=-1, keepdim=True)
+                # avg_reward = action_rewards.uns
+                avg_rewad = torch.zeros_like(action_rewards).cuda()
                 # Store for non-greedy model (we need the full return before we can do a backprop step)
                 # action_list.append(actions)
                 # logprob_list.append(action_logprobs)
                 # reward_list.append(action_rewards)
 
                 # Local baseline
-                loss = -1 * (action_logprobs * (action_rewards - avg_reward)) / (actions.size(-1) - 1)
+                loss = -1 * (action_logprobs * (action_rewards - avg_reward))
                 # batch
                 loss = loss.sum(dim=1)
                 # Average over batch
                 # Divide by batches_step to mimic taking mean over larger batch
                 loss = loss.mean()  # For consistency: we generally set batches_step to 1 for greedy
                 loss.backward()
+                print("SUCCESS!")
+                exit()
 
             optimiser.step()
 
