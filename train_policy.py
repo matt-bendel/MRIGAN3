@@ -241,9 +241,10 @@ def train(args):
 
             optimiser.zero_grad()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-
+            accum_loss = 0
             for step in range(48):
                 # Get policy and probabilities.
+                # TODO: Get 4 different trajectories
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                 var_recons = torch.var(recons, dim=1)
                 policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
@@ -272,7 +273,7 @@ def train(args):
                 action_rewards = base_score - var_scores
                 base_score = var_scores
                 # batch x 1
-                # avg_reward = action_rewards.uns
+                # avg_reward = action_rewards.uns # TODO: Turn on for different trajectories
                 avg_reward = torch.zeros_like(action_rewards).cuda()
                 # Store for non-greedy model (we need the full return before we can do a backprop step)
                 # action_list.append(actions)
@@ -282,16 +283,17 @@ def train(args):
                 # Local baseline
                 loss = -1 * (action_logprobs * (action_rewards - avg_reward))
                 # batch
-                loss = loss.sum(dim=1)
+                # loss = loss.sum(dim=1) # TODO: Turn on for different trajectories
                 # Average over batch
                 # Divide by batches_step to mimic taking mean over larger batch
                 loss = loss.mean()  # For consistency: we generally set batches_step to 1 for greedy
                 loss.backward()
-                print("SUCCESS!")
-                exit()
+                accum_loss += loss.item()
 
+            print(f"EPOCH: {epoch+1} | LOSS: {accum_loss}")
             optimiser.step()
 
+        exit()
         # TODO: This, one full sampling trajectory for arbitrary batch element
         ind = 2
         with torch.no_grad():
