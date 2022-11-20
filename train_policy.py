@@ -170,7 +170,8 @@ def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
     recons = torch.zeros(kspace.size(0), 8, 8, 384, 384, 2)
 
     for z in range(8):
-        recon = G(zf, kspace, mask=mask) * gt_std + gt_mean
+        recon = G(zf, kspace, mask=mask)
+        recon = recon * gt_std + gt_mean
         recons[:, z, :, :, :, 0] = recon[:, 0:8, :, :]
         recons[:, z, :, :, :, 1] = recon[:, 8:16, :, :]
 
