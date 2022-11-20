@@ -182,18 +182,18 @@ def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
 
     return kspace_recons, var
 
-# TODO: This
 def get_policy_probs(model, recons, mask):
     channel_size = 1
     res = mask.size(-2)
     # Reshape trajectory dimension into batch dimension for parallel forward pass
     # Obtain policy model logits
     output = model(recons)
-    print(output.shape)
     # Reshape trajectories back into their own dimension
     output = output.view(mask.size(0), channel_size, res)
     # Mask already acquired rows by setting logits to very negative numbers
-    loss_mask = (mask == 0).squeeze(-1).squeeze(-2).float()
+    print(mask.shape)
+    loss_mask = (mask == 0).squeeze(-1).squeeze(-3).squeeze(1).float()
+    print(loss_mask.shape)
     logits = torch.where(loss_mask.byte(), output, -1e7 * torch.ones_like(output))
     # Softmax over 'logits' representing row scores
     probs = torch.nn.functional.softmax(logits - logits.max(dim=-1, keepdim=True)[0], dim=-1)
@@ -223,7 +223,7 @@ def train(args):
     if args.data_parallel:
         model = torch.nn.DataParallel(model)
     optimiser = torch.optim.Adam(model.parameters(), 5e-5, weight_decay=0)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimiser, 40, 0.1)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimiser, 40, 0.1)
     start_epoch = 0
 
     if args.resume:
@@ -296,9 +296,19 @@ def train(args):
         for i, data in enumerate(dev_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
 
-        scheduler.step()
+        # scheduler.step()
 
         # TODO: Save
+        torch.save(
+            {
+                'epoch': epoch,
+                'args': args,
+                'model': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'exp_dir': exp_dir
+            },
+            f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'model.pt'
+        )
 
 
 if __name__ == '__main__':
