@@ -142,5 +142,5 @@ class GANWrapper:
         samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
 
         samples = self.readd_measures(samples, true_measures, mask)
-        print(sample.shape)
+        print(samples.shape)
         return samples

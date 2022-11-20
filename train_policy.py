@@ -171,7 +171,7 @@ def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
 
     for z in range(8):
         recon = G(zf, kspace, mask=mask)
-        recon = recon * gt_std + gt_mean
+        recon = recon * gt_std[:, None, None, None] + gt_mean[:, None, None, None]
         recons[:, z, :, :, :, 0] = recon[:, 0:8, :, :]
         recons[:, z, :, :, :, 1] = recon[:, 8:16, :, :]
 
