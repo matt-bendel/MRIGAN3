@@ -190,8 +190,9 @@ def get_policy_probs(model, recons, mask):
     output = model(recons)
     # Reshape trajectories back into their own dimension
     output = output.view(mask.size(0), channel_size, res)
+    print(output.shape)
     # Mask already acquired rows by setting logits to very negative numbers
-    loss_mask = (mask == 0)[:, 0, 0, :, 0]
+    loss_mask = (mask == 0)[:, 0, 0, :, 0].view(mask.size(0), channel_size, res)
     print(loss_mask.shape)
     logits = torch.where(loss_mask.byte(), output, -1e7 * torch.ones_like(output))
     # Softmax over 'logits' representing row scores
