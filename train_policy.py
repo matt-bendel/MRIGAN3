@@ -258,16 +258,17 @@ def train(args):
 
                 for i in range(actions.size(0)):
                     if i == 0:
-                        print(actions[i,0])
                         plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_pre.png')
 
                     mask[i, :, :, actions[i,0], :] = 1
                     if i == 0:
-                        print(actions[i, 0])
                         plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_post.png')
 
+                print(recons.device)
+                print(mask.device)
+                print(kspace.device)
                 recons = (1-mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
                 var_scores = torch.mean(torch.var(complex_abs(recons), dim=1), dim=(1, 2, 3))
                 # batch x num_trajectories
