@@ -1,6 +1,7 @@
 import random
 import os
 import torch
+import time
 
 import numpy as np
 import torch.autograd as autograd
@@ -230,6 +231,7 @@ def train(args):
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
     for epoch in range(start_epoch, 50):
+        epoch_start = time.time()
         for i, data in enumerate(train_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
@@ -243,7 +245,6 @@ def train(args):
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
             for step in range(48):
-                print(step)
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
@@ -291,7 +292,10 @@ def train(args):
                 loss.backward()
                 accum_loss += loss.item()
 
-            print(f"EPOCH: {epoch+1} | BATCH: {i+1/len(train_loader)} | LOSS: {accum_loss}")
+            epoch_end_hr = time.time() - epoch_start
+            epoch_end_hr /= 60 # minutes
+            epoch_end_hr /= 60 # hrs
+            print(f"EPOCH: {epoch+1} | BATCH: {i+1}/{len(train_loader)} | TIME: {epoch_end_hr:.2f} | LOSS: {accum_loss}")
             optimiser.step()
 
         exit()
