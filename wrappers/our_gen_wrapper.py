@@ -122,13 +122,11 @@ class GANWrapper:
 
         return reformatted_tensor
 
-    def readd_measures(self, samples, measures):
+    def readd_measures(self, samples, measures, mask):
         reformatted_tensor = self.reformat(samples)
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
-        inds = get_mask(self.resolution, R=self.args.R)
-
-        reconstructed_kspace[:, :, inds[0], inds[1], :] = measures[:, :, inds[0], inds[1], :]
+        reconstructed_kspace = reconstructed_kspace * (1 - mask) + mask * measures
 
         image = ifft2c_new(reconstructed_kspace)
 
@@ -138,7 +136,7 @@ class GANWrapper:
 
         return output_im
 
-    def __call__(self, y, true_measures, noise_var=1):
+    def __call__(self, y, true_measures, noise_var=1, mask=None):
         num_vectors = y.size(0)
         print(y.shape)
         z = self.get_noise(num_vectors, 1)
@@ -146,6 +144,6 @@ class GANWrapper:
 
         print(samples.shape)
         print(true_measures.shape)
-        samples = self.readd_measures(samples, true_measures)
+        samples = self.readd_measures(samples, true_measures, mask)
 
         return samples
