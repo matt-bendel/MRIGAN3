@@ -268,10 +268,7 @@ def train(args):
                         plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_post.png')
 
-                print(mask.shape)
-                print(recons.shape)
-                print(kspace.shape)
-                recons = (1-mask)*recons + mask*kspace
+                recons = (1-mask.unsqueeze(1).repeate(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeate(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeate(1, 8, 1, 1, 1, 1)
                 var_scores = torch.var(complex_abs(kspace_recons), dim=1)
                 # batch x num_trajectories
                 action_rewards = base_score - var_scores
