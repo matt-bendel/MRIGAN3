@@ -184,11 +184,12 @@ def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
 
 # TODO: This
 def get_policy_probs(model, recons, mask):
-    channel_size = 2
+    channel_size = 1
     res = mask.size(-2)
     # Reshape trajectory dimension into batch dimension for parallel forward pass
     # Obtain policy model logits
     output = model(recons)
+    print(output.shape)
     # Reshape trajectories back into their own dimension
     output = output.view(mask.size(0), channel_size, res)
     # Mask already acquired rows by setting logits to very negative numbers
