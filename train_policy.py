@@ -256,12 +256,6 @@ def train(args):
                 action_logprobs = torch.log(torch.gather(probs, -1, actions)).squeeze(1)
                 actions = actions.squeeze(1)
 
-
-                # Obtain rewards in parallel by taking actions in parallel
-                print(actions)
-                print(actions.shape)
-                exit()
-
                 for i in range(actions.size(0)):
                     if i == 0:
                         print(actions[i,0])
