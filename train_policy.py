@@ -243,6 +243,7 @@ def train(args):
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
             for step in range(48):
+                print(step)
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
@@ -290,7 +291,7 @@ def train(args):
                 loss.backward()
                 accum_loss += loss.item()
 
-            print(f"EPOCH: {epoch+1} | LOSS: {accum_loss}")
+            print(f"EPOCH: {epoch+1} | BATCH: {i+1/len(train_loader)} | LOSS: {accum_loss}")
             optimiser.step()
 
         exit()
