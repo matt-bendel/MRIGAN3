@@ -229,11 +229,18 @@ def train(args):
     for epoch in range(start_epoch, 50):
         for i, data in enumerate(train_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
-            print(mask.shape)
+            zf = zf.cuda()
+            gt = gt.cuda()
+            kspace = kspace.cuda()
+            gt_mean = gt_mean.cuda()
+            gt_std = gt_std.cuda()
+            mask = mask.cuda()
+
             optimiser.zero_grad()
 
             for step in range(48):
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+                print(recons.shape)
                 # Get policy and probabilities.
                 policy, probs = get_policy_probs(model, recons, mask)
                 actions = torch.multinomial(probs.squeeze(1), 1, replacement=True)
@@ -271,7 +278,8 @@ def train(args):
 
             optimiser.step()
 
-        # TODO: This
+        # TODO: This, one full sampling trajectory for arbitrary batch element
+        ind = 2
         for i, data in enumerate(dev_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
 
