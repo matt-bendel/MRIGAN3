@@ -190,10 +190,8 @@ def get_policy_probs(model, recons, mask):
     output = model(recons)
     # Reshape trajectories back into their own dimension
     output = output.view(mask.size(0), channel_size, res)
-    print(output.shape)
     # Mask already acquired rows by setting logits to very negative numbers
     loss_mask = (mask == 0)[:, 0, 0, :, 0].view(mask.size(0), channel_size, res)
-    print(loss_mask.shape)
     logits = torch.where(loss_mask.byte(), output, -1e7 * torch.ones_like(output))
     # Softmax over 'logits' representing row scores
     probs = torch.nn.functional.softmax(logits - logits.max(dim=-1, keepdim=True)[0], dim=-1)
@@ -264,7 +262,18 @@ def train(args):
                 print(actions.shape)
                 exit()
 
-                mask[:, :, :, actions, :] = 1
+                for i in range(actions.size(0)):
+                    if i == 0:
+                        print(actions[i,0])
+                        plt.imshow(mask[i, 0, :, :, 0].detatch().cpu().numpy())
+                        plt.savefig('mask_pre.png')
+
+                    mask[i, :, :, actions[i,0], :] = 1
+                    if i == 0:
+                        print(actions[i, 0])
+                        plt.imshow(mask[i, 0, :, :, 0].detatch().cpu().numpy())
+                        plt.savefig('mask_post.png')
+                        exit()
 
                 recons = (1-mask)*recons + mask*kspace
                 var_scores = torch.var(complex_abs(kspace_recons), dim=1)
