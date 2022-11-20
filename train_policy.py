@@ -168,7 +168,7 @@ def generate_gif(type):
 
 def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
     recons = torch.zeros(kspace.size(0), 8, 8, 384, 384, 2)
-    new_m = mask[:, :, :, :, 0].repeate(1, 2, 1, 1)
+    new_m = mask[:, :, :, :, 0].repeat(1, 2, 1, 1)
     preint(new_m.shape)
     for z in range(8):
         recon = G(zf, kspace * new_m) * gt_std + gt_mean
