@@ -259,7 +259,7 @@ def train(args):
                 for i in range(actions.size(0)):
                     if i == 0:
                         print(actions[i,0])
-                        plt.imshow(mask[i, 0, :, :, 0].detatch().cpu().numpy())
+                        plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_pre.png')
 
                     mask[i, :, :, actions[i,0], :] = 1
