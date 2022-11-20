@@ -142,8 +142,6 @@ class GANWrapper:
         z = self.get_noise(num_vectors, 1)
         samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
 
-        print(samples.shape)
-        print(true_measures.shape)
         samples = self.readd_measures(samples, true_measures, mask)
 
         return samples
