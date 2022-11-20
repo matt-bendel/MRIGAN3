@@ -231,8 +231,8 @@ def train(args):
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
     for epoch in range(start_epoch, 50):
-        epoch_start = time.time()
         for i, data in enumerate(train_loader):
+            epoch_start = time.time()
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
             gt = gt.cuda()
