@@ -245,7 +245,12 @@ def train(args):
 
             for step in range(48):
                 # Get policy and probabilities.
-                policy, probs = get_policy_probs(model, recons, mask)
+                policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
+                var_recons = torch.var(recons, dim=1)
+                policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
+                policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
+
+                policy, probs = get_policy_probs(model, policy_in, mask)
                 actions = torch.multinomial(probs.squeeze(1), 1, replacement=True)
                 actions = actions.unsqueeze(1)  # batch x num_traj -> batch x 1 x num_traj
                 # probs shape = batch x 1 x res
