@@ -328,7 +328,8 @@ def train(args):
 
         # scheduler.step()
 
-        # TODO: Save
+        send_mail(f"POLICY EPOCH {epoch + 1} UPDATE", f"TODO: FILL OUT")
+
         torch.save(
             {
                 'epoch': epoch,
@@ -337,7 +338,7 @@ def train(args):
                 'optimizer': optimizer.state_dict(),
                 'exp_dir': exp_dir
             },
-            f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'model.pt'
+            f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'policy_model.pt'
         )
 
 
