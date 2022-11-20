@@ -265,9 +265,8 @@ def train(args):
                     mask[i, :, :, actions[i,0], :] = 1
                     if i == 0:
                         print(actions[i, 0])
-                        plt.imshow(mask[i, 0, :, :, 0].detatch().cpu().numpy())
+                        plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_post.png')
-                        exit()
 
                 recons = (1-mask)*recons + mask*kspace
                 var_scores = torch.var(complex_abs(kspace_recons), dim=1)
@@ -298,6 +297,18 @@ def train(args):
         ind = 2
         for i, data in enumerate(dev_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
+            zf = zf[ind].cuda()
+            gt = gt[ind].cuda()
+            kspace = kspace[ind].cuda()
+            gt_mean = gt_mean[ind].cuda()
+            gt_std = gt_std[ind].cuda()
+            mask = mask[ind].cuda()
+
+            recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+            for step in range(48):
+                pass
+
+            break
 
         # scheduler.step()
 
