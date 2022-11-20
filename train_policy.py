@@ -301,29 +301,33 @@ def train(args):
 
         # TODO: This, one full sampling trajectory for arbitrary batch element
         # ind = 2
-        # with torch.no_grad():
-        #     for i, data in enumerate(dev_loader):
-        #         zf, gt, kspace, gt_mean, gt_std, mask = data
-        #         zf = zf[ind].cuda().unsqueeze(0)
-        #         gt = gt[ind].cuda().unsqueeze(0)
-        #         kspace = kspace[ind].cuda().unsqueeze(0)
-        #         gt_mean = gt_mean[ind].cuda().unsqueeze(0)
-        #         gt_std = gt_std[ind].cuda().unsqueeze(0)
-        #         mask = mask[ind].cuda().unsqueeze(0)
-        #
-        #         recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-        #         for step in range(24):
-        #             policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
-        #             var_recons = torch.var(recons, dim=1)
-        #             policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
-        #             policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
-        #
-        #             policy, probs = get_policy_probs(model, policy_in, mask)
-        #             action = policy.sample()
-        #             print(action)
-        #             exit()
-        #
-        #         break
+        with torch.no_grad():
+            for i, data in enumerate(dev_loader):
+                zf, gt, kspace, gt_mean, gt_std, mask = data
+                zf = zf[ind].cuda().unsqueeze(0)
+                gt = gt[ind].cuda().unsqueeze(0)
+                kspace = kspace[ind].cuda().unsqueeze(0)
+                gt_mean = gt_mean[ind].cuda().unsqueeze(0)
+                gt_std = gt_std[ind].cuda().unsqueeze(0)
+                mask = mask[ind].cuda().unsqueeze(0)
+
+                recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+                for step in range(24):
+                    policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
+                    var_recons = torch.var(recons, dim=1)
+                    policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
+                    policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
+
+                    policy, probs = get_policy_probs(model, policy_in, mask)
+                    action = policy.sample()
+                    print(action)
+                    exit()
+
+                    mask[0, :, :, action[0, 0], :] = 1
+
+                    recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8,1, 1,1,1) * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
+
+                break
 
         # scheduler.step()
 
