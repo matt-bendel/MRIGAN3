@@ -238,10 +238,9 @@ def train(args):
             mask = mask.cuda()
 
             optimiser.zero_grad()
+            recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
 
             for step in range(48):
-                recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-                print(recons.shape)
                 # Get policy and probabilities.
                 policy, probs = get_policy_probs(model, recons, mask)
                 actions = torch.multinomial(probs.squeeze(1), 1, replacement=True)
@@ -258,9 +257,13 @@ def train(args):
 
                 mask[:, :, :, actions, :] = 1
 
-                recons, var_scores = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+                recons = (1-mask)*recons + mask*kspace
+                var_scores = torch.var(complex_abs(kspace_recons), dim=1)
                 # batch x num_trajectories
                 action_rewards = base_score - var_scores
+                print(action_rewards.shape)
+                exit()
+                base_score = var_scores
                 # batch x 1
                 avg_reward = torch.mean(action_rewards, dim=-1, keepdim=True)
                 # Store for non-greedy model (we need the full return before we can do a backprop step)
@@ -306,6 +309,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
+    args.batch_size = 16
     args.in_chans = 16
     args.out_chans = 16
 
