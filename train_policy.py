@@ -204,6 +204,9 @@ def train(args):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
     G = load_best_gan(args)
     G.update_gen_status(val=True)
+    for param in G.gen.parameters():
+        param.requires_grad = False
+
     # TODO: Load on resume
     # Improvement model to train
     model = PolicyModel(
