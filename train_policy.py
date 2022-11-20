@@ -199,8 +199,7 @@ def get_policy_probs(model, recons, mask):
     policy = torch.distributions.Categorical(probs)
     return policy, probs
 
-def train(args, bl=1, adv_mult=0.0):
-    print(f"WEIGHT: {adv_mult}")
+def train(args):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
     G = load_best_gan(args)
     G.update_gen_status(val=True)
@@ -219,6 +218,7 @@ def train(args, bl=1, adv_mult=0.0):
     if args.data_parallel:
         model = torch.nn.DataParallel(model)
     optimiser = torch.optim.Adam(model.parameters(), 5e-5, weight_decay=0)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimiser, 40, 0.1)
     start_epoch = 0
 
     if args.resume:
@@ -230,6 +230,7 @@ def train(args, bl=1, adv_mult=0.0):
         for i, data in enumerate(train_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
             print(mask.shape)
+            optimiser.zero_grad()
 
             for step in range(48):
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
@@ -268,9 +269,13 @@ def train(args, bl=1, adv_mult=0.0):
                 loss = loss.mean()  # For consistency: we generally set batches_step to 1 for greedy
                 loss.backward()
 
+            optimiser.step()
+
         # TODO: This
         for i, data in enumerate(dev_loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
+
+        scheduler.step()
 
         # TODO: Save
 
@@ -296,4 +301,4 @@ if __name__ == '__main__':
     args.out_chans = 16
 
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-    train(args, bl=0, adv_mult=val)
+    train(args)
