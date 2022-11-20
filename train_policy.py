@@ -273,7 +273,7 @@ def train(args):
                 base_score = var_scores
                 # batch x 1
                 # avg_reward = action_rewards.uns
-                avg_rewad = torch.zeros_like(action_rewards).cuda()
+                avg_reward = torch.zeros_like(action_rewards).cuda()
                 # Store for non-greedy model (we need the full return before we can do a backprop step)
                 # action_list.append(actions)
                 # logprob_list.append(action_logprobs)
