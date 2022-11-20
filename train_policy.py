@@ -244,7 +244,7 @@ def train(args):
             optimiser.zero_grad()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
-            for step in range(48):
+            for step in range(24):
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
@@ -259,14 +259,14 @@ def train(args):
                 action_logprobs = torch.log(torch.gather(probs, -1, actions)).squeeze(1)
                 actions = actions.squeeze(1)
 
-                for i in range(actions.size(0)):
-                    if i == 0:
-                        plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
+                for j in range(actions.size(0)):
+                    if j == 0:
+                        plt.imshow(mask[j, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_pre.png')
 
-                    mask[i, :, :, actions[i,0], :] = 1
-                    if i == 0:
-                        plt.imshow(mask[i, 0, :, :, 0].cpu().numpy())
+                    mask[j, :, :, actions[j,0], :] = 1
+                    if j == 0:
+                        plt.imshow(mask[j, 0, :, :, 0].cpu().numpy())
                         plt.savefig('mask_post.png')
 
                 recons = (1-mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
@@ -312,7 +312,7 @@ def train(args):
                 mask = mask[ind].cuda().unsqueeze(0)
 
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-                for step in range(48):
+                for step in range(24):
                     policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                     var_recons = torch.var(recons, dim=1)
                     policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
