@@ -61,11 +61,15 @@ class DataTransform:
         # im_tensor = reduce_resolution(im_tensor)
 
         true_image = torch.clone(im_tensor)
-        true_measures = fft2c_new(im_tensor) * mask
+        true_measures = fft2c_new(im_tensor) #* mask
         image = im_tensor
 
         kspace = fft2c_new(image)
         masked_kspace = kspace * mask
+        # maps = mr.app.EspiritCalib(tensor_to_complex_np(masked_kspace.cpu()), calib_width=32,
+        #                            device=sp.Device(3), show_pbar=False, crop=0.70,
+        #                            kernel_width=6).run().get()
+        # S = sp.linop.Multiply((384, 384), maps)
         input_tensor = ifft2c_new(masked_kspace)
 
         normalized_input, mean, std = transforms.normalize_instance(input_tensor)
@@ -82,6 +86,8 @@ class DataTransform:
         final_gt = torch.zeros(16, 384, 384)
         final_gt[0:8, :, :] = normalized_gt[:, :, :, 0]
         final_gt[8:16, :, :] = normalized_gt[:, :, :, 1]
+
+        return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask
 
         if self.args.langevin_plots:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice
