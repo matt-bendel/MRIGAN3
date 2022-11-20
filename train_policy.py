@@ -169,7 +169,7 @@ def generate_gif(type):
 def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
     recons = torch.zeros(kspace.size(0), 8, 8, 384, 384, 2)
     new_m = mask[:, :, :, :, 0].repeat(1, 2, 1, 1)
-    preint(new_m.shape)
+    print(new_m.shape)
     for z in range(8):
         recon = G(zf, kspace * new_m) * gt_std + gt_mean
         recons[:, z, :, :, :, 0] = recon[:, 0:8, :, :]
@@ -187,7 +187,6 @@ def get_policy_probs(model, recons, mask):
     channel_size = 2
     res = mask.size(-2)
     # Reshape trajectory dimension into batch dimension for parallel forward pass
-    recons = recons.view(mask.size(0) * channel_size, 1, res, res)
     # Obtain policy model logits
     output = model(recons)
     # Reshape trajectories back into their own dimension
