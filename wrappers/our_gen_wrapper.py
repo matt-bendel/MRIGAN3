@@ -147,6 +147,9 @@ class GANWrapper:
             # samples = self.gen(y, mid_z=z_2)
         else:
             samples = self.gen(y)
+
+        print(samples.shape)
+        print(true_measures.shape)
         samples = self.readd_measures(samples, true_measures)
 
         return samples
