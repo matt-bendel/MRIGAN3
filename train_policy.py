@@ -244,7 +244,7 @@ def train(args):
             optimiser.zero_grad()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
-            for step in range(24):
+            for step in range(48):
                 print(f"STEP: {step+1}")
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
