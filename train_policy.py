@@ -230,7 +230,7 @@ def train(args):
 
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
-    for epoch in range(start_epoch, 10):
+    for epoch in range(start_epoch, 50):
         for i, data in enumerate(train_loader):
             epoch_start = time.time()
             zf, gt, kspace, gt_mean, gt_std, mask = data
@@ -287,9 +287,9 @@ def train(args):
                 accum_loss += loss.item()
 
             epoch_end_hr = time.time() - epoch_start
-            epoch_end_hr /= 60 # minutes
-            epoch_end_hr /= 60 # hrs
-            print(f"EPOCH: {epoch+1} | BATCH: {i+1}/{len(train_loader)} | TIME: {epoch_end_hr:.2f} | LOSS: {accum_loss}")
+            # epoch_end_hr /= 60 # minutes
+            # epoch_end_hr /= 60 # hrs
+            print(f"EPOCH: {epoch+1} | BATCH: {i+1}/{len(train_loader)} | TIME: {epoch_end_hr:.2f}s | LOSS: {accum_loss}")
             optimiser.step()
 
         # TODO: This, one full sampling trajectory for arbitrary batch element
@@ -336,7 +336,6 @@ def train(args):
             },
             f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'policy_model.pt'
         )
-        exit()
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
@@ -355,7 +354,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 40
+    args.batch_size = 80
     args.in_chans = 16
     args.out_chans = 16
 
