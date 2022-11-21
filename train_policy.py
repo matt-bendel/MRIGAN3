@@ -332,7 +332,6 @@ def train(args):
                 'args': args,
                 'model': model.state_dict(),
                 'optimizer': optimiser.state_dict(),
-                'exp_dir': exp_dir
             },
             f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'policy_model.pt'
         )
