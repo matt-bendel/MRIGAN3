@@ -262,14 +262,7 @@ def train(args):
                 actions = actions.squeeze(1)
 
                 for j in range(actions.size(0)):
-                    if j == 0:
-                        plt.imshow(mask[j, 0, :, :, 0].cpu().numpy())
-                        plt.savefig('mask_pre.png')
-
                     mask[j, :, :, actions[j,0], :] = 1
-                    if j == 0:
-                        plt.imshow(mask[j, 0, :, :, 0].cpu().numpy())
-                        plt.savefig('mask_post.png')
 
                 recons = (1-mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
                 var_scores = torch.mean(torch.var(complex_abs(recons), dim=1), dim=(1, 2, 3))
