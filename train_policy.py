@@ -245,6 +245,7 @@ def train(args):
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
             for step in range(24):
+                step_start = time.time()
                 print(f"STEP: {step+1}")
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
@@ -277,14 +278,14 @@ def train(args):
                 base_score = var_scores
                 # batch x 1
                 # avg_reward = action_rewards.uns # TODO: Turn on for different trajectories
-                avg_reward = torch.zeros_like(action_rewards).cuda()
+                # avg_reward = torch.zeros_like(action_rewards).cuda()
                 # Store for non-greedy model (we need the full return before we can do a backprop step)
                 # action_list.append(actions)
                 # logprob_list.append(action_logprobs)
                 # reward_list.append(action_rewards)
 
                 # Local baseline
-                loss = -1 * (action_logprobs * (action_rewards - avg_reward))
+                loss = -1 * (action_logprobs * action_rewards)
                 # batch
                 # loss = loss.sum(dim=1) # TODO: Turn on for different trajectories
                 # Average over batch
@@ -292,6 +293,7 @@ def train(args):
                 loss = loss.mean()  # For consistency: we generally set batches_step to 1 for greedy
                 loss.backward()
                 accum_loss += loss.item()
+                print(time.time() - step_start)
 
             epoch_end_hr = time.time() - epoch_start
             epoch_end_hr /= 60 # minutes
