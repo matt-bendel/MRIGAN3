@@ -244,9 +244,8 @@ def train(args):
             optimiser.zero_grad()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             accum_loss = 0
-            for step in range(24):
-                step_start = time.time()
-                print(f"STEP: {step+1}")
+            for step in range(48):
+                # print(f"STEP: {step+1}")
                 # Get policy and probabilities.
                 # TODO: Get 4 different trajectories
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
@@ -286,7 +285,6 @@ def train(args):
                 loss = loss.mean()  # For consistency: we generally set batches_step to 1 for greedy
                 loss.backward()
                 accum_loss += loss.item()
-                print(time.time() - step_start)
 
             epoch_end_hr = time.time() - epoch_start
             epoch_end_hr /= 60 # minutes
@@ -357,7 +355,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 16
+    args.batch_size = 40
     args.in_chans = 16
     args.out_chans = 16
 
