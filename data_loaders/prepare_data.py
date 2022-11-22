@@ -77,7 +77,7 @@ class DataTransform:
 
         # For Dynamic Inpainting
         # normalized_true_measures = transforms.normalize(ifft2c_new(true_measures), mean, std)
-        normalized_true_measures = fft2c_new(true_measures)
+        normalized_true_measures = true_measures
 
         final_input = torch.zeros(16, 384, 384)
         final_input[0:8, :, :] = normalized_input[:, :, :, 0]
