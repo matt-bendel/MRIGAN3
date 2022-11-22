@@ -187,11 +187,11 @@ def get_policy_probs(model, recons, mask, num_traj=8):
     res = mask.size(-2)
     # Reshape trajectory dimension into batch dimension for parallel forward pass
     # Obtain policy model logits
-    output = model(recons.repeat(num_traj, 1, 1, 1))
+    output = model(recons)
     # Reshape trajectories back into their own dimension
-    output = output.view(mask.size(0), num_traj, res)
+    output = output.view(mask.size(0), 1, res)
     # Mask already acquired rows by setting logits to very negative numbers
-    loss_mask = (mask == 0)[:, 0, 0, :, 0].unsqueeze(1).repeat(1, num_traj, 1)
+    loss_mask = (mask == 0)[:, 0, 0, :, 0].unsqueeze(1)
     logits = torch.where(loss_mask.byte(), output, -1e7 * torch.ones_like(output))
     # Softmax over 'logits' representing row scores
     probs = torch.nn.functional.softmax(logits - logits.max(dim=-1, keepdim=True)[0], dim=-1)
