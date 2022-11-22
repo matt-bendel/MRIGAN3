@@ -254,7 +254,7 @@ def train(args):
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                 var_recons = torch.var(recons, dim=1)
                 policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
-                policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
+                policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 1]
 
                 policy, probs = get_policy_probs(model, policy_in, mask)
                 actions = torch.multinomial(probs.squeeze(1), num_traj, replacement=True)
@@ -337,7 +337,7 @@ def train(args):
                     policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                     var_recons = torch.var(recons, dim=1)
                     policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
-                    policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
+                    policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 1]
 
                     policy, probs = get_policy_probs(model, policy_in, mask, num_traj=1)
                     if step == 0:
@@ -345,11 +345,11 @@ def train(args):
                     else:
                         actions = policy.sample()
 
-                    print(actions.shape)
+                    for j in range(mask.size(0)):
+                        mask[j, :, :, actions[j, 0], :] = 1
 
-                    mask[ind, :, :, actions[ind, 0], :] = 1
-
-                    recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8,1, 1,1,1) * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
+                    recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1) \
+                             * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
                 place = 1
                 for r, val in enumerate(im_list):
