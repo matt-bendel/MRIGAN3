@@ -309,12 +309,12 @@ def train(args):
         with torch.no_grad():
             for i, data in enumerate(dev_loader):
                 zf, gt, kspace, gt_mean, gt_std, mask = data
-                zf = zf.cuda().unsqueeze(0)
-                gt = gt.cuda().unsqueeze(0)
-                kspace = kspace.cuda().unsqueeze(0)
-                gt_mean = gt_mean.cuda().unsqueeze(0)
-                gt_std = gt_std.cuda().unsqueeze(0)
-                mask = mask.cuda().unsqueeze(0)
+                zf = zf.cuda()
+                gt = gt.cuda()
+                kspace = kspace.cuda()
+                gt_mean = gt_mean.cuda()
+                gt_std = gt_std.cuda()
+                mask = mask.cuda()
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
                 mean_kspace = torch.mean(recons[ind], dim=1)
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace[0].cpu()), calib_width=16,
@@ -357,6 +357,7 @@ def train(args):
                     place += 1
 
                 generate_gif('image', len(im_list))
+                break
 
         # scheduler.step()
 
