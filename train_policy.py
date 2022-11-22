@@ -260,22 +260,19 @@ def train(args):
                 # probs shape = batch x 1 x res
                 action_logprobs = torch.log(torch.gather(probs, -1, actions)).squeeze(1)
                 actions = actions.squeeze(1)
-                print(actions.shape)
 
                 mask = mask.unsqueeze(1).repeat(1, num_traj, 1, 1, 1, 1)
                 for j in range(actions.size(0)):
                     for k in range(actions.size(1)):
                         mask[j, k, :, :, actions[j,k], :] = 1
 
-                var_scores = torch.zeros(mask.size(0), mask.size(1))
+                var_scores = torch.zeros(mask.size(0), mask.size(1)).cuda()
                 for k in range(mask.size(1)):
                     m = mask[:, k, :, :, :, :]
                     recons = (1-m.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + m.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
                     var_scores[:, k] = torch.mean(torch.var(complex_abs(recons), dim=1), dim=(1, 2, 3))
 
                 # batch x num_trajectories
-                print(base_score.shape)
-                print(var_scores.shape)
                 action_rewards = base_score - var_scores
                 base_score = var_scores
                 # batch x 1
