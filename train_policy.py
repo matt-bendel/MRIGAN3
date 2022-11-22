@@ -169,8 +169,7 @@ def generate_gif(type, tot):
 
 def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
     recons = torch.zeros(kspace.size(0), 8, 8, 384, 384, 2).cuda()
-    print(kspace.shape)
-    normalized_kspace = fft2c_new((ifft2c_new(kspace) - gt_mean[:, None, None, None]) / gt_std[:, None, None, None])
+    normalized_kspace = fft2c_new((ifft2c_new(kspace) - gt_mean[:, None, None, None, None]) / gt_std[:, None, None, None, None])
 
     for z in range(8):
         recon = G(zf, normalized_kspace, mask=mask)
