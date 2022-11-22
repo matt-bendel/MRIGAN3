@@ -316,8 +316,10 @@ def train(args):
                 gt_std = gt_std.cuda()
                 mask = mask.cuda()
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-                mean_kspace = torch.mean(recons[ind], dim=1)
-                maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace[0].cpu()), calib_width=16,
+                print(recons.shape)
+                mean_kspace = torch.mean(recons, dim=1)[ind]
+                print(mean_kspace.shape)
+                maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace.cpu()), calib_width=16,
                                            device=sp.Device(3), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
                 S = sp.linop.Multiply((384, 384), maps)
@@ -357,6 +359,7 @@ def train(args):
                     place += 1
 
                 generate_gif('image', len(im_list))
+                exit()
                 break
 
         # scheduler.step()
