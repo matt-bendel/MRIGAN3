@@ -341,7 +341,7 @@ def train(args):
 
                     policy, probs = get_policy_probs(model, policy_in, mask, num_traj=1)
                     if step == 0:
-                        actions = torch.multinomial(probs.squeeze(1), args.num_test_trajectories, replacement=True)
+                        actions = torch.multinomial(probs.squeeze(1), 1, replacement=True)
                     else:
                         actions = policy.sample()
 
