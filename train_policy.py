@@ -184,7 +184,7 @@ def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
 
     return kspace_recons, var
 
-def get_policy_probs(model, recons, mask, num_traj=8):
+def get_policy_probs(model, recons, mask, num_traj=4):
     res = mask.size(-2)
     # Reshape trajectory dimension into batch dimension for parallel forward pass
     # Obtain policy model logits
@@ -202,7 +202,7 @@ def get_policy_probs(model, recons, mask, num_traj=8):
 
 def train(args):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
-    num_traj = 8
+    num_traj = 4
     G = load_best_gan(args)
     G.update_gen_status(val=True)
     for param in G.gen.parameters():
@@ -390,7 +390,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 80
+    args.batch_size = 120
     args.in_chans = 16
     args.out_chans = 16
 
