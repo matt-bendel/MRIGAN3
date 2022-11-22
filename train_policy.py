@@ -331,7 +331,7 @@ def train(args):
                 im_list = []
                 for step in range(48):
                     print(f"STEP: {step+1}")
-                    im_recon = torch.tensor(S.H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[ind]))).abs().numpy()
+                    im_recon = torch.tensor(S.H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[ind]).cpu())).abs().numpy()
                     im_list.append(im_recon)
 
                     policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
