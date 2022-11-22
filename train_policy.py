@@ -232,6 +232,7 @@ def train(args):
 
     for epoch in range(start_epoch, 50):
         for i, data in enumerate(train_loader):
+            break
             epoch_start = time.time()
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
@@ -293,9 +294,7 @@ def train(args):
 
                 idx = random.randint(0, mask.shape[1] - 1)
                 mask = mask[:, idx:idx + 1, :, :, :, :].squeeze(1)
-                print(mask.shape)
                 recons = (1-mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
-                exit()
 
             epoch_end_hr = time.time() - epoch_start
             # epoch_end_hr /= 60 # minutes
@@ -314,9 +313,24 @@ def train(args):
                 gt_mean = gt_mean[ind].cuda().unsqueeze(0)
                 gt_std = gt_std[ind].cuda().unsqueeze(0)
                 mask = mask[ind].cuda().unsqueeze(0)
-
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+                mean_kspace = torch.mean(recons, dim=1)
+                maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace[0].cpu()), calib_width=16,
+                                           device=sp.Device(3), show_pbar=False, crop=0.70,
+                                           kernel_width=6).run().get()
+                S = sp.linop.Multiply((384, 384), maps)
+
+                target = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                target[:, :, :, 0] = gt[0, 0:8, :, :]
+                target[:, :, :, 1] = gt[0, 8:16, :, :]
+                target = tensor_to_complex_np((target * gt_std[0] + gt_mean[0]).cpu())
+                target_np = torch.tensor(S.H * target).abs().numpy()
+
+                im_list = []
                 for step in range(48):
+                    im_recon = torch.tensor(S.H * ifft2c_new(torch.mean(recons, dim=1)[0])).abs().numpy()
+                    im_list.append(im_recon)
+
                     policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                     var_recons = torch.var(recons, dim=1)
                     policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
@@ -327,13 +341,19 @@ def train(args):
                         actions = torch.multinomial(probs.squeeze(1), args.num_test_trajectories, replacement=True)
                     else:
                         actions = policy.sample()
-                    exit()
+
+                    print(actions.shape)
 
                     mask[0, :, :, actions[0, 0], :] = 1
 
                     recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8,1, 1,1,1) * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
-                break
+                place = 1
+                for r, val in enumerate(gen_im_list):
+                    gif_im(target_np, val, place, 'image')
+                    place += 1
+
+                generate_gif('image')
 
         # scheduler.step()
 
