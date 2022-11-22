@@ -157,14 +157,14 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     plt.close()
 
 
-def generate_gif(type):
+def generate_gif(type, tot):
     images = []
-    for i in range(8):
+    for i in range(tot):
         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
-    for i in range(8):
+    for i in range(tot):
         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
 
 def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
@@ -231,6 +231,7 @@ def train(args):
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
     for epoch in range(start_epoch, 50):
+        model.train()
         for i, data in enumerate(train_loader):
             break
             epoch_start = time.time()
@@ -304,31 +305,33 @@ def train(args):
 
         # TODO: This, one full sampling trajectory for arbitrary batch element
         ind = 2
+        model.eval()
         with torch.no_grad():
             for i, data in enumerate(dev_loader):
                 zf, gt, kspace, gt_mean, gt_std, mask = data
-                zf = zf[ind].cuda().unsqueeze(0)
-                gt = gt[ind].cuda().unsqueeze(0)
-                kspace = kspace[ind].cuda().unsqueeze(0)
-                gt_mean = gt_mean[ind].cuda().unsqueeze(0)
-                gt_std = gt_std[ind].cuda().unsqueeze(0)
-                mask = mask[ind].cuda().unsqueeze(0)
+                zf = zf.cuda().unsqueeze(0)
+                gt = gt.cuda().unsqueeze(0)
+                kspace = kspace.cuda().unsqueeze(0)
+                gt_mean = gt_mean.cuda().unsqueeze(0)
+                gt_std = gt_std.cuda().unsqueeze(0)
+                mask = mask.cuda().unsqueeze(0)
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-                mean_kspace = torch.mean(recons, dim=1)
+                mean_kspace = torch.mean(recons[ind], dim=1)
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace[0].cpu()), calib_width=16,
                                            device=sp.Device(3), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
                 S = sp.linop.Multiply((384, 384), maps)
 
                 target = torch.zeros(size=(8, 384, 384, 2), device=args.device)
-                target[:, :, :, 0] = gt[0, 0:8, :, :]
-                target[:, :, :, 1] = gt[0, 8:16, :, :]
-                target = tensor_to_complex_np((target * gt_std[0] + gt_mean[0]).cpu())
+                target[:, :, :, 0] = gt[ind, 0:8, :, :]
+                target[:, :, :, 1] = gt[ind, 8:16, :, :]
+                target = tensor_to_complex_np((target * gt_std[ind] + gt_mean[ind]).cpu())
                 target_np = torch.tensor(S.H * target).abs().numpy()
 
                 im_list = []
                 for step in range(48):
-                    im_recon = torch.tensor(S.H * ifft2c_new(torch.mean(recons, dim=1)[0])).abs().numpy()
+                    print(f"STEP: {step+1}")
+                    im_recon = torch.tensor(S.H * ifft2c_new(torch.mean(recons, dim=1)[ind])).abs().numpy()
                     im_list.append(im_recon)
 
                     policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
@@ -344,20 +347,20 @@ def train(args):
 
                     print(actions.shape)
 
-                    mask[0, :, :, actions[0, 0], :] = 1
+                    mask[ind, :, :, actions[ind, 0], :] = 1
 
                     recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8,1, 1,1,1) * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
                 place = 1
-                for r, val in enumerate(gen_im_list):
+                for r, val in enumerate(im_list):
                     gif_im(target_np, val, place, 'image')
                     place += 1
 
-                generate_gif('image')
+                generate_gif('image', len(im_list))
 
         # scheduler.step()
 
-        send_mail(f"POLICY EPOCH {epoch + 1} UPDATE", f"TODO: FILL OUT")
+        send_mail(f"POLICY EPOCH {epoch + 1} UPDATE", f"TODO: FILL OUT", file_name="variation_gif.gif")
 
         torch.save(
             {
