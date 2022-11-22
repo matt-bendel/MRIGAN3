@@ -255,7 +255,6 @@ def train(args):
                 policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
 
                 policy, probs = get_policy_probs(model, policy_in, mask)
-                peinr(probs.shape)
                 actions = torch.multinomial(probs.squeeze(1), num_traj, replacement=True)
                 actions = actions.unsqueeze(1)  # batch x num_traj -> batch x 1 x num_traj
                 # probs shape = batch x 1 x res
