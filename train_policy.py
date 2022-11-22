@@ -316,9 +316,7 @@ def train(args):
                 gt_std = gt_std.cuda()
                 mask = mask.cuda()
                 recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
-                print(recons.shape)
                 mean_kspace = torch.mean(recons, dim=1)[ind]
-                print(mean_kspace.shape)
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace.cpu()), calib_width=16,
                                            device=sp.Device(3), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
@@ -333,7 +331,7 @@ def train(args):
                 im_list = []
                 for step in range(48):
                     print(f"STEP: {step+1}")
-                    im_recon = torch.tensor(S.H * ifft2c_new(torch.mean(recons, dim=1)[ind])).abs().numpy()
+                    im_recon = torch.tensor(S.H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[ind]))).abs().numpy()
                     im_list.append(im_recon)
 
                     policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
