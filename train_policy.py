@@ -183,16 +183,15 @@ def compute_scores(G, kspace, mask, zf, gt_mean, gt_std):
 
     return kspace_recons, var
 
-def get_policy_probs(model, recons, mask):
-    channel_size = 1
+def get_policy_probs(model, recons, mask, num_traj=8):
     res = mask.size(-2)
     # Reshape trajectory dimension into batch dimension for parallel forward pass
     # Obtain policy model logits
-    output = model(recons)
+    output = model(recons.repeat(num_traj, 1, 1, 1))
     # Reshape trajectories back into their own dimension
-    output = output.view(mask.size(0), channel_size, res)
+    output = output.view(mask.size(0), num_traj, res)
     # Mask already acquired rows by setting logits to very negative numbers
-    loss_mask = (mask == 0)[:, 0, 0, :, 0].view(mask.size(0), channel_size, res)
+    loss_mask = (mask == 0)[:, 0, 0, :, 0].unsqueeze(1).repeat(1, num_traj, 1)
     logits = torch.where(loss_mask.byte(), output, -1e7 * torch.ones_like(output))
     # Softmax over 'logits' representing row scores
     probs = torch.nn.functional.softmax(logits - logits.max(dim=-1, keepdim=True)[0], dim=-1)
@@ -202,6 +201,7 @@ def get_policy_probs(model, recons, mask):
 
 def train(args):
     args.exp_dir.mkdir(parents=True, exist_ok=True)
+    num_traj = 8
     G = load_best_gan(args)
     G.update_gen_status(val=True)
     for param in G.gen.parameters():
@@ -243,48 +243,60 @@ def train(args):
 
             optimiser.zero_grad()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
+            base_score = base_score.unsqueeze(1).repeat(1, num_traj)
+
             accum_loss = 0
             for step in range(48):
                 # print(f"STEP: {step+1}")
                 # Get policy and probabilities.
-                # TODO: Get 4 different trajectories
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                 var_recons = torch.var(recons, dim=1)
                 policy_in[:, 0:8, :, :] = var_recons[:, :, :, :, 0]
                 policy_in[:, 8:16, :, :] = var_recons[:, :, :, :, 0]
 
                 policy, probs = get_policy_probs(model, policy_in, mask)
-                actions = torch.multinomial(probs.squeeze(1), 1, replacement=True)
+                actions = torch.multinomial(probs.squeeze(1), num_traj, replacement=True)
                 actions = actions.unsqueeze(1)  # batch x num_traj -> batch x 1 x num_traj
                 # probs shape = batch x 1 x res
                 action_logprobs = torch.log(torch.gather(probs, -1, actions)).squeeze(1)
                 actions = actions.squeeze(1)
 
+                mask = mask.unsqueeze(1).repeat(1, num_traj, 1, 1, 1, 1)
                 for j in range(actions.size(0)):
-                    mask[j, :, :, actions[j,0], :] = 1
+                    for k in range(actions.size(1)):
+                        mask[j, k, :, :, actions[j,k,0], :] = 1
 
-                recons = (1-mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
-                var_scores = torch.mean(torch.var(complex_abs(recons), dim=1), dim=(1, 2, 3))
+                var_scores = torch.zeros(mask.size(0), mask.size(1))
+                for k in range(mask.size(1)):
+                    m = mask[:, k, :, :, :, :]
+                    recons = (1-m.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + m.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
+                    var_scores[:, k] = torch.mean(torch.var(complex_abs(recons), dim=1), dim=(1, 2, 3))
+
                 # batch x num_trajectories
                 action_rewards = base_score - var_scores
                 base_score = var_scores
                 # batch x 1
-                # avg_reward = action_rewards.uns # TODO: Turn on for different trajectories
-                # avg_reward = torch.zeros_like(action_rewards).cuda()
+                avg_reward = torch.mean(action_rewards, dim=-1, keepdim=True)
                 # Store for non-greedy model (we need the full return before we can do a backprop step)
                 # action_list.append(actions)
                 # logprob_list.append(action_logprobs)
                 # reward_list.append(action_rewards)
 
                 # Local baseline
-                loss = -1 * (action_logprobs * action_rewards)
-                # batch
-                # loss = loss.sum(dim=1) # TODO: Turn on for different trajectories
+                loss = -1 * (action_logprobs * (action_rewards - avg_reward)) / (actions.size(-1) - 1)
+                print(loss.shape)
+                loss = loss.sum(dim=1)
                 # Average over batch
                 # Divide by batches_step to mimic taking mean over larger batch
                 loss = loss.mean()  # For consistency: we generally set batches_step to 1 for greedy
                 loss.backward()
                 accum_loss += loss.item()
+
+                idx = random.randint(0, mask.shape[1] - 1)
+                mask = mask[:, idx:idx + 1, :, :, :, :]
+                print(mask.shape)
+                recons = (1-mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1))*recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)*kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
+                exit()
 
             epoch_end_hr = time.time() - epoch_start
             # epoch_end_hr /= 60 # minutes
@@ -353,7 +365,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 80
+    args.batch_size = 40
     args.in_chans = 16
     args.out_chans = 16
 
