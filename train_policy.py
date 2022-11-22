@@ -234,7 +234,6 @@ def train(args):
     for epoch in range(start_epoch, 50):
         model.train()
         for i, data in enumerate(train_loader):
-            break
             epoch_start = time.time()
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
@@ -358,7 +357,6 @@ def train(args):
                     place += 1
 
                 generate_gif('image', len(im_list))
-                exit()
                 break
 
         # scheduler.step()
@@ -392,7 +390,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 4
+    args.batch_size = 80
     args.in_chans = 16
     args.out_chans = 16
 
