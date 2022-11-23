@@ -227,7 +227,11 @@ def train(args):
     start_epoch = 0
 
     if args.resume:
-        start_epoch += 1
+        checkpoint = pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy/policy_model.pt')
+        checkpoint = torch.load(checkpoint, map_location=torch.device('cuda'))
+        model.load_state_dict(checkpoint['model'])
+        optimiser.load_state_dict(checkpoint['optimizer'])
+        start_epoch = checkpoint['epoch']+1
 
     train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
 
