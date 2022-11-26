@@ -253,7 +253,7 @@ class ModulatedConv2d(nn.Module):
                 batch * in_channel, self.out_channel, self.kernel_size, self.kernel_size
             )
             out = F.conv_transpose2d(input, weight, padding=0, stride=2, groups=batch)
-            if kwargs['skip'].shape[-1] != kwargs['skip'].shape[-1]:
+            if kwargs['skip'].shape[-1] != out.shape[-1]:
                 out = F.interpolate(out, size=(kwargs['skip'].shape[-1], kwargs['skip'].shape[-1]), mode='bilinear', align_corners=True)
             _, _, height, width = out.shape
             out = out.view(batch, self.out_channel, height, width)
