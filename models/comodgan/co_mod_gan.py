@@ -191,6 +191,8 @@ class G_synthesis_co_mod_gan(nn.Module):
             def __init__(self, res):
                 super().__init__()
                 self.res = res
+                print(nf(res-1))
+                exit()
                 self.Conv0_up = StyledConv(
                         nf(res-2),
                         nf(res-1),
