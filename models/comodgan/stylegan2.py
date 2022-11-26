@@ -450,6 +450,10 @@ class ToRGB(nn.Module):
         if skip is not None:
             skip = self.upsample(skip)
 
+            if out.shape[-1] != skip.shape[-1]:
+                out = F.interpolate(skip, size=(out.shape[-1], out.shape[-1]), mode='bilinear',
+                                    align_corners=True)
+
             out = out + skip
 
         return out
