@@ -255,8 +255,8 @@ def test(args):
     with torch.no_grad():
         plot_count = 0
         for i, data in enumerate(loader):
-            kspace_ims = []
-            mri_ims = []
+            kspace_ims = [[] for i in range(48)]
+            mri_ims = [[] for i in range(48)]
 
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
@@ -296,8 +296,8 @@ def test(args):
                     ssim_vals[step].append(ssim(targets_im[j], im_np))
 
                     kspace_np = complex_abs(fft2c_new(im_recon)).cpu().numpy()
-                    kspace_ims.append({'recon': kspace_np, 'gt': targets_kspace[j], 'mask': mask[j, 0, :, :, 0].cpu().numpy()})
-                    mri_ims.append({'recon': im_np, 'gt': targets_im[j]})
+                    kspace_ims[step].append({'recon': kspace_np, 'gt': targets_kspace[j], 'mask': mask[j, 0, :, :, 0].cpu().numpy()})
+                    mri_ims[step].append({'recon': im_np, 'gt': targets_im[j]})
 
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                 var_recons = torch.var(recons, dim=1)
@@ -319,12 +319,33 @@ def test(args):
                 for j in range(mask.size(0)):
                     if i == 0:
                         for step in range(48):
-                            plt.figure()
-                            plt.imshow(kspace_ims[step]['mask'], cmap='viridis')
-                            plt.axis('off')
-                            plt.colorbar()
-                            plt.savefig(f'policy_plots/masks/mask_{plot_count}_step.png', bbox_inches='tight')
-                            plt.close()
+                            if (step + 1) % 12 == 0 or step == 0:
+                                plt.figure()
+                                plt.imshow(kspace_ims[step]['mask'], cmap='viridis')
+                                plt.axis('off')
+                                plt.colorbar()
+                                plt.savefig(f'policy_plots/masks/mask_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.close()
+
+                                rotated_gt = ndimage.rotate(mri_ims[step]['gt'], 180)
+                                rotated_recon = ndimage.rotate(mri_ims[step]['recon'], 180)
+                                plt.figure()
+                                plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+                                plt.axis('off')
+                                plt.savefig(f'policy_plots/masks/gt_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.close()
+
+                                plt.figure()
+                                plt.imshow(rotated_recon, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+                                plt.axis('off')
+                                plt.savefig(f'policy_plots/masks/recon_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.close()
+
+                                plt.figure()
+                                plt.imshow(kspace_ims[step]['recon'], cmap='gray')
+                                plt.axis('off')
+                                plt.savefig(f'policy_plots/masks/kspace_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.close()
 
                     rotated_gt = ndimage.rotate(mri_ims[47]['gt'], 180)
                     rotated_recon = ndimage.rotate(mri_ims[47]['recon'], 180)
