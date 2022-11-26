@@ -127,7 +127,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                         nf(1),
                         kernel_size=3,
                         activate=True)
-                self.Dense0 = EqualLinear(nf(1)*4*4, nf(1)*2,
+                self.Dense0 = EqualLinear(18432, nf(1)*2,
                                 activation="fused_lrelu")
                 self.dropout = nn.Dropout(0.5)
             def forward(self, data):
@@ -136,8 +136,6 @@ class G_synthesis_co_mod_gan(nn.Module):
                 E_features[2] = x
                 bsize = x.size(0)
                 x = x.view(bsize, -1)
-                print(x.shape)
-                exit()
                 x = self.Dense0(x)
                 x = self.dropout(x)
                 return x, E_features
