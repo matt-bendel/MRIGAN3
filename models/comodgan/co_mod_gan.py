@@ -263,8 +263,8 @@ class G_synthesis_co_mod_gan(nn.Module):
             block = getattr(self, 'G_%dx%d' % (2**res, 2**res))
             x, y = block(x, y, dlatents_in, x_global, E_features)
         raw_out = y
-        images_out = raw_out * (1 - masks_in) + images_in * masks_in
-        return images_out, raw_out
+        # images_out = raw_out * (1 - masks_in) + images_in * masks_in
+        return raw_out
 
 #----------------------------------------------------------------------------
 # Main generator network.
