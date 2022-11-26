@@ -338,7 +338,7 @@ class Discriminator(BaseNetwork):
         num_channels = 16
 
         resolution_log2 = int(np.log2(resolution))
-        assert resolution == 2**resolution_log2 and resolution >= 4
+        # assert resolution == 2**resolution_log2 and resolution >= 4
         def nf(stage): return np.clip(int(fmap_base / (2.0 ** (stage * fmap_decay))), fmap_min, fmap_max)
         #assert architecture in ['orig', 'skip', 'resnet']
 
@@ -411,6 +411,7 @@ class Discriminator(BaseNetwork):
         #print(out.shape)
         out = self.Conv4x4(out)
         out = out.view(input.size(0), -1)
+        print(out.shape)
         out = self.Dense0(out)
         out = self.Output(out)
         return out
