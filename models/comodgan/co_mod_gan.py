@@ -212,6 +212,10 @@ class G_synthesis_co_mod_gan(nn.Module):
                 mod_vector = get_mod(dlatents_in, res*2-5, x_global)
                 noise = None
                 x = self.Conv0_up(x, mod_vector, noise, x_skip=x_skip)
+                print(x.shape)
+                print(x_skip.shape)
+                exit()
+
                 x = x + x_skip
                 mod_vector = get_mod(dlatents_in, self.res*2-4, x_global)
                 x = self.Conv1(x, mod_vector, noise, x_skip=x_skip)
