@@ -191,15 +191,14 @@ class G_synthesis_co_mod_gan(nn.Module):
             def __init__(self, res):
                 super().__init__()
                 self.res = res
-                print(nf(res-1))
-                exit()
                 self.Conv0_up = StyledConv(
                         nf(res-2),
                         nf(res-1),
                         kernel_size=3,
                         style_dim=mod_size,
                         upsample=True,
-                        blur_kernel=resample_kernel)
+                        blur_kernel=resample_kernel,
+                )
                 self.Conv1 = StyledConv(
                         nf(res-1),
                         nf(res-1),
@@ -213,11 +212,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                 x_skip = E_features[self.res]
                 mod_vector = get_mod(dlatents_in, res*2-5, x_global)
                 noise = None
-                x = self.Conv0_up(x, mod_vector, noise, x_skip=x_skip)
-                print(x.shape)
-                print(x_skip.shape)
-                exit()
-
+                x = self.Conv0_up(x, mod_vector, noise, x_skip=x_skip, target_dim=x_skip.shape[-1])
                 x = x + x_skip
                 mod_vector = get_mod(dlatents_in, self.res*2-4, x_global)
                 x = self.Conv1(x, mod_vector, noise, x_skip=x_skip)
