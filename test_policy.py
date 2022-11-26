@@ -343,7 +343,7 @@ def test(args):
                             plt.close()
 
                             plt.figure()
-                            plt.imshow(kspace_ims[s][j]['recon'], cmap='gray')
+                            plt.imshow(kspace_ims[s][j]['recon'] ** 0.4, cmap='gray')
                             plt.axis('off')
                             plt.savefig(f'policy_plots/masks/kspace_{plot_count}_step_{s}.png', bbox_inches='tight')
                             plt.close()
@@ -367,6 +367,7 @@ def test(args):
                 plt.axis('off')
                 plt.savefig(f'policy_plots/kspace_{plot_count}.png', bbox_inches='tight')
                 plt.close()
+                plot_count += 1
 
         final_psnrs = []
         final_ssims = []
