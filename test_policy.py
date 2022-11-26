@@ -255,8 +255,8 @@ def test(args):
     with torch.no_grad():
         plot_count = 0
         for i, data in enumerate(loader):
-            kspace_ims = [[] for i in range(48)]
-            mri_ims = [[] for i in range(48)]
+            kspace_ims = []
+            mri_ims = []
 
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
