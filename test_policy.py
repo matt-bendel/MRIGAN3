@@ -319,33 +319,33 @@ def test(args):
 
                 for j in range(mask.size(0)):
                     if i == 0:
-                        for step in range(48):
-                            if (step + 1) % 12 == 0 or step == 0:
+                        for s in range(48):
+                            if (s + 1) % 12 == 0 or s == 0:
                                 plt.figure()
-                                plt.imshow(kspace_ims[step][j]['mask'], cmap='viridis')
+                                plt.imshow(kspace_ims[s][j]['mask'], cmap='viridis')
                                 plt.axis('off')
                                 plt.colorbar()
-                                plt.savefig(f'policy_plots/masks/mask_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.savefig(f'policy_plots/masks/mask_{plot_count}_step_{s}.png', bbox_inches='tight')
                                 plt.close()
 
-                                rotated_gt = ndimage.rotate(mri_ims[step][j]['gt'], 180)
-                                rotated_recon = ndimage.rotate(mri_ims[step][j]['recon'], 180)
+                                rotated_gt = ndimage.rotate(mri_ims[s][j]['gt'], 180)
+                                rotated_recon = ndimage.rotate(mri_ims[s][j]['recon'], 180)
                                 plt.figure()
                                 plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
                                 plt.axis('off')
-                                plt.savefig(f'policy_plots/masks/gt_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.savefig(f'policy_plots/masks/gt_{plot_count}_step_{s}.png', bbox_inches='tight')
                                 plt.close()
 
                                 plt.figure()
                                 plt.imshow(rotated_recon, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
                                 plt.axis('off')
-                                plt.savefig(f'policy_plots/masks/recon_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.savefig(f'policy_plots/masks/recon_{plot_count}_step_{s}.png', bbox_inches='tight')
                                 plt.close()
 
                                 plt.figure()
-                                plt.imshow(kspace_ims[step][j]['recon'], cmap='gray')
+                                plt.imshow(kspace_ims[s][j]['recon'], cmap='gray')
                                 plt.axis('off')
-                                plt.savefig(f'policy_plots/masks/kspace_{plot_count}_step_{step}.png', bbox_inches='tight')
+                                plt.savefig(f'policy_plots/masks/kspace_{plot_count}_step_{s}.png', bbox_inches='tight')
                                 plt.close()
 
                     rotated_gt = ndimage.rotate(mri_ims[47][j]['gt'], 180)
