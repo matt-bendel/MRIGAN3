@@ -250,6 +250,7 @@ def test(args):
     ind = 2
     model.eval()
     psnr_vals = [[] for i in range(48)]
+    ssim_vals = [[] for i in range(48)]
 
     with torch.no_grad():
         for i, data in enumerate(loader):
@@ -291,6 +292,7 @@ def test(args):
                     im_recon = transforms.to_tensor(S_vals[j].H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[j]).cpu()))
                     im_np = complex_abs(im_recon).cpu().numpy()
                     psnr_vals[step].append(psnr(targets_im[j], im_np))
+                    ssim_vals[step].append(ssim(targets_im[j], im_np))
 
                     kspace_np = complex_abs(fft2c_new(im_recon)).cpu().numpy()
                     kspace_ims.append({'recon': kspace_np, 'gt': targets_kspace[j], 'mask': mask[j, 0, :, :, 0].cpu().numpy()})
@@ -315,7 +317,26 @@ def test(args):
 
             # TODO: Get plots
 
-        # # TODO: Get final PSNR/SSIM
+        final_psnrs = []
+        final_ssims = []
+
+        for step in range(48):
+            final_ssims.append(np.mean(ssim_vals[step]))
+            final_psnrs.append(np.mean(psnr_vals[step]))
+
+        file = open("psnr_vals.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(final_psnrs)
+        file.write(content)
+        file.close()
+
+        file = open("ssim_vals.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(final_ssims)
+        file.write(content)
+        file.close()
 
         print("DONE!")
 
