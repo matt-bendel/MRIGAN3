@@ -136,6 +136,8 @@ class G_synthesis_co_mod_gan(nn.Module):
                 E_features[2] = x
                 bsize = x.size(0)
                 x = x.view(bsize, -1)
+                print(x.shape)
+                exit()
                 x = self.Dense0(x)
                 x = self.dropout(x)
                 return x, E_features
