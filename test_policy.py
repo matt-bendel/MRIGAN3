@@ -320,6 +320,7 @@ def test(args):
                     if i == 0:
                         for step in range(48):
                             if (step + 1) % 12 == 0 or step == 0:
+                                print(kspace_ims[step])
                                 plt.figure()
                                 plt.imshow(kspace_ims[step]['mask'], cmap='viridis')
                                 plt.axis('off')
