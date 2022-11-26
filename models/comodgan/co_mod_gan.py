@@ -253,7 +253,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                     Block(res))
 
     def forward(self, images_in, masks_in, dlatents_in):
-        y = images_in * masks_in
+        y = images_in
         E_features = {}
         x_global, E_features = self.E((y, E_features))
         x = x_global
