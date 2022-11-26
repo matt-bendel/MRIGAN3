@@ -316,34 +316,35 @@ def test(args):
                 recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1) \
                          * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
-            for j in range(mask.size(0)):
-                if i == 0:
-                    for step in range(48):
-                        plt.figure()
-                        plt.imshow(kspace_ims[step]['mask'], cmap='viridis')
-                        plt.axis('off')
-                        plt.savefig(f'policy_plots/masks/mask_{plot_count}_step.png')
-                        plt.close()
+                for j in range(mask.size(0)):
+                    if i == 0:
+                        for step in range(48):
+                            plt.figure()
+                            plt.imshow(kspace_ims[step]['mask'], cmap='viridis')
+                            plt.axis('off')
+                            plt.colorbar()
+                            plt.savefig(f'policy_plots/masks/mask_{plot_count}_step.png', bbox_inches='tight')
+                            plt.close()
 
-                rotated_gt = ndimage.rotate(mri_ims[47]['gt'], 180)
-                rotated_recon = ndimage.rotate(mri_ims[47]['recon'], 180)
-                plt.figure()
-                plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-                plt.axis('off')
-                plt.savefig(f'policy_plots/gt_{plot_count}.png')
-                plt.close()
+                    rotated_gt = ndimage.rotate(mri_ims[47]['gt'], 180)
+                    rotated_recon = ndimage.rotate(mri_ims[47]['recon'], 180)
+                    plt.figure()
+                    plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+                    plt.axis('off')
+                    plt.savefig(f'policy_plots/gt_{plot_count}.png', bbox_inches='tight')
+                    plt.close()
 
-                plt.figure()
-                plt.imshow(rotated_recon, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-                plt.axis('off')
-                plt.savefig(f'policy_plots/recon_{plot_count}.png')
-                plt.close()
+                    plt.figure()
+                    plt.imshow(rotated_recon, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+                    plt.axis('off')
+                    plt.savefig(f'policy_plots/recon_{plot_count}.png', bbox_inches='tight')
+                    plt.close()
 
-                plt.figure()
-                plt.imshow(kspace_ims[47]['recon'], cmap='gray')
-                plt.axis('off')
-                plt.savefig(f'policy_plots/kspace_{plot_count}.png')
-                plt.close()
+                    plt.figure()
+                    plt.imshow(kspace_ims[47]['recon'], cmap='gray')
+                    plt.axis('off')
+                    plt.savefig(f'policy_plots/kspace_{plot_count}.png', bbox_inches='tight')
+                    plt.close()
 
         final_psnrs = []
         final_ssims = []
