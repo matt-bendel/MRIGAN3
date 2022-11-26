@@ -412,6 +412,7 @@ class Discriminator(BaseNetwork):
         out = self.Conv4x4(out)
         out = out.view(input.size(0), -1)
         print(out.shape)
+        exit()
         out = self.Dense0(out)
         out = self.Output(out)
         return out
