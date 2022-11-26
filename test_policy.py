@@ -253,6 +253,9 @@ def test(args):
 
     with torch.no_grad():
         for i, data in enumerate(loader):
+            kspace_ims = [[] for i in range(48)]
+            mri_ims = [[] for i in range(48)]
+
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
             gt = gt.cuda()
@@ -262,7 +265,8 @@ def test(args):
             mask = mask.cuda()
             recons, base_score = compute_scores(G, kspace, mask, zf, gt_mean, gt_std)
             mean_kspace = torch.mean(recons, dim=1)
-            targets = []
+            targets_im = []
+            targets_kspace = []
             S_vals = []
 
             for j in range(zf.size(0)):
@@ -274,18 +278,23 @@ def test(args):
                 target = torch.zeros(size=(8, 384, 384, 2), device=args.device)
                 target[:, :, :, 0] = gt[j, 0:8, :, :]
                 target[:, :, :, 1] = gt[j, 8:16, :, :]
-                target = tensor_to_complex_np((target * gt_std[ind] + gt_mean[ind]).cpu())
-                target_np = torch.tensor(S_vals[j].H * target).abs().numpy()
-                targets.append(target_np)
+                target = tensor_to_complex_np((target * gt_std[j] + gt_mean[j]).cpu())
+                target_np = transforms.to_tensor(S_vals[j].H * target)
+                im_np = complex_abs(target_np).cpu().numpy()
+                kspace_np = complex_abs(fft2c_new(target_np)).cpu().numpy()
+                targets_kspace.append(kspace_np)
+                targets_im.append(im_np)
 
-            im_list = []
             for step in range(48):
                 print(f"STEP: {step+1}")
                 for j in range(zf.size(0)):
                     im_recon = transforms.to_tensor(S_vals[j].H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[j]).cpu()))
-                    print(im_recon.shape)
-                    exit()
-                    im_list.append(im_recon)
+                    im_np = complex_abs(im_recon).cpu().numpy()
+                    psnr_vals[step].append(psnr(targets_im[j], im_np))
+
+                    kspace_np = complex_abs(fft2c_new(im_recon)).cpu().numpy()
+                    kspace_ims.append({'recon': kspace_np, 'gt': targets_kspace[j], 'mask': mask[j, 0, :, :, 0].cpu().numpy()})
+                    mri_ims.append({'recon': im_np, 'gt': targets_im[j]})
 
                 policy_in = torch.zeros(recons.size(0), 16, 384, 384).cuda()
                 var_recons = torch.var(recons, dim=1)
@@ -304,28 +313,11 @@ def test(args):
                 recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1) \
                          * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
-            # TODO: Get final PSNR/SSIM
-            place = 1
-            for r, val in enumerate(im_list):
-                gif_im(target_np, val, place, 'image')
-                place += 1
+            # TODO: Get plots
 
-            generate_gif('image', len(im_list))
-            break
+        # # TODO: Get final PSNR/SSIM
 
-        # scheduler.step()
-
-        send_mail(f"POLICY EPOCH {epoch + 1} UPDATE", f"TODO: FILL OUT", file_name="variation_gif.gif")
-
-        torch.save(
-            {
-                'epoch': epoch,
-                'args': args,
-                'model': model.state_dict(),
-                'optimizer': optimiser.state_dict(),
-            },
-            f=pathlib.Path('/home/bendel.8/Git_Repos/MRIGAN3/trained_models/policy') / 'policy_model.pt'
-        )
+        print("DONE!")
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
