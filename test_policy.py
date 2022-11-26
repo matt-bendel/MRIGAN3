@@ -225,14 +225,31 @@ def test(args):
     checkpoint = torch.load(checkpoint, map_location=torch.device('cuda'))
     model.load_state_dict(checkpoint['model'])
 
-    train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
+    data = SelectiveSliceData_Val(
+        root=args.data_path / 'small_T2_test',
+        transform=DataTransform(args, test=True),
+        challenge='multicoil',
+        sample_rate=1,
+        use_top_slices=True,
+        number_of_top_slices=6,
+        restrict_size=False,
+        big_test=True
+    )
+
+    loader = DataLoader(
+        dataset=data,
+        batch_size=4,
+        num_workers=16,
+        pin_memory=True,
+        drop_last=True
+    )
 
     ind = 2
     model.eval()
     psnr_vals = [[] for i in range(48)]
 
     with torch.no_grad():
-        for i, data in enumerate(dev_loader):
+        for i, data in enumerate(loader):
             zf, gt, kspace, gt_mean, gt_std, mask = data
             zf = zf.cuda()
             gt = gt.cuda()
@@ -284,6 +301,7 @@ def test(args):
                 recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1) \
                          * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
+            # TODO: Get final PSNR/SSIM
             place = 1
             for r, val in enumerate(im_list):
                 gif_im(target_np, val, place, 'image')
@@ -323,7 +341,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    args.batch_size = 120
+    args.batch_size = 4
     args.in_chans = 16
     args.out_chans = 16
 
