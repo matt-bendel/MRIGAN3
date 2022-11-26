@@ -137,9 +137,10 @@ class GANWrapper:
         return output_im
 
     def __call__(self, y, true_measures, noise_var=1, mask=None):
-        num_vectors = y.size(0)
-        z = self.get_noise(num_vectors, 1)
-        samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
+        # num_vectors = y.size(0)
+        # z = self.get_noise(num_vectors, 1)
+        # samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
+        samples = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
 
         samples = self.readd_measures(samples, true_measures, mask)
         return samples
