@@ -30,6 +30,7 @@ from mail import send_mail
 from evaluation_scripts import compute_cfid
 from wrappers.our_gen_wrapper import load_best_gan
 from models.policy.policy_model import PolicyModel
+from scipy import ndimage
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
@@ -320,7 +321,6 @@ def test(args):
                     if i == 0:
                         for step in range(48):
                             if (step + 1) % 12 == 0 or step == 0:
-                                print(kspace_ims[step][j])
                                 plt.figure()
                                 plt.imshow(kspace_ims[step][j]['mask'], cmap='viridis')
                                 plt.axis('off')
