@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import imageio as iio
 import sigpy as sp
 import sigpy.mri as mr
+from data.mri_data import SelectiveSliceData_Val
 
 ################
 from typing import Optional
