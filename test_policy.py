@@ -282,7 +282,7 @@ def test(args):
             for step in range(48):
                 print(f"STEP: {step+1}")
                 for j in range(zf.size(0)):
-                    im_recon = torch.tensor(S_vals[j].H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[j]).cpu()))
+                    im_recon = transforms.to_tensor(S_vals[j].H * tensor_to_complex_np(ifft2c_new(torch.mean(recons, dim=1)[j]).cpu()))
                     print(im_recon.shape)
                     exit()
                     im_list.append(im_recon)
