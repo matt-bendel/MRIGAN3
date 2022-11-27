@@ -401,7 +401,7 @@ class Discriminator(BaseNetwork):
         # self.Conv4x4 = ConvLayer(nf(1), nf(1), kernel_size=3, activate=True)
 
         self.Conv4x4 = ConvLayer(nf(1), nf(1), kernel_size=3, activate=True)
-        self.Dense0 = EqualLinear(nf(1)*4*4, nf(0), activation='fused_lrelu')
+        self.Dense0 = EqualLinear(18432, nf(0), activation='fused_lrelu')
         self.Output = EqualLinear(nf(0), 1)
 
     def forward(self, input, y):
@@ -412,8 +412,6 @@ class Discriminator(BaseNetwork):
         #print(out.shape)
         out = self.Conv4x4(out)
         out = out.view(input.size(0), -1)
-        print(out.shape)
-        exit()
         out = self.Dense0(out)
         out = self.Output(out)
         return out
