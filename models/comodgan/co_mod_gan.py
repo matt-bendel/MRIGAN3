@@ -318,9 +318,9 @@ class Generator(BaseNetwork):
             dlatent2 = dlatents_in[1].unsqueeze(1).repeat(1, self.G_synthesis.num_layers - inject_index, 1)
 
             dlatent = torch.cat([dlatent, dlatent2], 1)
-        output, raw_out = self.G_synthesis(images_in, masks_in, dlatent)
+        output = self.G_synthesis(images_in, masks_in, dlatent)
         if return_latents:
-            return output, raw_out, dlatent
+            return output, dlatent
         else:
             return output
 
