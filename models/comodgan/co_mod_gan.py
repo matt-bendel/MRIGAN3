@@ -404,9 +404,9 @@ class Discriminator(BaseNetwork):
         self.Dense0 = EqualLinear(nf(1)*4*4, nf(0), activation='fused_lrelu')
         self.Output = EqualLinear(nf(0), 1)
 
-    def forward(self, input, label):
-        y = torch.cat([input, label], 1)
-        out = self.convs(y)
+    def forward(self, input, y):
+        out = torch.cat([input, y], 1)
+        out = self.convs(out)
         batch, channel, height, width = out.shape
         group_size = min(batch, 4)
         #print(out.shape)
