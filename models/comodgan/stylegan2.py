@@ -257,9 +257,9 @@ class ModulatedConv2d(nn.Module):
             out = out.view(batch, self.out_channel, height, width)
             out = self.blur(out)
 
-            if kwargs['skip'].shape[-1] != out.shape[-1]:
-                out = F.interpolate(out, size=(kwargs['skip'].shape[-1], kwargs['skip'].shape[-1]), mode='bilinear',
-                                    align_corners=True)
+            # if kwargs['skip'].shape[-1] != out.shape[-1]:
+            #     out = F.interpolate(out, size=(kwargs['skip'].shape[-1], kwargs['skip'].shape[-1]), mode='bilinear',
+            #                         align_corners=True)
 
         elif self.downsample:
             input = self.blur(input)
@@ -450,9 +450,9 @@ class ToRGB(nn.Module):
         if skip is not None:
             skip = self.upsample(skip)
 
-            if out.shape[-1] != skip.shape[-1]:
-                skip = F.interpolate(skip, size=(out.shape[-1], out.shape[-1]), mode='bilinear',
-                                    align_corners=True)
+            # if out.shape[-1] != skip.shape[-1]:
+            #     skip = F.interpolate(skip, size=(out.shape[-1], out.shape[-1]), mode='bilinear',
+            #                         align_corners=True)
 
             out = out + skip
 
