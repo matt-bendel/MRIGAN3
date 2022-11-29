@@ -225,7 +225,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                 super().__init__()
                 self.Dense = EqualLinear(
                         nf(1)*2,
-                        nf(1)*4*4,
+                        nf(1)*6*6,
                         activation="fused_lrelu")
                 self.Conv = StyledConv(
                         nf(1),
@@ -239,7 +239,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                         upsample=False, out_channel=num_channels)
             def forward(self, x, dlatents_in, x_global):
                 x = self.Dense(x)
-                x = x.view(-1, nf(1), 4, 4)
+                x = x.view(-1, nf(1), 6, 6)
                 mod_vector = get_mod(dlatents_in, 0, x_global)
                 noise = None
                 x = self.Conv(x, mod_vector, noise)
@@ -258,9 +258,7 @@ class G_synthesis_co_mod_gan(nn.Module):
         E_features = {}
         x_global, E_features = self.E((y, E_features))
         print(x_global.shape)
-        for feat in E_features:
-            print(feat)
-        exit()
+
         x = x_global
         x, y = self.G_4x4(x, dlatents_in, x_global)
         for res in range(3, self.resolution_log2 + 1):
