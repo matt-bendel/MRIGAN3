@@ -303,6 +303,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.close(fig)
 
 def create_posterior_sample_plots(sample, gt, plot_num):
+    gt['ours'] = (gt['ours'] - np.min(gt['ours'])) / (np.max(gt['ours']) - np.min(gt['ours']))
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
     plt.figure()
@@ -311,17 +312,21 @@ def create_posterior_sample_plots(sample, gt, plot_num):
     plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/gt_{plot_num}.png')
     plt.close()
 
-    rotated_zfr = ndimage.rotate(gt['zfr'], 180)
-    plt.figure()
-    plt.imshow(rotated_zfr, cmap='gray', vmin=0, vmax=np.max(rotated_zfr))
-    plt.axis('off')
-    plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/zfr_{plot_num}.png')
-    plt.close()
+    # rotated_zfr = ndimage.rotate(gt['zfr'], 180)
+    # plt.figure()
+    # plt.imshow(rotated_zfr, cmap='gray', vmin=0, vmax=np.max(rotated_zfr))
+    # plt.axis('off')
+    # plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/zfr_{plot_num}.png')
+    # plt.close()
 
-    methods = ['ours', 'adler', 'ohayon', 'langevin']
+    methods = ['ours']
 
     for method in methods:
         for z in range(32):
+            sample[method][z] = (sample[method][z] - np.min(sample[method][z])) / (np.max(sample[method][z]) - np.min(sample[method][z]))
+            with open('prof_ahmad_plots/{plot_num}/{method}/recon_{method}_{plot_num}_sample_{z}.npy', 'wb') as f:
+                np.save(f, ndimage.rotate(sample[method][z], 180))
+
             plt.figure()
             plt.imshow(ndimage.rotate(sample[method][z], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
             plt.axis('off')
