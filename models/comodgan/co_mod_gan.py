@@ -257,7 +257,6 @@ class G_synthesis_co_mod_gan(nn.Module):
         y = images_in
         E_features = {}
         x_global, E_features = self.E((y, E_features))
-        print(x_global.shape)
 
         x = x_global
         x, y = self.G_4x4(x, dlatents_in, x_global)
