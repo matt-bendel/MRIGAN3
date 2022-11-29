@@ -212,6 +212,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                         nf(res-1),
                         mod_size, out_channel=num_channels)
             def forward(self, x, y, dlatents_in, x_global, E_features):
+                print("X SHAPE: ", x.shape)
                 x_skip = E_features[self.res]
                 mod_vector = get_mod(dlatents_in, res*2-5, x_global)
                 noise = None
