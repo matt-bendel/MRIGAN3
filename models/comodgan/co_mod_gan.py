@@ -191,9 +191,6 @@ class G_synthesis_co_mod_gan(nn.Module):
             def __init__(self, res):
                 super().__init__()
                 self.res = res
-                print(res)
-                print(nf(res-2))
-                print(nf(res-1))
                 self.Conv0_up = StyledConv(
                         nf(res-2),
                         nf(res-1),
@@ -212,7 +209,6 @@ class G_synthesis_co_mod_gan(nn.Module):
                         nf(res-1),
                         mod_size, out_channel=num_channels)
             def forward(self, x, y, dlatents_in, x_global, E_features):
-                print("X SHAPE: ", x.shape)
                 x_skip = E_features[self.res]
                 mod_vector = get_mod(dlatents_in, res*2-5, x_global)
                 noise = None
@@ -261,6 +257,9 @@ class G_synthesis_co_mod_gan(nn.Module):
         y = images_in
         E_features = {}
         x_global, E_features = self.E((y, E_features))
+        for feat in E_features:
+            print(feat.shape)
+        exit()
         x = x_global
         x, y = self.G_4x4(x, dlatents_in, x_global)
         for res in range(3, self.resolution_log2 + 1):
