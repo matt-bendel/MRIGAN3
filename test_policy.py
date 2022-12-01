@@ -314,6 +314,9 @@ def test(args):
                 for j in range(mask.size(0)):
                     mask[j, :, :, actions[j, 0], :] = 1
 
+                print(mask[0, 0, 0, :, 0])
+                exit()
+
                 recons = (1 - mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)) * recons + mask.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1) \
                          * kspace.unsqueeze(1).repeat(1, 8, 1, 1, 1, 1)
 
