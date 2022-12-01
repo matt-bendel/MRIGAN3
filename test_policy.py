@@ -327,7 +327,6 @@ def test(args):
                             plt.figure()
                             plt.imshow(kspace_ims[s][j]['mask'], cmap='viridis')
                             plt.axis('off')
-                            plt.colorbar()
                             plt.savefig(f'policy_plots/masks/mask_{plot_count}_step_{s}.png', bbox_inches='tight')
                             plt.close()
 
