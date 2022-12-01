@@ -8,12 +8,12 @@ from models.comodgan.co_mod_gan import Generator
 from models.comodgan.co_mod_gan import Discriminator
 
 def build_model(args):
-    model = GeneratorModel(
-        in_chans=args.in_chans + 2,
-        out_chans=args.out_chans,
-    ).to(torch.device('cuda'))
-    #
-    # model = Generator(384).to(torch.device('cuda'))
+    # model = GeneratorModel(
+    #     in_chans=args.in_chans + 2,
+    #     out_chans=args.out_chans,
+    # ).to(torch.device('cuda'))
+
+    model = Generator(384).to(torch.device('cuda'))
 
     return model
 

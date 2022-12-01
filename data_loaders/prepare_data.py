@@ -61,7 +61,7 @@ class DataTransform:
         # im_tensor = reduce_resolution(im_tensor)
 
         true_image = torch.clone(im_tensor)
-        true_measures = fft2c_new(im_tensor) #* mask
+        true_measures = fft2c_new(im_tensor) * mask
         image = im_tensor
 
         kspace = fft2c_new(image)
@@ -76,9 +76,8 @@ class DataTransform:
         normalized_gt = transforms.normalize(true_image, mean, std)
 
         # For Dynamic Inpainting
-        # normalized_true_measures = transforms.normalize(ifft2c_new(true_measures), mean, std)
-        # normalized_true_measures = fft2c_new(normalized_true_measures)
-        normalized_true_measures = true_measures
+        normalized_true_measures = transforms.normalize(ifft2c_new(true_measures), mean, std)
+        normalized_true_measures = fft2c_new(normalized_true_measures)
 
         final_input = torch.zeros(16, 384, 384)
         final_input[0:8, :, :] = normalized_input[:, :, :, 0]
@@ -88,7 +87,7 @@ class DataTransform:
         final_gt[0:8, :, :] = normalized_gt[:, :, :, 0]
         final_gt[8:16, :, :] = normalized_gt[:, :, :, 1]
 
-        return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask
+        # return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask
 
         if self.args.langevin_plots:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice

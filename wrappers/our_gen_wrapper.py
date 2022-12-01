@@ -122,26 +122,13 @@ class GANWrapper:
 
         return reformatted_tensor
 
-    # def readd_measures(self, samples, measures):
-    #     reformatted_tensor = self.reformat(samples)
-    #     reconstructed_kspace = fft2c_new(reformatted_tensor)
-    #
-    #     inds = get_mask(self.resolution, R=self.args.R)
-    #
-    #     reconstructed_kspace[:, :, inds[0], inds[1], :] = measures[:, :, inds[0], inds[1], :]
-    #
-    #     image = ifft2c_new(reconstructed_kspace)
-    #
-    #     output_im = torch.zeros(size=samples.shape, device=self.args.device)
-    #     output_im[:, 0:8, :, :] = image[:, :, :, :, 0]
-    #     output_im[:, 8:16, :, :] = image[:, :, :, :, 1]
-    #
-    #     return output_im
-    def readd_measures(self, samples, measures, mask):
+    def readd_measures(self, samples, measures):
         reformatted_tensor = self.reformat(samples)
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
-        reconstructed_kspace = reconstructed_kspace * (1 - mask) + mask * measures
+        inds = get_mask(self.resolution, R=self.args.R)
+
+        reconstructed_kspace[:, :, inds[0], inds[1], :] = measures[:, :, inds[0], inds[1], :]
 
         image = ifft2c_new(reconstructed_kspace)
 
@@ -153,9 +140,9 @@ class GANWrapper:
 
     def __call__(self, y, true_measures, noise_var=1, mask=None):
         # num_vectors = y.size(0)
-        z = self.get_noise(num_vectors, 1)
-        samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
-        # samples = self.gen(y, None, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
+        # z = self.get_noise(num_vectors, 1)
+        # samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
+        samples = self.gen(y, None, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
 
         samples = self.readd_measures(samples, true_measures)
         return samples
