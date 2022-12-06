@@ -107,9 +107,11 @@ class GANWrapper:
         self.gen = gen
         self.data_consistency = True
 
-    def get_noise(self, num_vectors, var):
+    def get_noise(self, num_vectors, var, mask):
         # return torch.cuda.FloatTensor(np.random.normal(size=(num_vectors, self.args.latent_size), scale=1))
-        return torch.randn(num_vectors, 2, self.resolution, self.resolution).cuda()
+        noise_fft = fft2c_new(torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda())
+        noise_fft = mask * noise_fft
+        return ifft2c_new(noise_fft).permute(0, 3, 1, 2)
 
     def update_gen_status(self, val):
         self.gen.eval() if val else self.gen.train()
@@ -122,13 +124,13 @@ class GANWrapper:
 
         return reformatted_tensor
 
-    def readd_measures(self, samples, measures):
+    def readd_measures(self, samples, measures, mask):
         reformatted_tensor = self.reformat(samples)
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
-        inds = get_mask(self.resolution, R=self.args.R)
+        # inds = get_mask(self.resolution, R=self.args.R)
 
-        reconstructed_kspace[:, :, inds[0], inds[1], :] = measures[:, :, inds[0], inds[1], :]
+        reconstructed_kspace = torch.where(measures < 1e-8, reconstructed_kspace, measures)
 
         image = ifft2c_new(reconstructed_kspace)
 
@@ -139,10 +141,10 @@ class GANWrapper:
         return output_im
 
     def __call__(self, y, true_measures, noise_var=1, mask=None):
-        # num_vectors = y.size(0)
-        # z = self.get_noise(num_vectors, 1)
-        # samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
-        samples = self.gen(y, None, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
-
-        samples = self.readd_measures(samples, true_measures)
+        num_vectors = y.size(0)
+        z = self.get_noise(num_vectors, 1, mask)
+        samples = self.gen(torch.cat([y, z], dim=1), mid_z=None)
+        # samples = self.gen(y, None, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
+        #
+        samples = self.readd_measures(samples, y, mask)
         return samples

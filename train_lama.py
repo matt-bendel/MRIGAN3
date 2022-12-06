@@ -249,17 +249,16 @@ def train(args, bl=1, adv_mult=0.0):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            y, x, y_true, mean, std, mask = data
+            y, x, y_true, mean, std = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            mask = mask.to(args.device)
 
             for j in range(args.num_iters_discriminator):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, y_true, mask=mask)
+                x_hat = G(y, y_true)
 
                 real_pred = D(input=x, y=y)
                 fake_pred = D(input=x_hat, y=y)
@@ -278,7 +277,7 @@ def train(args, bl=1, adv_mult=0.0):
             gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 384, 384),
                                device=args.device)
             for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y, y_true, mask=mask)
+                gens[:, z, :, :, :] = G(y, y_true)
 
             if args.patch_disc:
                 fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 94, 94), device=args.device)
@@ -304,11 +303,14 @@ def train(args, bl=1, adv_mult=0.0):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-2
+            adv_weight = 1e-5
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
             g_loss += - std_weight * torch.std(gens, dim=1).mean()
+
+            # if g_loss < -20:
+            #     raise Exception
 
             g_loss.backward()
             opt_G.step()
@@ -331,16 +333,15 @@ def train(args, bl=1, adv_mult=0.0):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                y, x, y_true, mean, std, mask = data
+                y, x, y_true, mean, std = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
-                mask = mask.to(args.device)
 
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 384, 384),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask)
+                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1)
 
                 avg = torch.mean(gens, dim=1)
 
@@ -448,7 +449,7 @@ def train(args, bl=1, adv_mult=0.0):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
 
-        mu_0 = 2e-2
+        mu_0 = 5e-2
         std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
