@@ -255,6 +255,15 @@ def train(args, bl=1, adv_mult=0.0):
             y_true = y_true.to(args.device)
             mask = mask.to(args.device)
 
+            for k in range (5):
+                mask_np = mask[k, 0, :, :, 0].cpu().numpy()
+                plt.figure()
+                plt.imshow(mask_np, cmap='viridis')
+                plt.savefig(f'mask_{k}.png')
+                plt.close()
+
+            exit()
+
             for j in range(args.num_iters_discriminator):
                 for param in D.parameters():
                     param.grad = None
