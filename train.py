@@ -257,6 +257,8 @@ def train(args, bl=1, adv_mult=0.0):
 
             for k in range (5):
                 mask_np = mask[k, 0, :, :, 0].cpu().numpy()
+                print(mask_np[0, :])
+                print(mask_np[:, 0])
                 plt.figure()
                 plt.imshow(mask_np, cmap='viridis')
                 plt.savefig(f'mask_{k}.png')
