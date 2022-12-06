@@ -8,7 +8,7 @@ def get_mask(resolution, return_mask=False, R=4, p_m=False):
     total_lines = 384 // R - 32
     m = np.zeros((384, 384))
     m[:, 175:207] = True
-    a = np.random.randint(0, 352, size=total_lines)
+    a = np.random.choice(352, total_lines, replace=False)
     a = np.where(a < 175, a, a + 32)
     # a = np.array(
     #     [0, 10, 19, 28, 37, 46, 54, 61, 69, 76, 83, 89, 95, 101, 107, 112, 118, 122, 127, 132, 136, 140, 144, 148,
