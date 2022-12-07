@@ -4,12 +4,15 @@ import numpy as np
 from data import transforms
 
 
-def get_mask(resolution, return_mask=False, R=4, p_m=False):
-    total_lines = 384 // R - 32
-    m = np.zeros((384, 384))
-    m[:, 175:207] = True
-    a = np.random.choice(352, total_lines, replace=False)
-    a = np.where(a < 175, a, a + 32)
+def get_mask(resolution, return_mask=False, R=4, p_m=False, args=None):
+    total_lines = resolution // R - 32
+    m = np.zeros((resolution, resolution))
+    midway = resolution // 2
+    s = midway - args.calib_width // 2
+    e = s + args.calib_width
+    m[:, s:e] = True
+    a = np.random.choice(resolution - args.calib_width, total_lines, replace=False)
+    a = np.where(a < s, a, a + args.calib_width)
     # a = np.array(
     #     [0, 10, 19, 28, 37, 46, 54, 61, 69, 76, 83, 89, 95, 101, 107, 112, 118, 122, 127, 132, 136, 140, 144, 148,
     #      151, 155, 158, 161, 164,

@@ -20,6 +20,8 @@ def create_arg_parser():
 
     # LEARNING ARGS
     parser.add_argument('--batch-size', default=32, type=int, help='Mini batch size')
+    parser.add_argument('--im-size', default=128, type=int, help='Mini batch size')
+    parser.add_argument('--calib_width', default=10, type=int, help='Mini batch size')
     parser.add_argument('--num-epochs', type=int, default=200, help='Number of training epochs')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
     parser.add_argument('--beta_1', type=float, default=0, help='Beta 1 for Adam')

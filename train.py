@@ -286,7 +286,7 @@ def train(args, bl=1, adv_mult=0.0):
             for param in G.gen.parameters():
                 param.grad = None
 
-            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, 384, 384),
+            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y, y_true, mask=mask)
@@ -348,34 +348,34 @@ def train(args, bl=1, adv_mult=0.0):
                 y_true = y_true.to(args.device)
                 mask = mask.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, 384, 384),
+                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
                     gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask)
 
                 avg = torch.mean(gens, dim=1)
 
-                avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+                avg_gen = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
                 avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
                 avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-                gt = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+                gt = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
                 gt[:, :, :, :, 0] = x[:, 0:8, :, :]
                 gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
                 for j in range(y.size(0)):
                     new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
-                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=args.calib_width,
                                                device=sp.Device(3), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
-                    S = sp.linop.Multiply((384, 384), maps)
+                    S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                         (avg_gen[j] * std[j] + mean[j]).cpu())
 
                     avg_gen_np = torch.tensor(S.H * avg_ksp).abs().numpy()
                     gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
-                    single_gen = torch.zeros(8, 384, 384, 2).to(args.device)
+                    single_gen = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
                     single_gen[:, :, :, 0] = gens[j, 0, 0:8, :, :]
                     single_gen[:, :, :, 1] = gens[j, 0, 8:16, :, :]
 
@@ -396,7 +396,7 @@ def train(args, bl=1, adv_mult=0.0):
 
                         gen_im_list = []
                         for z in range(8):
-                            val_rss = torch.zeros(8, 384, 384, 2).to(args.device)
+                            val_rss = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
                             val_rss[:, :, :, 0] = gens[ind, z, 0:8, :, :]
                             val_rss[:, :, :, 1] = gens[ind, z, 8:16, :, :]
                             gen_im_list.append(transforms.root_sum_of_squares(
