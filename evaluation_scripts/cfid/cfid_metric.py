@@ -149,10 +149,10 @@ class CFIDMetric:
             np.sum(np.square(np.abs(s_maps)), axis=1))
 
     def _get_embed_im(self, multi_coil_inp, mean, std, maps):
-        embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 384, 384),
+        embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, self.args.im_size, self.args.im_size),
                                 device=self.args.device)
         for i in range(multi_coil_inp.size(0)):
-            reformatted = torch.zeros(size=(8, 384, 384, 2),
+            reformatted = torch.zeros(size=(8, self.args.im_size, self.args.im_size, 2),
                                       device=self.args.device)
             reformatted[:, :, :, 0] = multi_coil_inp[i, 0:8, :, :]
             reformatted[:, :, :, 1] = multi_coil_inp[i, 8:16, :, :]
@@ -190,9 +190,9 @@ class CFIDMetric:
                 for j in range(condition.shape[0]):
                     new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
                     s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                                 device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                 device=sp.Device(2), show_pbar=False, crop=0.70,
                                                  kernel_width=6).run().get()
-                    S = sp.linop.Multiply((384, 384), s_maps)
+                    S = sp.linop.Multiply((self.args.im_size, self.args.im_size), s_maps)
 
                     maps.append(S)
 
@@ -236,9 +236,9 @@ class CFIDMetric:
                             for j in range(condition.shape[0]):
                                 new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
                                 s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                                             device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                             device=sp.Device(2), show_pbar=False, crop=0.70,
                                                              kernel_width=6).run().get()
-                                S = sp.linop.Multiply((384, 384), s_maps)
+                                S = sp.linop.Multiply((self.args.im_size, self.args.im_size), s_maps)
 
                                 maps.append(S)
 
