@@ -512,7 +512,7 @@ if __name__ == '__main__':
     if args.data_parallel or (args.device >= 0):
         if not args.data_parallel:
             os.environ['CUDA_VISIBLE_DEVICES'] = str(args.device)
-        os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"
         args.device = torch.device('cuda')
     else:
         args.device = torch.device('cpu')
