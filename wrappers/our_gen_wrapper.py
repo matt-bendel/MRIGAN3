@@ -129,8 +129,7 @@ class GANWrapper:
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
         # inds = get_mask(self.resolution, R=self.args.R)
-        print(measures.min())
-
+        print(torch.min(torch.abs(measures)))
         reconstructed_kspace = torch.where(torch.abs(measures) < 1e-12, reconstructed_kspace, measures)
 
         image = ifft2c_new(reconstructed_kspace)
