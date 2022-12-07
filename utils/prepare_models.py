@@ -4,8 +4,8 @@ from models.generators.our_gen import GeneratorModel
 from models.generators.stylegan import StyleGAN
 from models.discriminators.our_disc import DiscriminatorModel
 from models.discriminators.patch_disc import PatchDisc
-from models.comodgan.co_mod_gan import Generator
-from models.comodgan.co_mod_gan import Discriminator
+# from models.comodgan.co_mod_gan import Generator
+# from models.comodgan.co_mod_gan import Discriminator
 
 def build_model(args):
     model = GeneratorModel(
