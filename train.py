@@ -248,7 +248,6 @@ def train(args, bl=1, adv_mult=0.0):
         }
 
         for i, data in enumerate(train_loader):
-            break
             G.update_gen_status(val=False)
             y, x, y_true, mean, std, mask, inds = data
             y = y.to(args.device)
@@ -256,6 +255,7 @@ def train(args, bl=1, adv_mult=0.0):
             y_true = y_true.to(args.device)
             mask = mask.to(args.device)
             print(inds.shape)
+            break
 
             # for k in range (5):
             #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
@@ -272,7 +272,7 @@ def train(args, bl=1, adv_mult=0.0):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, y_true, mask=inds)
+                x_hat = G(y, y_true, mask=mask, inds=inds)
 
                 real_pred = D(input=x, y=y)
                 fake_pred = D(input=x_hat, y=y)
@@ -356,7 +356,7 @@ def train(args, bl=1, adv_mult=0.0):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=inds)
+                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask, inds=inds)
 
                 avg = torch.mean(gens, dim=1)
 
