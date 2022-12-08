@@ -254,7 +254,6 @@ def train(args, bl=1, adv_mult=0.0):
             x = x.to(args.device)
             y_true = y_true.to(args.device)
             mask = mask.to(args.device)
-            print(inds.shape)
             break
 
             # for k in range (5):
