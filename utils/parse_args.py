@@ -19,7 +19,7 @@ def create_arg_parser():
                         help='Whether or not to dynamically remove chunk of image')
 
     # LEARNING ARGS
-    parser.add_argument('--batch-size', default=6, type=int, help='Mini batch size')
+    parser.add_argument('--batch-size', default=24, type=int, help='Mini batch size')
     parser.add_argument('--im-size', default=128, type=int, help='Mini batch size')
     parser.add_argument('--calib_width', default=10, type=int, help='Mini batch size')
     parser.add_argument('--num-epochs', type=int, default=200, help='Number of training epochs')
