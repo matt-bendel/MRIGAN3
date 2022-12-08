@@ -379,9 +379,10 @@ def train(args, bl=1, adv_mult=0.0):
                     temp_re = complex_abs(fft2c_new(transform.to_tensor(S.H * avg_ksp))) ** 0.4
                     temp_gt = complex_abs(fft2c_new(transforms.to_tensor(S.H * gt_ksp))) ** 0.4
 
-                    error = np.abs(temp_gt - temp_re)
+                    error = np.abs(temp_gt.cpu().numpy() - temp_re.cpu().numpy())
 
                     plt.imshow(3 * error, cmap='jet', vmax=1)
+                    plt.savefig('temp_kspace_error.png')
                     print(temp_re.shape)
 
                     exit()
