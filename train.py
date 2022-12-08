@@ -248,6 +248,7 @@ def train(args, bl=1, adv_mult=0.0):
         }
 
         for i, data in enumerate(train_loader):
+            break
             G.update_gen_status(val=False)
             y, x, y_true, mean, std, mask, inds = data
             y = y.to(args.device)

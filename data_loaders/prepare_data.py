@@ -52,7 +52,6 @@ class DataTransform:
         """
         # GRO Sampling mask:
         mask, inds = get_mask(self.args.im_size, return_mask=True, R=self.args.R, args=self.args)
-        inds = torch.from_numpy(inds)
         kspace = kspace.transpose(1, 2, 0)
         x = ifft(kspace, (0, 1))  # (768, 396, 16)
         coil_compressed_x = ImageCropandKspaceCompression(x)  # (384, 384, 8)
