@@ -376,7 +376,7 @@ def train(args, bl=1, adv_mult=0.0):
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                         (avg_gen[j] * std[j] + mean[j]).cpu())
 
-                    temp_re = complex_abs(fft2c_new(transform.to_tensor(S.H * avg_ksp))) ** 0.4
+                    temp_re = complex_abs(fft2c_new(transforms.to_tensor(S.H * avg_ksp))) ** 0.4
                     temp_gt = complex_abs(fft2c_new(transforms.to_tensor(S.H * gt_ksp))) ** 0.4
 
                     error = np.abs(temp_gt.cpu().numpy() - temp_re.cpu().numpy())
