@@ -5,7 +5,7 @@ from data import transforms
 
 
 def get_mask(resolution, return_mask=False, R=4, p_m=False, args=None):
-    total_lines = resolution // R - 32
+    total_lines = resolution // R - args.calib_width
     m = np.zeros((resolution, resolution))
     midway = resolution // 2
     s = midway - args.calib_width // 2
