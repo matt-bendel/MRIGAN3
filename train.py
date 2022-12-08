@@ -249,11 +249,12 @@ def train(args, bl=1, adv_mult=0.0):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            y, x, y_true, mean, std, mask = data
+            y, x, y_true, mean, std, mask, inds = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
             mask = mask.to(args.device)
+            print(inds.shape)
 
             # for k in range (5):
             #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
@@ -270,7 +271,7 @@ def train(args, bl=1, adv_mult=0.0):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, y_true, mask=mask)
+                x_hat = G(y, y_true, mask=inds)
 
                 real_pred = D(input=x, y=y)
                 fake_pred = D(input=x_hat, y=y)
@@ -345,7 +346,7 @@ def train(args, bl=1, adv_mult=0.0):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                y, x, y_true, mean, std, mask = data
+                y, x, y_true, mean, std, mask, inds = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
@@ -354,7 +355,7 @@ def train(args, bl=1, adv_mult=0.0):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask)
+                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=inds)
 
                 avg = torch.mean(gens, dim=1)
 
@@ -374,6 +375,13 @@ def train(args, bl=1, adv_mult=0.0):
                     S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                         (avg_gen[j] * std[j] + mean[j]).cpu())
+
+                    temp_re = transform.to_tensor(S.H * avg_ksp)
+                    temp_gt = transforms.to_tensor(S.H * gt_ksp)
+
+                    print(temp_re.shape)
+
+                    exit()
 
                     avg_gen_np = torch.tensor(S.H * avg_ksp).abs().numpy()
                     gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()

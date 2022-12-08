@@ -51,7 +51,8 @@ class DataTransform:
                 norm (float): L2 norm of the entire volume.
         """
         # GRO Sampling mask:
-        mask = get_mask(self.args.im_size, return_mask=True, R=self.args.R, args=self.args)
+        mask, inds = get_mask(self.args.im_size, return_mask=True, R=self.args.R, args=self.args)
+        inds = torch.from_numpy(inds)
         kspace = kspace.transpose(1, 2, 0)
         x = ifft(kspace, (0, 1))  # (768, 396, 16)
         coil_compressed_x = ImageCropandKspaceCompression(x)  # (384, 384, 8)
@@ -61,7 +62,7 @@ class DataTransform:
         im_tensor = reduce_resolution(im_tensor)
 
         true_image = torch.clone(im_tensor)
-        true_measures = fft2c_new(im_tensor) * mask
+        true_measures = fft2c_new(im_tensor)
         image = im_tensor
 
         kspace = fft2c_new(image)
@@ -92,7 +93,7 @@ class DataTransform:
         if self.args.langevin_plots:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice
         else:
-            return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask
+            return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask, inds
 
 
 def create_datasets(args, val_only, big_test=False):

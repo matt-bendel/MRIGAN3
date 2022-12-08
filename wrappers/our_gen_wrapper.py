@@ -124,12 +124,15 @@ class GANWrapper:
 
         return reformatted_tensor
 
-    def readd_measures(self, samples, measures, mask):
+    def readd_measures(self, samples, measures, inds):
         reformatted_tensor = self.reformat(samples)
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
         # inds = get_mask(self.resolution, R=self.args.R)
         reconstructed_kspace = torch.where(torch.abs(measures) < 1e-16, reconstructed_kspace, measures)
+
+        for i in range(reconstructed_kspace.size(0)):
+            reconstructed_kspace[i, :, inds[i, 0], inds[i, 1], :] = measures[i, :, inds[i, 0], inds[i, 1], :]
 
         image = ifft2c_new(reconstructed_kspace)
 

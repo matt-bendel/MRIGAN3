@@ -43,4 +43,4 @@ def get_mask(resolution, return_mask=False, R=4, p_m=False, args=None):
     # mask = transforms.to_tensor(np.tile(samp, (numcoil, 1, 1)).astype(np.float32))
     # mask = torch.unsqueeze(mask, -1).repeat(1, 1, 1, 2)
 
-    return mask if return_mask else np.where(m == 1)
+    return mask, np.where(m == 1)
