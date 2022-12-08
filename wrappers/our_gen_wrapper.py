@@ -129,6 +129,9 @@ class GANWrapper:
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
         # inds = get_mask(self.resolution, R=self.args.R)
+        inv_mask = 1 - mask
+        print(torch.min(inv_mask))
+        print(torch.max(inv_mask))
         reconstructed_kspace = mask * measures + (1 - mask) * reconstructed_kspace
 
         # for i in range(reconstructed_kspace.size(0)):

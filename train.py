@@ -254,17 +254,17 @@ def train(args, bl=1, adv_mult=0.0):
             x = x.to(args.device)
             y_true = y_true.to(args.device)
             mask = mask.to(args.device)
-            break
 
-            # for k in range (5):
-            #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
-            #     print(mask_np[0, :])
-            #     print(mask_np[:, 0])
-            #     plt.figure()
-            #     plt.imshow(mask_np, cmap='viridis')
-            #     plt.savefig(f'mask_{k}.png')
-            #     plt.close()
-            #
+            for k in range (5):
+                mask_np = mask[k, 0, :, :, 0].cpu().numpy()
+                print(mask_np[0, :])
+                print(mask_np[:, 0])
+                plt.figure()
+                plt.imshow(mask_np, cmap='viridis')
+                plt.savefig(f'mask_{k}.png')
+                plt.close()
+
+            break
             # exit()
 
             for j in range(args.num_iters_discriminator):
