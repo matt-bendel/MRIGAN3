@@ -206,12 +206,13 @@ class FIDMetric:
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader)):
-            condition, gt, true_cond, mean, std = data
+            condition, gt, true_cond, mean, std, mask = data
             condition = condition.cuda()
             gt = gt.cuda()
             true_cond = true_cond.cuda()
             mean = mean.cuda()
             std = std.cuda()
+            mask = mask.cuda()
             maps = []
 
             with torch.no_grad():
@@ -225,7 +226,7 @@ class FIDMetric:
                     maps.append(S)
 
                 for k in range(self.num_samps):
-                    recon = self.gan(condition, true_cond)
+                    recon = self.gan(condition, true_cond, mask=mask)
 
                     image = self._get_embed_im(recon, mean, std, maps)
                     condition_im = self._get_embed_im(condition, mean, std, maps)
@@ -244,12 +245,13 @@ class FIDMetric:
             for i, data in tqdm(enumerate(self.ref_loader),
                                 desc='Computing generated distribution',
                                 total=len(self.ref_loader)):
-                condition, gt, true_cond, mean, std = data
+                condition, gt, true_cond, mean, std, mask = data
                 condition = condition.cuda()
                 gt = gt.cuda()
                 true_cond = true_cond.cuda()
                 mean = mean.cuda()
                 std = std.cuda()
+                mask = mask.cuda()
                 maps = []
 
                 with torch.no_grad():
@@ -263,7 +265,7 @@ class FIDMetric:
                         maps.append(S)
 
                     for k in range(self.num_samps):
-                        recon = self.gan(condition, true_cond)
+                        recon = self.gan(condition, true_cond, mask=mask.cuda())
 
                         image = self._get_embed_im(recon, mean, std, maps)
                         condition_im = self._get_embed_im(condition, mean, std, maps)
@@ -325,7 +327,7 @@ class FIDMetric:
 
         for data in tqdm(self.ref_loader,
                          desc='Computing reference distribution'):
-            condition, gt, true_cond, mean, std = data
+            condition, gt, true_cond, mean, std, mask = data
             condition = condition.cuda()
             gt = gt.cuda()
             true_cond = true_cond.cuda()
