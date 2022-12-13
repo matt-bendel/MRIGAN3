@@ -477,6 +477,7 @@ def main(args):
 
                 gt_dict = {
                     'ours': gt_np,
+                    'zfr': zfr_ours_np
                 }
 
                 if i + j == 6 or i + j== 15:
