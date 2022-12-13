@@ -349,9 +349,9 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     plt.savefig(f'new_method_plots/{plot_num}/std_recon_im.png', bbox_inches='tight')
     plt.close()
 
-    c_white = plt.colors.colorConverter.to_rgba('white', alpha=0)
-    c_red = plt.colors.colorConverter.to_rgba('red', alpha=1)
-    cmap_rb = plt.colors.LinearSegmentedColormap.from_list('rb_cmap', [c_white, c_red], 512)
+    c_white = matplotlib.colors.colorConverter.to_rgba('white', alpha=0)
+    c_red = matplotlib.colors.colorConverter.to_rgba('red', alpha=1)
+    cmap_rb = matplotlib.colors.LinearSegmentedColormap.from_list('rb_cmap', [c_white, c_red], 512)
 
     plt.figure()
     plt.imshow(rotated_std, cmap=cmap_rb, vmin=0, vmax=np.max(rotated_gt))
