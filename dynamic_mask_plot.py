@@ -326,6 +326,12 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     rotated_std = ndimage.rotate(std[method], 180)
 
     plt.figure()
+    plt.imshow(mask, cmap='viridis', vmin=0, vmax=1)
+    plt.axis('off')
+    plt.savefig(f'new_method_plots/{plot_num}/mask.png', bbox_inches='tight')
+    plt.close()
+
+    plt.figure()
     plt.imshow(rotated_avg, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     plt.axis('off')
     plt.savefig(f'new_method_plots/{plot_num}/avg_recon.png', bbox_inches='tight')
@@ -334,7 +340,7 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     plt.figure()
     plt.imshow(ndimage.rotate(np.abs(avg[method] - gt[method]), 180), cmap='jet', vmin=0, vmax=1)
     plt.axis('off')
-    plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}_error.png', bbox_inches='tight')
+    plt.savefig(f'new_method_plots/{plot_num}/samps/avg_recon_error.png', bbox_inches='tight')
     plt.close()
 
     plt.figure()
