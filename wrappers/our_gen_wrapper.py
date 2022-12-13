@@ -113,7 +113,7 @@ class GANWrapper:
         # noise_fft = fft2c_new(torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda())
         # noise_fft = mask[:, 0, :, :, :] * noise_fft
         # return ifft2c_new(noise_fft).permute(0, 3, 1, 2)
-        return torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda()
+        return torch.randn(num_vectors, 2, self.resolution, self.resolution).cuda()
 
     def update_gen_status(self, val):
         self.gen.eval() if val else self.gen.train()
