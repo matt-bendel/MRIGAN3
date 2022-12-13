@@ -110,9 +110,10 @@ class GANWrapper:
 
     def get_noise(self, num_vectors, var, mask):
         # return torch.cuda.FloatTensor(np.random.normal(size=(num_vectors, self.args.latent_size), scale=1))
-        noise_fft = fft2c_new(torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda())
-        noise_fft = mask[:, 0, :, :, :] * noise_fft
-        return ifft2c_new(noise_fft).permute(0, 3, 1, 2)
+        # noise_fft = fft2c_new(torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda())
+        # noise_fft = mask[:, 0, :, :, :] * noise_fft
+        # return ifft2c_new(noise_fft).permute(0, 3, 1, 2)
+        return torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda()
 
     def update_gen_status(self, val):
         self.gen.eval() if val else self.gen.train()
