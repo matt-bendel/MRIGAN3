@@ -444,10 +444,8 @@ def main(args):
                                            device=sp.Device(2), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
                 S = sp.linop.Multiply((args.im_size, args.im_size), maps)
-                gt_ksp, avg_ksp_ours, avg_ksp_adler, avg_ksp_ohayon = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(
-                    (avg_gen_ours * std[j] + mean[j]).cpu()), tensor_to_complex_np(
-                    (avg_gen_adler * std[j] + mean[j]).cpu()), tensor_to_complex_np(
-                    (avg_gen_ohayon * std[j] + mean[j]).cpu())
+                gt_ksp, avg_ksp_ours  = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                    (avg_gen_ours * std[j] + mean[j]).cpu())
 
                 zfr_ours = tensor_to_complex_np((ifft2c_new(y_true[j]) * std[j] + mean[j]).cpu())
 
