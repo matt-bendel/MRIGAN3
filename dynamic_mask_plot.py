@@ -302,42 +302,55 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/std_devs_{plot_num}', pad_inches = 0, bbox_inches='tight', dpi=300)
     plt.close(fig)
 
-def create_posterior_sample_plots(sample, gt, plot_num):
+def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     gt['ours'] = (gt['ours'] - np.min(gt['ours'])) / (np.max(gt['ours']) - np.min(gt['ours']))
     rotated_gt = ndimage.rotate(gt['ours'], 180)
 
     plt.figure()
     plt.imshow(rotated_gt, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     plt.axis('off')
-    plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/gt_{plot_num}.png')
+    plt.savefig(f'new_method_plots/{plot_num}/gt/gt_{plot_num}.png')
     plt.close()
 
-    # rotated_zfr = ndimage.rotate(gt['zfr'], 180)
-    # plt.figure()
-    # plt.imshow(rotated_zfr, cmap='gray', vmin=0, vmax=np.max(rotated_zfr))
-    # plt.axis('off')
-    # plt.savefig(f'prof_ahmad_plots/{plot_num}/gt/zfr_{plot_num}.png')
-    # plt.close()
+    rotated_zfr = ndimage.rotate(gt['zfr'], 180)
+    plt.figure()
+    plt.imshow(rotated_zfr, cmap='gray', vmin=0, vmax=np.max(rotated_zfr))
+    plt.axis('off')
+    plt.savefig(f'new_method_plots/{plot_num}/gt/zfr_{plot_num}.png')
+    plt.close()
 
-    methods = ['ours']
+    method = 'ours'
+    rotated_avg = ndimage.rotate(avg[method], 180)
+    rotated_std = ndimage.rotate(std[method], 180)
 
-    for method in methods:
-        for z in range(32):
-            sample[method][z] = (sample[method][z] - np.min(sample[method][z])) / (np.max(sample[method][z]) - np.min(sample[method][z]))
-            with open('prof_ahmad_plots/{plot_num}/{method}/recon_{method}_{plot_num}_sample_{z}.npy', 'wb') as f:
-                np.save(f, ndimage.rotate(sample[method][z], 180))
+    plt.figure()
+    plt.imshow(rotated_avg, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    plt.axis('off')
+    plt.savefig(f'new_method_plots/{plot_num}/avg_recon.png')
+    plt.close()
 
-            plt.figure()
-            plt.imshow(ndimage.rotate(sample[method][z], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
-            plt.axis('off')
-            plt.savefig(f'prof_ahmad_plots/{plot_num}/{method}/recon_{method}_{plot_num}_sample_{z}.png')
-            plt.close()
+    plt.figure()
+    plt.imshow(ndimage.rotate(sample[method][z], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    plt.axis('off')
+    plt.savefig(f'new_method_plots/{plot_num}/std_recon.png')
+    plt.close()
 
-            plt.figure()
-            plt.imshow(ndimage.rotate(1.5 * np.abs(sample[method][z] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
-            plt.axis('off')
-            plt.savefig(f'prof_ahmad_plots/{plot_num}/{method}/recon_{method}_{plot_num}_sample_{z}_error.png')
-            plt.close()
+    for z in range(32):
+        sample[method][z] = (sample[method][z] - np.min(sample[method][z])) / (np.max(sample[method][z]) - np.min(sample[method][z]))
+        # with open(f'prof_ahmad_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}.npy', 'wb') as f:
+        #     np.save(f, ndimage.rotate(sample[method][z], 180))
+
+        plt.figure()
+        plt.imshow(ndimage.rotate(sample[method][z], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+        plt.axis('off')
+        plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}.png')
+        plt.close()
+
+        plt.figure()
+        plt.imshow(ndimage.rotate(1.5 * np.abs(sample[method][z] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
+        plt.axis('off')
+        plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}_error.png')
+        plt.close()
 
 
 def main(args):
@@ -381,16 +394,17 @@ def main(args):
 
     for i, data in enumerate(loader):
         with torch.no_grad():
-            y, x, y_true, mean, std, filename, slice = data
+            y, x, y_true, mean, std, filename, slice, mask = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
+            mask = mask.cuda()
 
-            gens_ours = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
+            gens_ours = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
 
             for z in range(num_code):
-                gens_ours[:, z, :, :, :] = G_ours(y, y_true)
+                gens_ours[:, z, :, :, :] = G_ours(y, y_true, mask=mask)
 
             avg_ours = torch.mean(gens_ours, dim=1)
 
@@ -399,15 +413,15 @@ def main(args):
                 for z in range(num_code):
                     temp_gens_ours[j, z, :, :, :] = gens_ours[j, z, :, :, :] * std[j].to(args.device) + mean[j].to(args.device)
 
-                new_gens_ours = torch.zeros(num_code, 8, 384, 384, 2)
+                new_gens_ours = torch.zeros(num_code, 8, args.im_size, args.im_size, 2)
                 new_gens_ours[:, :, :, :, 0] = temp_gens_ours[j, :, 0:8, :, :]
                 new_gens_ours[:, :, :, :, 1] = temp_gens_ours[j, :, 8:16, :, :]
 
-                avg_gen_ours = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                avg_gen_ours = torch.zeros(size=(8, args.im_size, args.im_size, 2), device=args.device)
                 avg_gen_ours[:, :, :, 0] = avg_ours[j, 0:8, :, :]
                 avg_gen_ours[:, :, :, 1] = avg_ours[j, 8:16, :, :]
 
-                gt = torch.zeros(size=(8, 384, 384, 2), device=args.device)
+                gt = torch.zeros(size=(8, args.im_size, args.im_size, 2), device=args.device)
                 gt[:, :, :, 0] = x[j, 0:8, :, :]
                 gt[:, :, :, 1] = x[j, 8:16, :, :]
 
@@ -415,7 +429,7 @@ def main(args):
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
                                            device=sp.Device(3), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
-                S = sp.linop.Multiply((384, 384), maps)
+                S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                 gt_ksp, avg_ksp_ours, avg_ksp_adler, avg_ksp_ohayon = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     (avg_gen_ours * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                     (avg_gen_adler * std[j] + mean[j]).cpu()), tensor_to_complex_np(
@@ -428,7 +442,7 @@ def main(args):
 
                 gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
 
-                ours_samples_np = np.zeros((num_code, 384, 384))
+                ours_samples_np = np.zeros((num_code, args.im_size, args.im_size))
 
                 for z in range(num_code):
                     gen_ours = tensor_to_complex_np((new_gens_ours[z]).cpu())
@@ -436,34 +450,6 @@ def main(args):
                     ours_samples_np[z] = torch.tensor(S.H * gen_ours).abs().numpy()
 
                 std_ours_np = np.std(ours_samples_np, axis=0)
-
-                recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
-                langevin_recons = np.zeros((32, 384, 384))
-                recon_object = None
-
-                for l in range(num_code):
-                    try:
-                        new_filename = recon_directory + filename[j] + f'|langevin|slide_idx_{slice[j]}_R=4_sample={l}_outputs.pt'
-                        recon_object = torch.load(new_filename)
-                    except Exception as e:
-                        print(e)
-                        exceptions = True
-                        break
-                    # temp_recon = unnormalize(recon_object['mvue'], recon_object['zfr'])
-
-                    langevin_recons[l] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cpu().numpy()
-
-                if exceptions:
-                    exceptions = False
-                    continue
-
-                langevin_gt = recon_object['gt'][0][0].abs().cpu().numpy()
-                langevin_avg = np.mean(langevin_recons, axis=0)
-                langevin_std = np.std(langevin_recons, axis=0)
-
-                # plt.imshow(np.abs(langevin_gt - langevin_avg), cmap='jet')
-                # plt.savefig('test.png')
-                # exit()
 
                 std_dict = {
                     'ours': std_ours_np,
@@ -494,18 +480,8 @@ def main(args):
                     'zfr': zfr_ours_np
                 }
 
-                # if i + j < 6:
-                #     continue
-                # elif i + j == 6:
-                if i + j == 6 or i +j == 10 or i + j == 8 or i + j== 15 or i + j == 16:
-                    create_posterior_sample_plots(samps_dict, gt_dict, i+j)
-                # else:
-                #     exit()
-                # create_mean_error_plots(avg_dict, std_dict, gt_dict, i+j)
-
-                # if i > 0:
-                #     exit()
-
+                if i + j == 6 or i + j== 15:
+                    create_posterior_sample_plots(avg_dict, std_dict, samps_dict, gt_dict, i+j, mask[j, 0, :, :, 0].cpu().numpy())
 
 
 if __name__ == '__main__':

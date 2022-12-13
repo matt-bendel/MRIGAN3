@@ -22,6 +22,7 @@ def load_best_gan(args):
         generator = torch.nn.DataParallel(generator)
 
     generator.load_state_dict(checkpoint_gen['model'])
+    print(checkpoint_gen['epoch'])
 
     generator = GANWrapper(generator, args)
 

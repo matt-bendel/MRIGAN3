@@ -90,7 +90,7 @@ class DataTransform:
         # return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask
 
         if self.args.langevin_plots:
-            return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice
+            return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice, mask
         else:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask, inds
 

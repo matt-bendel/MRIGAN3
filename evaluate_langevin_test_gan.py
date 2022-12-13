@@ -94,10 +94,10 @@ def main(args):
     )
 
     print("SMALL CFID")
-    # compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=1)
+    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=1)
 
     print("MEDIUM CFID")
-    compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
+    # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
 
     print("LARGE CFID")
     # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
