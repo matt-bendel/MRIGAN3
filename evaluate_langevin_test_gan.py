@@ -117,10 +117,11 @@ def main(args):
 
         for i, data in enumerate(loader):
             with torch.no_grad():
-                y, x, y_true, mean, std, mask = data
+                y, x, y_true, mean, std, mask, inds = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
+                mask = mask.cuda()
 
                 gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)

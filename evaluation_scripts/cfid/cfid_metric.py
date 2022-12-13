@@ -222,17 +222,18 @@ class CFIDMetric:
                 for i, data in tqdm(enumerate(self.ref_loader),
                                     desc='Computing generated distribution',
                                     total=len(self.ref_loader)):
-                    condition, gt, true_cond, mean, std = data
+                    condition, gt, true_cond, mean, std, mask, inds = data
                     condition = condition.cuda()
                     gt = gt.cuda()
                     true_cond = true_cond.cuda()
                     mean = mean.cuda()
                     std = std.cuda()
+                    mask = mask.cuda()
                     maps = []
 
                     with torch.no_grad():
                         for l in range(self.num_samps):
-                            recon = self.gan(condition, true_cond)
+                            recon = self.gan(condition, true_cond, mask=mask)
 
                             for j in range(condition.shape[0]):
                                 new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
