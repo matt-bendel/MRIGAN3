@@ -94,7 +94,7 @@ def main(args):
     )
 
     print("SMALL CFID")
-    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=1)
+    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
 
     print("MEDIUM CFID")
     # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
@@ -159,7 +159,7 @@ def main(args):
                 for j in range(y.size(0)):
                     new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                     maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                               device=sp.Device(3), show_pbar=False, crop=0.70,
+                                               device=sp.Device(2), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
                     S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
