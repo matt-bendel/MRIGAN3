@@ -344,7 +344,7 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     plt.close()
 
     plt.figure()
-    plt.imshow(rotated_std, cmap='viridis', vmin=0, vmax=np.max(rotated_gt))
+    plt.imshow(rotated_std, cmap='viridis')
     plt.axis('off')
     plt.savefig(f'new_method_plots/{plot_num}/std_recon_im.png', bbox_inches='tight')
     plt.close()
@@ -354,7 +354,7 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     cmap_rb = matplotlib.colors.LinearSegmentedColormap.from_list('rb_cmap', [c_white, c_red], 512)
 
     plt.figure()
-    plt.imshow(rotated_std, cmap=cmap_rb, vmin=0, vmax=np.max(rotated_gt))
+    plt.imshow(rotated_std, cmap=cmap_rb)
     plt.axis('off')
     plt.savefig(f'new_method_plots/{plot_num}/std_recon_overlay.png', bbox_inches='tight')
     plt.close()
