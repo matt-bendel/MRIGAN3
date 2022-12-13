@@ -93,13 +93,16 @@ def main(args):
         drop_last=True
     )
 
-    # compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
-    # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=8)
+    print("SMALL CFID")
+    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
+
+    print("MEDIUM CFID")
+    compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=8)
+
+    print("LARGE CFID")
     compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
 
-    # compute_fid.get_fid(args, G, train_loader, loader)
-    # exit()
-    return
+    compute_fid.get_fid(args, G, train_loader, loader)
 
     for num in vals:
         num_code = num
@@ -114,17 +117,17 @@ def main(args):
 
         for i, data in enumerate(loader):
             with torch.no_grad():
-                y, x, y_true, mean, std = data
+                y, x, y_true, mean, std, mask = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 384, 384),
+                gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
 
                 for z in range(num_code):
                     start = time.time()
-                    gens[:, z, :, :, :] = G(y, y_true)
+                    gens[:, z, :, :, :] = G(y, y_true, mask=mask)
                     elapsed = time.time() - start
                     times.append(elapsed)
 
@@ -140,15 +143,15 @@ def main(args):
 
                 apsd_vals.append(torch.mean(torch.std(temp_gens, dim=1), dim=(0, 1, 2, 3)).cpu().numpy())
 
-                new_gens = torch.zeros(y.size(0), num_code, 8, 384, 384, 2)
+                new_gens = torch.zeros(y.size(0), num_code, 8, args.im_size, args.im_size, 2)
                 new_gens[:, :, :, :, :, 0] = temp_gens[:, :, 0:8, :, :]
                 new_gens[:, :, :, :, :, 1] = temp_gens[:, :, 8:16, :, :]
 
-                avg_gen = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+                avg_gen = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
                 avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
                 avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-                gt = torch.zeros(size=(y.size(0), 8, 384, 384, 2), device=args.device)
+                gt = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
                 gt[:, :, :, :, 0] = x[:, 0:8, :, :]
                 gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
@@ -157,7 +160,7 @@ def main(args):
                     maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
                                                device=sp.Device(3), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
-                    S = sp.linop.Multiply((384, 384), maps)
+                    S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
                         (avg_gen[j] * std[j] + mean[j]).cpu())
 
