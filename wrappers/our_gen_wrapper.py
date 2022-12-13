@@ -11,10 +11,10 @@ from utils.get_mask import get_mask
 # TODO: CHANGE BACK TO LOADING BEST
 def load_best_gan(args):
     from utils.prepare_models import build_model, build_model_sg
-    # checkpoint_file_gen = pathlib.Path(
-    #     f'{args.checkpoint_dir}/generator_best_model.pt')
     checkpoint_file_gen = pathlib.Path(
-        f'{args.checkpoint_dir}/generator_model.pt')
+        f'{args.checkpoint_dir}/generator_best_model.pt')
+    # checkpoint_file_gen = pathlib.Path(
+    #     f'{args.checkpoint_dir}/generator_model.pt')
     checkpoint_gen = torch.load(checkpoint_file_gen, map_location=torch.device('cuda'))
 
     generator = build_model(args) if not args.stylegan else build_model_sg(args)
@@ -23,7 +23,6 @@ def load_best_gan(args):
 
     generator.load_state_dict(checkpoint_gen['model'])
     print(f'EPOCH: {checkpoint_gen["epoch"]}')
-    exit()
 
     generator = GANWrapper(generator, args)
 
