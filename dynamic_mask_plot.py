@@ -21,10 +21,10 @@ from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from scipy import ndimage
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes, mark_inset
-
+import matplotlib.pylab as pl
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import load_best_gan
-
+from matplotlib.colors import LinearSegmentedColormap
 # def generate_image(fig, target, image, method, image_ind, rows, cols, kspace=False, disc_num=False):
 #     # rows and cols are both previously defined ints
 #     ax = fig.add_subplot(rows, cols, image_ind)
@@ -312,6 +312,8 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     plt.savefig(f'new_method_plots/{plot_num}/gt/gt_{plot_num}.png')
     plt.close()
 
+    avg['ours'] = (avg['ours'] - np.min(avg['ours'])) / (np.max(avg['ours']) - np.min(avg['ours']))
+
     rotated_zfr = ndimage.rotate(gt['zfr'], 180)
     plt.figure()
     plt.imshow(rotated_zfr, cmap='gray', vmin=0, vmax=np.max(rotated_zfr))
@@ -326,13 +328,29 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
     plt.figure()
     plt.imshow(rotated_avg, cmap='gray', vmin=0, vmax=np.max(rotated_gt))
     plt.axis('off')
-    plt.savefig(f'new_method_plots/{plot_num}/avg_recon.png')
+    plt.savefig(f'new_method_plots/{plot_num}/avg_recon.png', bbox_inches='tight')
     plt.close()
 
     plt.figure()
-    plt.imshow(ndimage.rotate(sample[method][z], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
+    plt.imshow(ndimage.rotate(np.abs(avg[method] - gt[method]), 180), cmap='jet', vmin=0, vmax=1)
     plt.axis('off')
-    plt.savefig(f'new_method_plots/{plot_num}/std_recon.png')
+    plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}_error.png', bbox_inches='tight')
+    plt.close()
+
+    plt.figure()
+    plt.imshow(rotated_std, cmap='viridis', vmin=0, vmax=np.max(rotated_gt))
+    plt.axis('off')
+    plt.savefig(f'new_method_plots/{plot_num}/std_recon_im.png', bbox_inches='tight')
+    plt.close()
+
+    c_white = plt.colors.colorConverter.to_rgba('white', alpha=0)
+    c_red = plt.colors.colorConverter.to_rgba('red', alpha=1)
+    cmap_rb = plt.colors.LinearSegmentedColormap.from_list('rb_cmap', [c_white, c_red], 512)
+
+    plt.figure()
+    plt.imshow(rotated_std, cmap=cmap_rb, vmin=0, vmax=np.max(rotated_gt))
+    plt.axis('off')
+    plt.savefig(f'new_method_plots/{plot_num}/std_recon_overlay.png', bbox_inches='tight')
     plt.close()
 
     for z in range(32):
@@ -343,33 +361,23 @@ def create_posterior_sample_plots(avg, std, sample, gt, plot_num, mask):
         plt.figure()
         plt.imshow(ndimage.rotate(sample[method][z], 180), cmap='gray', vmin=0, vmax=np.max(rotated_gt))
         plt.axis('off')
-        plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}.png')
+        plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}.png', bbox_inches='tight')
         plt.close()
 
         plt.figure()
-        plt.imshow(ndimage.rotate(1.5 * np.abs(sample[method][z] - gt[method]), 180), cmap='jet', vmin=0, vmax=0.0001)
+        plt.imshow(ndimage.rotate(1.5 * np.abs(sample[method][z] - gt[method]), 180), cmap='jet', vmin=0, vmax=1)
         plt.axis('off')
-        plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}_error.png')
+        plt.savefig(f'new_method_plots/{plot_num}/samps/recon_{plot_num}_sample_{z}_error.png', bbox_inches='tight')
         plt.close()
 
 
 def main(args):
     args.batch_size = 4
-    ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
     # iterate over files in
     # that directory
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
     G_ours = load_best_gan(args)
     G_ours.update_gen_status(val=True)
-
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
-    G_adler = load_best_gan(args)
-    G_adler.update_gen_status(val=True)
-
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
-    G_ohayon = load_best_gan(args)
-    G_ohayon.update_gen_status(val=True)
 
     data = SelectiveSliceData_Val(
         root=args.data_path / 'small_T2_test',
@@ -453,31 +461,18 @@ def main(args):
 
                 std_dict = {
                     'ours': std_ours_np,
-                    'adler': std_adler_np,
-                    'ohayon': std_ohayon_np,
-                    'langevin': langevin_std,
                 }
 
                 samps_dict = {
                     'ours': ours_samples_np,
-                    'adler': adler_samples_np,
-                    'ohayon': ohayon_samples_np,
-                    'langevin': langevin_recons,
                 }
 
                 avg_dict = {
                     'ours': avg_gen_np_ours,
-                    'adler': avg_gen_np_adler,
-                    'ohayon': avg_gen_np_ohayon,
-                    'langevin': langevin_avg
                 }
 
                 gt_dict = {
                     'ours': gt_np,
-                    'adler': gt_np,
-                    'ohayon': gt_np,
-                    'langevin': langevin_gt,
-                    'zfr': zfr_ours_np
                 }
 
                 if i + j == 6 or i + j== 15:
