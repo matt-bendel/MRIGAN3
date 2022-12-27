@@ -60,7 +60,7 @@ def ssim(
 
     return ssim
 
-def main(args):
+def main(args, i):
     ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
     # iterate over files in
     # that directory
@@ -94,7 +94,7 @@ def main(args):
     )
 
     print("SMALL CFID")
-    compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
+    cfid = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
 
     print("MEDIUM CFID")
     # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
@@ -187,6 +187,8 @@ def main(args):
         # print('SSIM: ', np.median(ssim_vals))
         print("\n")
 
+        return cfid, np.mean(psnr_vals)
+
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
@@ -206,5 +208,24 @@ if __name__ == '__main__':
 
     args.in_chans = 16
     args.out_chans = 16
+    cfids = []
+    psnrs = []
 
-    main(args)
+    for i in range (100):
+        cfid_val, psnr_val = main(args, i)
+        cfids.append(cfid_val)
+        psnrs.append(psnr_val)
+
+    file = open("psnr_mask_study.txt", "w+")
+
+    # Saving the 2D array in a text file
+    content = str(psnrs)
+    file.write(content)
+    file.close()
+
+    file = open("cfid_mask_study.txt", "w+")
+
+    # Saving the 2D array in a text file
+    content = str(cfids)
+    file.write(content)
+    file.close()
