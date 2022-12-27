@@ -60,7 +60,7 @@ def ssim(
 
     return ssim
 
-def main(args, i):
+def main(args, mask_num):
     ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
     # iterate over files in
     # that directory
@@ -122,6 +122,13 @@ def main(args, i):
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
                 mask = mask.cuda()
+                with open(f'mask_{mask_num}.npy', 'rb') as f:
+                    m = np.load(f)
+
+                samp = m
+                numcoil = 8
+                mask = transforms.to_tensor(np.tile(samp, (numcoil, 1, 1)).astype(np.float32))
+                mask = torch.unsqueeze(mask, -1).repeat(1, 1, 1, 2).unsqueeze(0).repeat(x.size(0), 1, 1, 1, 1).cuda()
 
                 gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
