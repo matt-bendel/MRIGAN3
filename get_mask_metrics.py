@@ -94,7 +94,7 @@ def main(args, mask_num):
     )
 
     print("SMALL CFID")
-    cfid = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
+    # cfid = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
 
     print("MEDIUM CFID")
     # compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
@@ -122,7 +122,7 @@ def main(args, mask_num):
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
                 mask = mask.cuda()
-                with open(f'mask_{mask_num}.npy', 'rb') as f:
+                with open(f'mask_study/mask_{mask_num}.npy', 'rb') as f:
                     m = np.load(f)
 
                 samp = m
@@ -194,7 +194,7 @@ def main(args, mask_num):
         # print('SSIM: ', np.median(ssim_vals))
         print("\n")
 
-        return cfid, np.mean(psnr_vals)
+        return np.mean(psnr_vals)
 
 
 if __name__ == '__main__':
@@ -219,8 +219,8 @@ if __name__ == '__main__':
     psnrs = []
 
     for i in range (100):
-        cfid_val, psnr_val = main(args, i)
-        cfids.append(cfid_val)
+        psnr_val = main(args, i)
+        # cfids.append(cfid_val)
         psnrs.append(psnr_val)
 
     file = open("psnr_mask_study.txt", "w+")
@@ -230,9 +230,9 @@ if __name__ == '__main__':
     file.write(content)
     file.close()
 
-    file = open("cfid_mask_study.txt", "w+")
-
+    # file = open("cfid_mask_study.txt", "w+")
+    #
     # Saving the 2D array in a text file
-    content = str(cfids)
-    file.write(content)
-    file.close()
+    # content = str(cfids)
+    # file.write(content)
+    # file.close()
