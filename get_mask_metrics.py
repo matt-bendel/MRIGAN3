@@ -159,7 +159,7 @@ def main(args):
                 for j in range(y.size(0)):
                     new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                     maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                               device=sp.Device(1), show_pbar=False, crop=0.70,
+                                               device=sp.Device(2), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
                     S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
@@ -207,17 +207,4 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
-    # main(args)
-    #
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
-    # main(args)
-    #
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
     main(args)
-
-    # print('MEDIAN')
-    # print('APSD: ', np.median(apsd_vals))
-    # print('PSNR: ', np.median(psnr_vals))
-    # print('SNR: ', np.median(snr_vals))
-    # print('SSIM: ', np.median(ssim_vals))
