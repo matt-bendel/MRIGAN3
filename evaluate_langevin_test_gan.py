@@ -211,8 +211,8 @@ if __name__ == '__main__':
     # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ours"
     # main(args)
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
-    main(args)
+    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_ohayon"
+    # main(args)
 
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/cvpr_adler"
     main(args)
