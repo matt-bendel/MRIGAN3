@@ -143,7 +143,7 @@ class FIDMetric:
         self.truncation = truncation
         self.truncation_latent = truncation_latent
         self.load_stats = load_stats
-        self.num_samps = num_samps
+        self.num_samps = 8
         self.use_train = use_train
 
         self.mu_fake, self.sigma_fake = None, None
