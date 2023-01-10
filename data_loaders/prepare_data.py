@@ -58,7 +58,7 @@ class DataTransform:
 
         im_tensor = transforms.to_tensor(coil_compressed_x).permute(2, 0, 1, 3)
 
-        im_tensor = reduce_resolution(im_tensor)
+        # im_tensor = reduce_resolution(im_tensor)
 
         true_image = torch.clone(im_tensor)
         true_measures = fft2c_new(im_tensor) * mask
