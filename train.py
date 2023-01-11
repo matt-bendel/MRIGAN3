@@ -292,8 +292,8 @@ def train(args, bl=1, adv_mult=0.0):
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y, y_true, mask=mask)
 
-            patch_out = 30
-            # patch_out = 94
+            # patch_out = 30
+            patch_out = 94
 
             if args.patch_disc:
                 fake_pred = torch.zeros(size=(y.shape[0], args.num_z, patch_out, patch_out), device=args.device)
