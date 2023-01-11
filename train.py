@@ -47,8 +47,8 @@ def psnr_complex(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
 ) -> np.ndarray:
     """Compute Peak Signal to Noise Ratio metric (PSNR)"""
-    gt = torch.from_numpy(gt)
-    pred = torch.from_numpy(pred)
+    gt = transforms.to_tensor(gt)
+    pred = transforms.to_tensor(pred)
 
     gt_mag = complex_abs(gt)
     maxval = gt_mag.max()
