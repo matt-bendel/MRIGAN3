@@ -126,19 +126,19 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
     im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
+    plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{index - 1}.png')
     plt.close()
 
 
 def generate_gif(type, num):
     images = []
     for i in range(num):
-        images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
+        images.append(iio.imread(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif_test.gif', images, duration=0.25)
 
     for i in range(num):
-        os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
+        os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
 
 def get_colorbar(fig, im, ax, left=False):

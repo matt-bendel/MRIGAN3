@@ -86,19 +86,19 @@ from wrappers.our_gen_wrapper import load_best_gan
 #     generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
 #     im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
 #
-#     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
+#     plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{index - 1}.png')
 #     plt.close()
 #
 #
 # def generate_gif(type):
 #     images = []
 #     for i in range(32):
-#         images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
+#         images.append(iio.imread(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png'))
 #
 #     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 #
 #     for i in range(32):
-#         os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
+#         os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
 def normalize(gen_img, estimated_mvue):
     '''
@@ -272,7 +272,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     generate_image(fig, gt[avg_keys[2]], avg[avg_keys[2]], labels[2], 4, 5, 1)
     generate_image(fig, gt[avg_keys[3]], avg[avg_keys[3]], labels[3], 5, 5, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/recons_{plot_num}', bbox_inches='tight', dpi=300)
+    plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/cvpr_plots/recons_{plot_num}', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
     fig = plt.figure()
@@ -285,7 +285,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
 
     cbar_1 = get_colorbar(fig, im_er, ax_er)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/errors_{plot_num}', bbox_inches='tight', dpi=300)
+    plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/cvpr_plots/errors_{plot_num}', bbox_inches='tight', dpi=300)
     plt.close(fig)
 
     fig = plt.figure()
@@ -299,7 +299,7 @@ def create_mean_error_plots(avg, std_devs, gt, plot_num):
     cbar_2 = get_colorbar(fig, im_std, ax_std)
 
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/cvpr_plots/std_devs_{plot_num}', pad_inches = 0, bbox_inches='tight', dpi=300)
+    plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/cvpr_plots/std_devs_{plot_num}', pad_inches = 0, bbox_inches='tight', dpi=300)
     plt.close(fig)
 
 def create_posterior_sample_plots(sample, gt, plot_num):

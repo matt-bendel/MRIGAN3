@@ -180,19 +180,19 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
     im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
+    plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{index - 1}.png')
     plt.close()
 
 
 def generate_gif(type):
     images = []
     for i in range(8):
-        images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
+        images.append(iio.imread(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
     for i in range(8):
-        os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
+        os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
 def train(args, bl=1, adv_mult=0.0):
     print(f"WEIGHT: {adv_mult}")
@@ -387,15 +387,15 @@ def train(args, bl=1, adv_mult=0.0):
                     #
                     # exit()
 
-                    avg_gen_np = torch.tensor(S.H * avg_ksp).abs().numpy()
-                    gt_np = torch.tensor(S.H * gt_ksp).abs().numpy()
+                    avg_gen_np = torch.tensor(S.H * avg_ksp).numpy()
+                    gt_np = torch.tensor(S.H * gt_ksp).numpy()
 
                     single_gen = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
                     single_gen[:, :, :, 0] = gens[j, 0, 0:8, :, :]
                     single_gen[:, :, :, 1] = gens[j, 0, 8:16, :, :]
 
                     single_gen_complex_np = tensor_to_complex_np((single_gen * std[j] + mean[j]).cpu())
-                    single_gen_np = torch.tensor(S.H * single_gen_complex_np).abs().numpy()
+                    single_gen_np = torch.tensor(S.H * single_gen_complex_np).numpy()
 
                     losses['ssim'].append(ssim(gt_np, avg_gen_np))
                     losses['psnr'].append(psnr(gt_np, avg_gen_np))
@@ -538,7 +538,7 @@ if __name__ == '__main__':
     # vals = [1.8]
     #
     # for val in vals:
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
+    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models/base"
     #     try:
     #         args.batch_size = 36
     #         train(args, bl=0, adv_mult=val)
@@ -548,7 +548,7 @@ if __name__ == '__main__':
     #         print(e)
     #         send_mail("TRAINING CRASH", "See terminal for failure cause.")
     #
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models"
     #     try:
     #         args.batch_size = 20
     #         for i in range(8):
@@ -560,7 +560,7 @@ if __name__ == '__main__':
     #         print(e)
     #         send_mail("TESTING FAILED", "See terminal for failure cause.")
 
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models"
     # try:
     train(args, bl=0, adv_mult=1e-5)
     # except KeyboardInterrupt:
@@ -578,7 +578,7 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
         send_mail("TESTING FAILED", "See terminal for failure cause.")
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models"
 
     # try:
     #     train(args, bl=0, adv_mult=1e-2)

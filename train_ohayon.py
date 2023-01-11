@@ -180,19 +180,19 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
     im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
 
-    plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
+    plt.savefig(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{index - 1}.png')
     plt.close()
 
 
 def generate_gif(type):
     images = []
     for i in range(8):
-        images.append(iio.imread(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png'))
+        images.append(iio.imread(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
     for i in range(8):
-        os.remove(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{i}.png')
+        os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
 def train(args, bl=1, adv_mult=0.0):
     print(f"WEIGHT: {adv_mult}")
@@ -440,7 +440,7 @@ if __name__ == '__main__':
     args.out_chans = 16
 
     vals = [1e-3]
-    args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
+    args.checkpoint_dir = "/home/bendel.8/Git_Repos/MRIGAN3/trained_models"
     for val in vals:
         try:
             train(args, bl=0, adv_mult=val)
