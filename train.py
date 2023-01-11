@@ -397,9 +397,9 @@ def train(args, bl=1, adv_mult=0.0):
                     single_gen_complex_np = tensor_to_complex_np((single_gen * std[j] + mean[j]).cpu())
                     single_gen_np = torch.tensor(S.H * single_gen_complex_np).numpy()
 
-                    losses['ssim'].append(ssim(gt_np, avg_gen_np))
-                    losses['psnr'].append(psnr(gt_np, avg_gen_np))
-                    losses['single_psnr'].append(psnr(gt_np, single_gen_np))
+                    losses['ssim'].append(np.abs(ssim(gt_np, avg_gen_np)))
+                    losses['psnr'].append(np.abs(psnr(gt_np, avg_gen_np)))
+                    losses['single_psnr'].append(np.abs(psnr(gt_np, single_gen_np)))
 
                     ind = 1
 
