@@ -43,6 +43,23 @@ def psnr(
 
     return psnr_val
 
+def psnr_complex(
+        gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
+) -> np.ndarray:
+    """Compute Peak Signal to Noise Ratio metric (PSNR)"""
+    gt = torch.from_numpy(gt)
+    pred = torch.from_numpy(pred)
+
+    gt_mag = complex_abs(gt)
+    maxval = gt_mag.max()
+
+    diff = gt - pred
+    diff_mag = complex_abs(diff)
+    mse = torch.pow(diff_mag, 2).mean()
+
+    psnr_val = 10 * torch.log10((maxval ** 2) / mse)
+
+    return psnr_val.numpy()
 # def psnr_coil(
 #         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
 # ) -> np.ndarray:
@@ -398,8 +415,8 @@ def train(args, bl=1, adv_mult=0.0):
                     single_gen_np = torch.tensor(S.H * single_gen_complex_np).numpy()
 
                     losses['ssim'].append(np.abs(ssim(gt_np, avg_gen_np)))
-                    losses['psnr'].append(np.abs(psnr(gt_np, avg_gen_np)))
-                    losses['single_psnr'].append(np.abs(psnr(gt_np, single_gen_np)))
+                    losses['psnr'].append(psnr_complex(gt_np, avg_gen_np))
+                    losses['single_psnr'].append(psnr_complex(gt_np, single_gen_np))
 
                     ind = 1
 
