@@ -271,7 +271,7 @@ def train(args, bl=1, adv_mult=0.0):
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            mask = get_mask(384)
+            mask = get_mask(384, args=args)
             mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
 
             # for k in range (5):
@@ -369,7 +369,7 @@ def train(args, bl=1, adv_mult=0.0):
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
-                mask = get_mask(384)
+                mask = get_mask(384, args=args)
                 mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
 
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
