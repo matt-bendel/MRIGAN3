@@ -185,7 +185,7 @@ class CFIDMetric:
             true_cond = true_cond.cuda()
             mean = mean.cuda()
             std = std.cuda()
-            mask = get_mask(384, args=args)
+            mask = get_mask(384, args=self.args)
             mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
             inds = None
             maps = []
