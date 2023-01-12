@@ -30,7 +30,7 @@ class DataTransform:
         """
         self.use_seed = use_seed
         self.args = args
-        self.mask = None
+        self.mask, self.inds = get_mask(self.args.im_size, return_mask=True, R=self.args.R, args=self.args)
         self.test = test
 
     def __call__(self, kspace, target, attrs, fname, slice, sense_maps=None):
@@ -51,7 +51,7 @@ class DataTransform:
                 norm (float): L2 norm of the entire volume.
         """
         # GRO Sampling mask:
-        mask, inds = get_mask(self.args.im_size, return_mask=True, R=self.args.R, args=self.args)
+        mask, inds = self.mask, self.inds
         kspace = kspace.transpose(1, 2, 0)
         x = ifft(kspace, (0, 1))  # (768, 396, 16)
         coil_compressed_x = ImageCropandKspaceCompression(x)  # (384, 384, 8)
@@ -92,7 +92,7 @@ class DataTransform:
         if self.args.langevin_plots:
             return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), fname, slice, mask
         else:
-            return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float(), mask, inds
+            return final_input.float(), final_gt.float(), normalized_true_measures.float(), mean.float(), std.float() #, mask, inds
 
 
 def create_datasets(args, val_only, big_test=False):

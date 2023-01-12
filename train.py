@@ -24,6 +24,7 @@ from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
 from evaluation_scripts import compute_cfid
+from utils.get_mask import get_mask
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
@@ -266,11 +267,12 @@ def train(args, bl=1, adv_mult=0.0):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            y, x, y_true, mean, std, mask, inds = data
+            y, x, y_true, mean, std = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            mask = mask.to(args.device)
+            mask = get_mask(384)
+            mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
 
             # for k in range (5):
             #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
@@ -363,16 +365,17 @@ def train(args, bl=1, adv_mult=0.0):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                y, x, y_true, mean, std, mask, inds = data
+                y, x, y_true, mean, std, = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
-                mask = mask.to(args.device)
+                mask = get_mask(384)
+                mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
 
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask, inds=inds)
+                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask, inds=None)
 
                 avg = torch.mean(gens, dim=1)
 
