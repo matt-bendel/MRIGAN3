@@ -10,6 +10,7 @@ import torchvision.transforms as transforms
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from tqdm import tqdm
+from utils.get_mask import get_mask
 
 def symmetric_matrix_square_root_torch(mat, eps=1e-10):
     """Compute square root of a symmetric matrix.
@@ -178,13 +179,15 @@ class CFIDMetric:
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader)):
-            condition, gt, true_cond, mean, std, mask, inds = data
+            condition, gt, true_cond, mean, std = data
             condition = condition.cuda()
             gt = gt.cuda()
             true_cond = true_cond.cuda()
             mean = mean.cuda()
             std = std.cuda()
-            mask = mask.cuda()
+            mask = get_mask(384, args=args)
+            mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
+            inds = None
             maps = []
 
             with torch.no_grad():
