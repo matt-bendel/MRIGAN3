@@ -219,7 +219,7 @@ class FIDMetric:
                 for j in range(condition.shape[0]):
                     new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
                     s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                                 device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                 device=sp.Device(0), show_pbar=False, crop=0.70,
                                                  kernel_width=6).run().get()
                     S = sp.linop.Multiply((self.args.im_size, self.args.im_size), s_maps)
 
@@ -235,8 +235,8 @@ class FIDMetric:
                     cond_e = self.condition_embedding(self.transforms(condition_im))
 
                     if self.cuda:
-                        image_embed.append(img_e.to('cuda:1'))
-                        cond_embed.append(cond_e.to('cuda:1'))
+                        image_embed.append(img_e)
+                        cond_embed.append(cond_e)
                     else:
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
@@ -258,7 +258,7 @@ class FIDMetric:
                     for j in range(condition.shape[0]):
                         new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
                         s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                                     device=sp.Device(3), show_pbar=False, crop=0.70,
+                                                     device=sp.Device(0), show_pbar=False, crop=0.70,
                                                      kernel_width=6).run().get()
                         S = sp.linop.Multiply((self.args.im_size, self.args.im_size), s_maps)
 
@@ -274,8 +274,8 @@ class FIDMetric:
                         cond_e = self.condition_embedding(self.transforms(condition_im))
 
                         if self.cuda:
-                            image_embed.append(img_e.to('cuda:1'))
-                            cond_embed.append(cond_e.to('cuda:1'))
+                            image_embed.append(img_e)
+                            cond_embed.append(cond_e)
                         else:
                             image_embed.append(img_e.cpu().numpy())
                             cond_embed.append(cond_e.cpu().numpy())
