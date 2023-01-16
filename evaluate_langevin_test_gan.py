@@ -97,16 +97,16 @@ def main(args):
     cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
 
     print("MEDIUM CFID")
-    cfid_2 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
+    cfid_2 = 0#compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
 
     print("LARGE CFID")
-    cfid_2 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
+    cfid_3 = 0#compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
 
     print("FID_1")
     fid_1 = compute_fid.get_fid(args, G, train_loader, loader)
 
     print("FID_2")
-    fid_2 = compute_fid.get_fid(args, G, train_loader, dev_loader)
+    fid_2 = 0#compute_fid.get_fid(args, G, train_loader, dev_loader)
 
     for num in vals:
         num_code = num
