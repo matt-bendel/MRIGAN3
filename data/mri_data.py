@@ -231,7 +231,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
                 #     pass
                     # print("UHOH")
 
-        files = keep_files
+        files = f
 
         print(len(files))
 
