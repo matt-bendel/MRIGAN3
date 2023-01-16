@@ -184,6 +184,8 @@ def main(args):
         print(f'SSIM: {np.mean(ssim_vals)} \pm {np.std(ssim_vals) / np.sqrt(len(ssim_vals))}')
         print(f'TIME: {np.mean(times)}')
         print("\n")
+        print(f'CFID_1: {cfid_1}')
+        print(f'FID_1: {fid_1}')
         # print('MEDIAN')
         # print('APSD: ', np.median(apsd_vals))
         # print('PSNR: ', np.median(psnr_vals))
