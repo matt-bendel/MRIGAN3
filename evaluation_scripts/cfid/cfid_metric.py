@@ -178,7 +178,7 @@ class CFIDMetric:
         count = 0
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
-                            total=len(self.loader)):
+                            total=len(self.loader), disable=True):
             condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
             gt = gt.cuda()
@@ -223,7 +223,7 @@ class CFIDMetric:
             with torch.no_grad():
                 for i, data in tqdm(enumerate(self.ref_loader),
                                     desc='Computing generated distribution',
-                                    total=len(self.ref_loader)):
+                                    total=len(self.ref_loader), disable=True):
                     condition, gt, true_cond, mean, std, mask, inds = data
                     condition = condition.cuda()
                     gt = gt.cuda()

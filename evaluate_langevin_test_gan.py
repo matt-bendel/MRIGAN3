@@ -97,16 +97,16 @@ def main(args):
     cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
 
     print("MEDIUM CFID")
-    # cfid_2 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
+    cfid_2 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
 
     print("LARGE CFID")
-    # cfid_2 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
+    cfid_2 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
 
     print("FID_1")
     fid_1 = compute_fid.get_fid(args, G, train_loader, loader)
 
     print("FID_2")
-    # fid_2 = compute_fid.get_fid(args, G, train_loader, dev_loader)
+    fid_2 = compute_fid.get_fid(args, G, train_loader, dev_loader)
 
     for num in vals:
         num_code = num
@@ -185,13 +185,11 @@ def main(args):
         print(f'TIME: {np.mean(times)}')
         print("\n")
         print(f'CFID_1: {cfid_1}')
-        print(f'FID_1: {fid_1}')
-        # print('MEDIAN')
-        # print('APSD: ', np.median(apsd_vals))
-        # print('PSNR: ', np.median(psnr_vals))
-        # print('SNR: ', np.median(snr_vals))
-        # print('SSIM: ', np.median(ssim_vals))
+        print(f'CFID_2: {cfid_2}')
+        print(f'CFID_3: {cfid_3}')
         print("\n")
+        print(f'FID_1: {fid_1}')
+        print(f'FID_2: {fid_2}')
 
 
 if __name__ == '__main__':

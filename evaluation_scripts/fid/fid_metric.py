@@ -205,7 +205,7 @@ class FIDMetric:
 
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
-                            total=len(self.loader)):
+                            total=len(self.loader), disable=True):
             condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
             gt = gt.cuda()
@@ -244,7 +244,7 @@ class FIDMetric:
         if self.use_train:
             for i, data in tqdm(enumerate(self.ref_loader),
                                 desc='Computing generated distribution',
-                                total=len(self.ref_loader)):
+                                total=len(self.ref_loader), disable=True):
                 condition, gt, true_cond, mean, std, mask, inds = data
                 condition = condition.cuda()
                 gt = gt.cuda()
@@ -326,7 +326,7 @@ class FIDMetric:
         cond_embed = []
 
         for data in tqdm(self.ref_loader,
-                         desc='Computing reference distribution'):
+                         desc='Computing reference distribution', disable=True):
             condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
             gt = gt.cuda()
