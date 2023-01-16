@@ -190,6 +190,7 @@ def main(args):
         print("\n")
         print(f'FID_1: {fid_1}')
         print(f'FID_2: {fid_2}')
+        print("\n")
 
 
 if __name__ == '__main__':
