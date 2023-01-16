@@ -223,8 +223,8 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
                     if (data.attrs['acquisition'] == 'AXT2'):
                         # scanner_str = findScannerStrength(data['ismrmrd_header'].value)
                         # if (scanner_str > 2.2):
-                        if data['kspace'].shape[1] >= 8:
-                            keep_files.append(fname)
+                        # if data['kspace'].shape[1] >= 8:
+                        keep_files.append(fname)
                         # else:
                             # print(fname)
                 except:
@@ -240,7 +240,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
 
         random.shuffle(files)
 
-        num_files = (round(len(files)*0.7) if big_test else round(len(files)*0.3))
+        num_files = len(files)
         print(num_files)
 
         f_testing_and_Val = sorted(files[-num_files:]) if big_test else sorted(files[0:num_files])
@@ -254,16 +254,16 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
         for fname in sorted(files):
             kspace = h5py.File(fname, 'r')['kspace']
 
-            if kspace.shape[-1] <= 384 or kspace.shape[1] < 8 or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_209_2090296.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
-                continue
-            else:
-                num_slices = 8 # kspace.shape[0]
-                self.examples += [(fname, slice) for slice in range(num_slices)]
+            # if kspace.shape[-1] <= 384 or kspace.shape[1] < 8 or str(
+            #         fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_209_2090296.h5' or str(
+            #         fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
+            #         fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
+            #         fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
+            #         fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
+            #     continue
+            # else:
+            num_slices = 6 # kspace.shape[0]
+            self.examples += [(fname, slice) for slice in range(num_slices)]
 
         print(len(self.examples))
 
