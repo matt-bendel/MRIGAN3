@@ -122,7 +122,6 @@ class WrapVGG(nn.Module):
         self.flatten = nn.Flatten()
         # Extract the first part of fully-connected layer from VGG16
         self.fc = net.classifier[:-5]
-        print(self.fc)
 
         # net.classifier = net.classifier[:-1]
         self.net = net

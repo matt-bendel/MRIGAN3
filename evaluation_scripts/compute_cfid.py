@@ -29,7 +29,6 @@ def get_lang_data_loaders(args):
     return None, loader
 
 def get_cfid(args, G, loader=False, ref_loader=False, num_samps=32, langevin=False):
-    print("GETTING INCEPTION EMBEDDING")
     inception_embedding = VGG16Embedding(parallel=True)
 
     cfid_metric = CFIDMetric(gan=G,
