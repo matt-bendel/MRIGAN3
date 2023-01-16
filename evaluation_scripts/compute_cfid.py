@@ -43,6 +43,6 @@ def get_cfid(args, G, loader=False, ref_loader=False, num_samps=32, langevin=Fal
 
     cfids = cfid_metric.get_cfid_torch_pinv()
     del cfid_metric
-    print(f'CFID: {cfids}')
+    # print(f'CFID: {cfids}')
 
-    return np.mean(cfids)
+    return cfids

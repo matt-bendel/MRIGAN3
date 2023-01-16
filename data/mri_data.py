@@ -219,6 +219,109 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
             # kspace = h5py.File(fname, 'r')['kspace']
 
             with h5py.File(fname, 'r') as data:
+                try:
+                    if (data.attrs['acquisition'] == 'AXT2'):
+                        # scanner_str = findScannerStrength(data['ismrmrd_header'].value)
+                        # if (scanner_str > 2.2):
+                        if data['kspace'].shape[1] >= 8:
+                            keep_files.append(fname)
+                        # else:
+                            # print(fname)
+                except:
+                    pass
+                    # print("UHOH")
+
+        files = keep_files
+
+        print(len(files))
+
+        random.seed(1000)
+        np.random.seed(1000)
+
+        random.shuffle(files)
+
+        num_files = (round(len(files)*0.7) if big_test else round(len(files)*0.3))
+        print(num_files)
+
+        f_testing_and_Val = sorted(files[-num_files:]) if big_test else sorted(files[0:num_files])
+
+        files = f_testing_and_Val
+
+        if sample_rate < 1:
+            random.shuffle(files)
+            num_files = round(len(files) * sample_rate)
+            files = files[:num_files]
+        for fname in sorted(files):
+            kspace = h5py.File(fname, 'r')['kspace']
+
+            if kspace.shape[-1] <= 384 or kspace.shape[1] < 8 or str(
+                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_209_2090296.h5' or str(
+                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
+                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
+                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
+                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
+                continue
+            else:
+                num_slices = 8 # kspace.shape[0]
+                self.examples += [(fname, slice) for slice in range(num_slices)]
+
+        print(len(self.examples))
+
+    def __len__(self):
+        return len(self.examples)
+
+    def __getitem__(self, i):
+        fname, slice = self.examples[i]
+        with h5py.File(fname, 'r') as data:
+            kspace = data['kspace'][slice]
+            target = data[self.recons_key][slice] if self.recons_key in data else None
+            # if self.test_set:
+            #     with h5py.File(pathlib.Path(str(fname).replace('small_T2_test', 'small_T2_test_sense_maps')), 'r') as sense_data:
+            #         sense_maps = sense_data['s_maps'][slice]
+            # else:
+            #     with h5py.File(pathlib.Path(str(fname).replace('multicoil_val', 'multicoil_val_T2_sense_maps')), 'r') as sense_data:
+            #         sense_maps = sense_data['s_maps'][slice]
+            return self.transform(kspace, target, data.attrs, fname.name, slice)
+
+class SelectiveSliceData_Test(torch.utils.data.Dataset):
+    """
+    A PyTorch Dataset that provides access to MR image slices.
+    """
+
+    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6, restrict_size=False, big_test=False, test_set=False):
+        """
+        Args:
+            root (pathlib.Path): Path to the dataset.
+            transform (callable): A callable object that pre-processes the raw data into
+                appropriate form. The transform function should take 'kspace', 'target',
+                'attributes', 'filename', and 'slice' as inputs. 'target' may be null
+                for test data.
+            challenge (str): "singlecoil" or "multicoil" depending on which challenge to use.
+            sample_rate (float, optional): A float between 0 and 1. This controls what fraction
+                of the volumes should be loaded.
+        """
+        if challenge not in ('singlecoil', 'multicoil'):
+            raise ValueError('challenge should be either "singlecoil" or "multicoil"')
+
+        self.test_set = test_set
+        self.transform = transform
+        self.recons_key = 'reconstruction_esc' if challenge == 'singlecoil' else 'reconstruction_rss'
+
+        self.examples = []
+        os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+        files = list(pathlib.Path(root).iterdir())
+
+        # remove files with wrong modality or scanner
+        keep_files = []
+        f = sorted(files)
+
+        print('total_files:')
+        print(len(f))
+
+        for fname in f[1:len(f)]:
+            # kspace = h5py.File(fname, 'r')['kspace']
+
+            with h5py.File(fname, 'r') as data:
                 keep_files.append(fname)
 
                 # try:
@@ -282,7 +385,6 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
             #     with h5py.File(pathlib.Path(str(fname).replace('multicoil_val', 'multicoil_val_T2_sense_maps')), 'r') as sense_data:
             #         sense_maps = sense_data['s_maps'][slice]
             return self.transform(kspace, target, data.attrs, fname.name, slice)
-
 
 class CombinedSliceDataset(torch.utils.data.Dataset):
     """

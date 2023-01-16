@@ -22,4 +22,4 @@ def get_fid(args, G, ref_loader, cond_loader):
                            cuda=True,
                            args=args)
 
-    fid_metric.get_fid()
+    return fid_metric.get_fid()
