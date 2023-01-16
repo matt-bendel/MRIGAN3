@@ -179,14 +179,13 @@ class CFIDMetric:
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader)):
-            condition, gt, true_cond, mean, std = data
+            condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
             gt = gt.cuda()
             true_cond = true_cond.cuda()
             mean = mean.cuda()
             std = std.cuda()
-            mask = get_mask(384, args=self.args)
-            mask = mask[0].repeat(gt.size(0), 1, 1, 1, 1).to(args.device)
+            mask = mask.cuda()
             inds = None
             maps = []
 

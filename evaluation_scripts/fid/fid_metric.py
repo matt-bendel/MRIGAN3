@@ -333,6 +333,7 @@ class FIDMetric:
             true_cond = true_cond.cuda()
             mean = mean.cuda()
             std = std.cuda()
+            mask = mask.cuda()
             maps = []
 
             with torch.no_grad():
