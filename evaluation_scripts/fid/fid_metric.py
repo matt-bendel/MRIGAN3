@@ -159,7 +159,7 @@ class FIDMetric:
 
     def _get_joint_statistics(self, image_embed, cond_embed):
         if self.cuda:
-            joint_embed = torch.cat([image_embed, cond_embed], dim=1).to('cuda:3')
+            joint_embed = torch.cat([image_embed, cond_embed], dim=1)
         else:
             joint_embed = np.concatenate([image_embed, cond_embed], axis=1)
         print(joint_embed.shape)
@@ -305,7 +305,7 @@ class FIDMetric:
             sigma = torch.tensor(sigma).cuda()
             alpha = torch.tensor(alpha).cuda()
 
-        return mu.to('cuda:3'), sigma.to('cuda:3'), alpha.to('cuda:3')
+        return mu, sigma, alpha
 
     def _get_reference_distribution(self):
         if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
@@ -317,7 +317,7 @@ class FIDMetric:
             self._save_activation_statistics(mu_real, sigma_real, self.alpha)
 
 
-        self.mu_real, self.sigma_real, self.alpha = mu_real.to('cuda:3'), sigma_real.to('cuda:3'), alpha.to('cuda:3')
+        self.mu_real, self.sigma_real, self.alpha = mu_real, sigma_real, alpha
 
         return mu_real, sigma_real, alpha
 
