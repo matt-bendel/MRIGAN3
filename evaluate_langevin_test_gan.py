@@ -90,7 +90,7 @@ def main(args):
         batch_size=4,
         num_workers=4,
         pin_memory=True,
-        drop_last=True
+        drop_last=False
     )
 
     print("SMALL CFID")
