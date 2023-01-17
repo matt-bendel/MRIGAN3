@@ -28,7 +28,7 @@ def get_lang_data_loaders(args):
 
     return None, loader
 
-def get_cfid(args, G, loader=False, ref_loader=False, num_samps=32, langevin=False):
+def get_cfid(args, G, loader=False, ref_loader=False, num_samps=32, langevin=False, max=100000):
     inception_embedding = VGG16Embedding(parallel=True)
 
     cfid_metric = CFIDMetric(gan=G,
@@ -38,7 +38,8 @@ def get_cfid(args, G, loader=False, ref_loader=False, num_samps=32, langevin=Fal
                              cuda=True,
                              args=args,
                              ref_loader=ref_loader,
-                             num_samps=num_samps)
+                             num_samps=num_samps,
+                             max=max)
 
     cfids = cfid_metric.get_cfid_torch_pinv()
     del cfid_metric

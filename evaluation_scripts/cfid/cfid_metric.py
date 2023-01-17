@@ -125,7 +125,8 @@ class CFIDMetric:
                  args=None,
                  eps=1e-6,
                  ref_loader=False,
-                 num_samps=1):
+                 num_samps=1,
+                 max=100000):
 
         self.gan = gan
         self.args = args
@@ -137,6 +138,7 @@ class CFIDMetric:
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
         self.num_samps = num_samps
         self.ref_loader = ref_loader
+        self.max_num = max
         self.transforms = torch.nn.Sequential(
             # transforms.Resize(256),
             # transforms.Resize(224),
@@ -179,6 +181,9 @@ class CFIDMetric:
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader), disable=True):
+            if count >= self.max_num:
+                break
+
             condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
             gt = gt.cuda()
@@ -219,11 +224,16 @@ class CFIDMetric:
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
 
+                    count += image.size(0)
+
         if self.ref_loader:
             with torch.no_grad():
                 for i, data in tqdm(enumerate(self.ref_loader),
                                     desc='Computing generated distribution',
                                     total=len(self.ref_loader), disable=True):
+                    if count >= self.max_num:
+                        break
+
                     condition, gt, true_cond, mean, std, mask, inds = data
                     condition = condition.cuda()
                     gt = gt.cuda()
@@ -262,6 +272,8 @@ class CFIDMetric:
                                 true_embed.append(true_e.cpu().numpy())
                                 image_embed.append(img_e.cpu().numpy())
                                 cond_embed.append(cond_e.cpu().numpy())
+
+                            count += image.size(0)
 
         if self.cuda:
             true_embed = torch.cat(true_embed, dim=0)
