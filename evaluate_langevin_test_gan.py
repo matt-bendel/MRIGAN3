@@ -109,7 +109,7 @@ def main(args):
         fid_1 = compute_fid.get_fid(args, G, train_loader, dev_loader, max=max)
         print(f"FID: {fid_1}")
         print(f"NUM SAMPLES: {max}")
-        print("\n\n")
+        print("\n")
 
     exit()
 

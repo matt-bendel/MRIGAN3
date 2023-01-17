@@ -9,10 +9,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 
 def get_fid(args, G, ref_loader, cond_loader, max=1000000):
-    print("GETTING VGG EMBEDDING")
     vgg_embedding = VGG16Embedding(parallel=True)
-
-    print("GETTING DATA LOADERS")
 
     fid_metric = FIDMetric(gan=G,
                            ref_loader=ref_loader,
