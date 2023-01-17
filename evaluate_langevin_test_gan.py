@@ -104,14 +104,21 @@ def main(args):
 
     print("FID_1")
     max_vals = np.linspace(80, 14400, num = 15)
-
+    fids = []
     for max in max_vals:
         fid_1 = compute_fid.get_fid(args, G, train_loader, dev_loader, max=max)
+        fids.append(fid_1)
         print(f"FID: {fid_1}")
         print(f"NUM SAMPLES: {max}")
         print("\n")
 
-    exit()
+    file = open(f"{args.checkpoint_dir}/cfids.txt", "w+")
+
+    # Saving the 2D array in a text file
+    content = str(fids)
+    file.write(content)
+    file.close()
+    return
 
     print("FID_2")
     fid_2 = 0#compute_fid.get_fid(args, G, train_loader, dev_loader)

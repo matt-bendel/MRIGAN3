@@ -209,7 +209,7 @@ class FIDMetric:
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader), disable=True):
-            if total > self.max_num:
+            if total >= self.max_num:
                 break
             condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
@@ -263,7 +263,7 @@ class FIDMetric:
 
                 with torch.no_grad():
                     for j in range(condition.shape[0]):
-                        if total > self.max_num:
+                        if total >= self.max_num:
                             break
                         new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
                         s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
