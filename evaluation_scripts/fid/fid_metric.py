@@ -129,7 +129,8 @@ class FIDMetric:
                  truncation_latent=None,
                  load_stats=False,
                  num_samps=32,
-                 use_train=False):
+                 use_train=False,
+                 max_num=1000000):
 
         self.gan = gan
         self.args = args
@@ -145,6 +146,7 @@ class FIDMetric:
         self.load_stats = load_stats
         self.num_samps = 8
         self.use_train = use_train
+        self.max_num = max_num
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -202,10 +204,13 @@ class FIDMetric:
     def _get_generated_distribution(self):
         image_embed = []
         cond_embed = []
+        total = 0
 
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader), disable=True):
+            if total > self.max_num:
+                break
             condition, gt, true_cond, mean, std, mask, inds = data
             condition = condition.cuda()
             gt = gt.cuda()
@@ -241,6 +246,8 @@ class FIDMetric:
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
 
+                    total += image.size(0)
+
         if self.use_train:
             for i, data in tqdm(enumerate(self.ref_loader),
                                 desc='Computing generated distribution',
@@ -256,6 +263,8 @@ class FIDMetric:
 
                 with torch.no_grad():
                     for j in range(condition.shape[0]):
+                        if total > self.max_num:
+                            break
                         new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
                         s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
                                                      device=sp.Device(0), show_pbar=False, crop=0.70,
@@ -279,6 +288,8 @@ class FIDMetric:
                         else:
                             image_embed.append(img_e.cpu().numpy())
                             cond_embed.append(cond_e.cpu().numpy())
+
+                        total += image.size(0)
 
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)

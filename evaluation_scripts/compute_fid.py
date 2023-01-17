@@ -8,7 +8,7 @@ from wrappers.our_gen_wrapper import load_best_gan
 from torch.utils.data import DataLoader
 import numpy as np
 
-def get_fid(args, G, ref_loader, cond_loader):
+def get_fid(args, G, ref_loader, cond_loader, max=1000000):
     print("GETTING VGG EMBEDDING")
     vgg_embedding = VGG16Embedding(parallel=True)
 
@@ -20,6 +20,7 @@ def get_fid(args, G, ref_loader, cond_loader):
                            image_embedding=vgg_embedding,
                            condition_embedding=vgg_embedding,
                            cuda=True,
-                           args=args)
+                           args=args,
+                           max_num=max)
 
     return fid_metric.get_fid()

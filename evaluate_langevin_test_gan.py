@@ -94,7 +94,7 @@ def main(args):
     )
 
     print("SMALL CFID")
-    cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
+    # cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
 
     print("MEDIUM CFID")
     cfid_2 = 0#compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
@@ -103,7 +103,13 @@ def main(args):
     cfid_3 = 0#compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
 
     print("FID_1")
-    fid_1 = compute_fid.get_fid(args, G, train_loader, loader)
+    max_vals = np.linspace(80, 14400, num = 15)
+
+    for max in max_vals:
+        fid_1 = compute_fid.get_fid(args, G, train_loader, dev_loader, max=max)
+        print(f"FID: {fid_1}")
+        print(f"NUM SAMPLES: {max}")
+        print("\n\n")
 
     print("FID_2")
     fid_2 = 0#compute_fid.get_fid(args, G, train_loader, dev_loader)
