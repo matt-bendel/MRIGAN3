@@ -101,7 +101,7 @@ def main(args):
         cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1, max=max)
         cfids.append(cfid_1)
         print(f"CFID: {cfid_1}")
-        print(f"NUM SAMPLES: {max}")
+        # print(f"NUM SAMPLES: {max}")
         print("\n")
 
     file = open(f"{args.checkpoint_dir}/cfids.txt", "w+")
