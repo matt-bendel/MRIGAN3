@@ -111,6 +111,8 @@ def main(args):
         print(f"NUM SAMPLES: {max}")
         print("\n\n")
 
+    exit()
+
     print("FID_2")
     fid_2 = 0#compute_fid.get_fid(args, G, train_loader, dev_loader)
 
