@@ -284,6 +284,8 @@ class CFIDMetric:
             image_embed = np.concatenate(image_embed, axis=0)
             cond_embed = np.concatenate(cond_embed, axis=0)
 
+        print(f"NUM SAMPLES: {count}")
+
         return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
             dtype=torch.float64)
 
