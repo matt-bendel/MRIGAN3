@@ -11,10 +11,6 @@ from utils.fftc import ifft2c_new, fft2c_new
 from utils.get_mask import get_mask
 from utils.math import complex_abs
 
-def get_mvue(kspace, s_maps):
-    ''' Get mvue estimate from coil measurements '''
-    return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(np.sum(np.square(np.abs(s_maps)), axis=1))
-
 class DataTransformLang:
     def __init__(self, args, use_seed=False, test=False):
         """
@@ -53,34 +49,8 @@ class DataTransformLang:
         # GRO Sampling mask:
         mask, inds = self.mask, self.inds
         gt_ksp = kspace
-        # Crop extra lines and reduce FoV in phase-encode
-        gt_ksp = sp.resize(kspace, (
-            gt_ksp.shape[0], gt_ksp.shape[1], self.image_size[1]))
 
-        # Reduce FoV by half in the readout direction
-        gt_ksp = sp.ifft(gt_ksp, axes=(-2,))
-        gt_ksp = sp.resize(gt_ksp, (gt_ksp.shape[0], self.image_size[0],
-                                    gt_ksp.shape[2]))
-        maps = sense_maps
-        gt_ksp = sp.fft(gt_ksp, axes=(-2,))  # Back to k-space
-
-        # Crop extra lines and reduce FoV in phase-encode
-        maps = sp.fft(maps, axes=(-2, -1))  # These are now maps in k-space
-        maps = sp.resize(maps, (
-            maps.shape[0], maps.shape[1], self.image_size[1]))
-
-        # Reduce FoV by half in the readout direction
-        maps = sp.ifft(maps, axes=(-2,))
-        maps = sp.resize(maps, (maps.shape[0], self.image_size[0],
-                                maps.shape[2]))
-        maps = sp.fft(maps, axes=(-2,))  # Back to k-space
-        maps = sp.ifft(maps, axes=(-2, -1))  # Finally convert back to image domain
-
-        # find mvue image
-        gt = transforms.to_tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps.reshape((1,) + maps.shape)))
-        print(gt.shape)
-
-        return gt, gt
+        return torch.tensor(gt_ksp)
 
 
 class DataTransform:

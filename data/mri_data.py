@@ -176,11 +176,8 @@ class SelectiveSliceData(torch.utils.data.Dataset):
         fname, slice = self.examples[i]
         with h5py.File(fname, 'r') as data:
             kspace = data['kspace'][slice]
-            maps = mr.app.EspiritCalib(kspace, calib_width=32,
-                                device=sp.Device(0), show_pbar=False, crop=0.70,
-                                kernel_width=6).run().get()
             target = data[self.recons_key][slice] if self.recons_key in data else None
-            return self.transform(kspace, target, data.attrs, fname.name, slice, sense_maps=maps)
+            return self.transform(kspace, target, data.attrs, fname.name, slice)
 
 
 class SelectiveSliceData_Val(torch.utils.data.Dataset):

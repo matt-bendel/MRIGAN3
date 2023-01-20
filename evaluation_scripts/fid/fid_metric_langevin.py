@@ -4,6 +4,7 @@ import torch
 
 import numpy as np
 import sigpy as sp
+import sigpy.mri as mr
 from scipy import linalg
 from utils.math import complex_abs
 
@@ -71,7 +72,9 @@ def trace_sqrt_product_torch(sigma, sigma_v):
 
     return torch.trace(symmetric_matrix_square_root_torch(sqrt_a_sigmav_a))
 
-
+def get_mvue(kspace, s_maps):
+    ''' Get mvue estimate from coil measurements '''
+    return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(np.sum(np.square(np.abs(s_maps)), axis=1))
 # **Estimators**
 #
 def sample_covariance_torch(a, b):
@@ -278,8 +281,41 @@ class FIDMetric:
 
         for data in tqdm(self.ref_loader,
                          desc='Computing reference distribution'):
-            condition, gt = data
-            condition = condition.cuda()
+            gt = data
+
+            for j in range(gt.size(0)):
+                # Crop extra lines and reduce FoV in phase-encode
+                gt_ksp = sp.resize(gt.numpy(), (
+                    gt_ksp.shape[0], gt_ksp.shape[1], 384))
+
+                # Reduce FoV by half in the readout direction
+                maps = mr.app.EspiritCalib(gt_ksp, calib_width=32,
+                                           device=sp.Device(0), show_pbar=False, crop=0.70,
+                                           kernel_width=6).run().get()
+                gt_ksp = sp.ifft(gt_ksp, axes=(-2,))
+                gt_ksp = sp.resize(gt_ksp, (gt_ksp.shape[0], 384,
+                                            gt_ksp.shape[2]))
+                gt_ksp = sp.fft(gt_ksp, axes=(-2,))  # Back to k-space
+
+                # Crop extra lines and reduce FoV in phase-encode
+                maps = sp.fft(maps, axes=(-2, -1))  # These are now maps in k-space
+                maps = sp.resize(maps, (
+                    maps.shape[0], maps.shape[1], 384))
+
+                # Reduce FoV by half in the readout direction
+                maps = sp.ifft(maps, axes=(-2,))
+                maps = sp.resize(maps, (maps.shape[0], 384,
+                                        maps.shape[2]))
+                maps = sp.fft(maps, axes=(-2,))  # Back to k-space
+                maps = sp.ifft(maps, axes=(-2, -1))  # Finally convert back to image domain
+
+                # find mvue image
+                gt = transforms.to_tensor(
+                    get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps.reshape((1,) + maps.shape)))
+                print(gt.shape)
+                exit()
+
+            condition = gt.cuda()
             gt = gt.cuda()
 
             with torch.no_grad():
