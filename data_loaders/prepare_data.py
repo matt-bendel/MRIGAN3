@@ -49,6 +49,17 @@ class DataTransformLang:
         # GRO Sampling mask:
         mask, inds = self.mask, self.inds
         gt_ksp = kspace
+        gt_ksp = sp.resize(gt.numpy(), (
+            gt_ksp.shape[0], gt_ksp.shape[1], 384))
+
+        # Reduce FoV by half in the readout direction
+        maps = mr.app.EspiritCalib(gt_ksp, calib_width=32,
+                                   device=sp.Device(0), show_pbar=False, crop=0.70,
+                                   kernel_width=6).run().get()
+        gt_ksp = sp.ifft(gt_ksp, axes=(-2,))
+        gt_ksp = sp.resize(gt_ksp, (gt_ksp.shape[0], 384,
+                                    gt_ksp.shape[2]))
+        gt_ksp = sp.fft(gt_ksp, axes=(-2,))
 
         return torch.tensor(gt_ksp)
 
