@@ -2,7 +2,7 @@ import cv2
 import torch
 import numpy as np
 import sigpy as sp
-
+import sigpy.mri as mr
 from utils.espirit import ifft, fft
 from torch.utils.data import DataLoader
 from data import transforms
@@ -10,6 +10,78 @@ from data.mri_data import SelectiveSliceData, SelectiveSliceData_Val
 from utils.fftc import ifft2c_new, fft2c_new
 from utils.get_mask import get_mask
 from utils.math import complex_abs
+
+def get_mvue(kspace, s_maps):
+    ''' Get mvue estimate from coil measurements '''
+    return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(np.sum(np.square(np.abs(s_maps)), axis=1))
+
+class DataTransformLang:
+    def __init__(self, args, use_seed=False, test=False):
+        """
+        Args:
+            mask_func (common.subsample.MaskFunc): A function that can create  a mask of
+                appropriate shape.
+            resolution (int): Resolution of the image.
+            which_challenge (str): Either "singlecoil" or "multicoil" denoting the dataset.
+            use_seed (bool): If true, this class computes a pseudo random number generator seed
+                from the filename. This ensures that the same mask is used for all the slices of
+                a given volume every time.
+        """
+        self.use_seed = use_seed
+        self.args = args
+        self.mask, self.inds = get_mask(self.args.im_size, return_mask=True, R=self.args.R, args=self.args)
+        self.test = test
+        self.image_size = (384, 384)
+
+    def __call__(self, kspace, target, attrs, fname, slice, sense_maps=None):
+        """
+        Args:
+            kspace (numpy.array): Input k-space of shape (num_coils, rows, cols, 2) for multi-coil
+                data or (rows, cols, 2) for single coil data.
+            target (numpy.array): Target image
+            attrs (dict): Acquisition related information stored in the HDF5 object.
+            fname (str): File name
+            slice (int): Serial number of the slice.
+        Returns:
+            (tuple): tuple containing:
+                image (torch.Tensor): Zero-filled input image.
+                target (torch.Tensor): Target image converted to a torch Tensor.
+                mean (float): Mean value used for normalization.
+                std (float): Standard deviation value used for normalization.
+                norm (float): L2 norm of the entire volume.
+        """
+        # GRO Sampling mask:
+        mask, inds = self.mask, self.inds
+        # Crop extra lines and reduce FoV in phase-encode
+        gt_ksp = sp.resize(kspace, (
+            gt_ksp.shape[0], gt_ksp.shape[1], self.image_size[1]))
+
+        # Reduce FoV by half in the readout direction
+        gt_ksp = sp.ifft(gt_ksp, axes=(-2,))
+        gt_ksp = sp.resize(gt_ksp, (gt_ksp.shape[0], self.image_size[0],
+                                    gt_ksp.shape[2]))
+        maps = mr.app.EspiritCalib(gt_ksp, calib_width=32,
+                                   device=sp.Device(0), show_pbar=False, crop=0.70,
+                                   kernel_width=6).run().get()
+        gt_ksp = sp.fft(gt_ksp, axes=(-2,))  # Back to k-space
+
+        # Crop extra lines and reduce FoV in phase-encode
+        maps = sp.fft(maps, axes=(-2, -1))  # These are now maps in k-space
+        maps = sp.resize(maps, (
+            maps.shape[0], maps.shape[1], self.image_size[1]))
+
+        # Reduce FoV by half in the readout direction
+        maps = sp.ifft(maps, axes=(-2,))
+        maps = sp.resize(maps, (maps.shape[0], self.image_size[0],
+                                maps.shape[2]))
+        maps = sp.fft(maps, axes=(-2,))  # Back to k-space
+        maps = sp.ifft(maps, axes=(-2, -1))  # Finally convert back to image domain
+
+        # find mvue image
+        gt = transforms.to_tensor(get_mvue(gt_ksp.reshape((1,) + gt_ksp.shape), maps.reshape((1,) + maps.shape)))
+        print(gt.shape)
+
+        return gt, gt
 
 
 class DataTransform:
@@ -120,6 +192,26 @@ def create_datasets(args, val_only, big_test=False):
 
     return dev_data, train_data if not val_only else dev_data
 
+def create_train_lang(args):
+    train_data = SelectiveSliceData(
+        root=args.data_path / 'multicoil_train',
+        transform=DataTransformLang(args),
+        challenge='multicoil',
+        sample_rate=1,
+        use_top_slices=True,
+        number_of_top_slices=args.num_of_top_slices,
+        restrict_size=False,
+    )
+
+    loader = DataLoader(
+        dataset=train_data,
+        batch_size=args.batch_size,
+        num_workers=16,
+        pin_memory=True,
+        drop_last=True,
+    )
+
+    return loader
 
 def create_data_loaders(args, val_only=False, big_test=False):
     dev_data, train_data = create_datasets(args, val_only, big_test=big_test)

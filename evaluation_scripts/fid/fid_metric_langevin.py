@@ -261,14 +261,7 @@ class FIDMetric:
         embed_ims = torch.zeros(size=(multi_coil_inp.size(0), 3, 384, 384),
                                 device=self.args.device)
         for i in range(multi_coil_inp.size(0)):
-            reformatted = torch.zeros(size=(8, 384, 384, 2),
-                                      device=self.args.device)
-            reformatted[:, :, :, 0] = multi_coil_inp[i, 0:8, :, :]
-            reformatted[:, :, :, 1] = multi_coil_inp[i, 8:16, :, :]
-
-            unnormal_im = tensor_to_complex_np((reformatted * std[i] + mean[i]).cpu())
-
-            im = torch.tensor(maps[i].H * unnormal_im).abs()
+            im = multi_coil_inp[i]
 
             im = 2 * (im - torch.min(im)) / (torch.max(im) - torch.min(im)) - 1
 
@@ -284,26 +277,13 @@ class FIDMetric:
 
         for data in tqdm(self.ref_loader,
                          desc='Computing reference distribution'):
-            condition, gt, true_cond, mean, std = data
+            condition, gt = data
             condition = condition.cuda()
             gt = gt.cuda()
-            true_cond = true_cond.cuda()
-            mean = mean.cuda()
-            std = std.cuda()
-            maps = []
 
             with torch.no_grad():
-                for j in range(condition.shape[0]):
-                    new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
-                    s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                                 device=sp.Device(3), show_pbar=False, crop=0.70,
-                                                 kernel_width=6).run().get()
-                    S = sp.linop.Multiply((384, 384), s_maps)
-
-                    maps.append(S)
-
-                image = self._get_embed_im_ref(gt, mean, std, maps)
-                condition_im = self._get_embed_im_ref(condition, mean, std, maps)
+                image = self._get_embed_im_ref(gt)
+                condition_im = self._get_embed_im_ref(condition)
 
                 img_e = self.image_embedding(image)
                 cond_e = self.condition_embedding(condition_im)

@@ -101,7 +101,7 @@ recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 
 args = create_arg_parser().parse_args()
 
-train_loader, _ = create_data_loaders(args, big_test=False)
+train_loader, _ = create_train_lang(args)
 get_fid(args, None, train_loader, None)
 exit()
 
