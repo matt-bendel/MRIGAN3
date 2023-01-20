@@ -118,6 +118,8 @@ def main(args):
     cfid_3 = 0#compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=train_loader, num_samps=1)
 
     print("FID_1")
+    fid_1 = compute_fid.get_fid(args, G, train_loader, loader, max=1000000)
+    return
     max_vals = np.linspace(520, 2280, num = 15)
     fids = []
     for max in max_vals:

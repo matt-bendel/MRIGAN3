@@ -248,48 +248,48 @@ class FIDMetric:
 
                     total += image.size(0)
 
-        if self.use_train:
-            for i, data in tqdm(enumerate(self.ref_loader),
-                                desc='Computing generated distribution',
-                                total=len(self.ref_loader), disable=True):
-                condition, gt, true_cond, mean, std, mask, inds = data
-                condition = condition.cuda()
-                gt = gt.cuda()
-                true_cond = true_cond.cuda()
-                mean = mean.cuda()
-                std = std.cuda()
-                mask = mask.cuda()
-                maps = []
-
-                with torch.no_grad():
-                    for j in range(condition.shape[0]):
-                        if total >= self.max_num:
-                            break
-                        new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
-                        s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                                     device=sp.Device(0), show_pbar=False, crop=0.70,
-                                                     kernel_width=6).run().get()
-                        S = sp.linop.Multiply((self.args.im_size, self.args.im_size), s_maps)
-
-                        maps.append(S)
-
-                    for k in range(self.num_samps):
-                        recon = self.gan(condition, true_cond, mask=mask.cuda())
-
-                        image = self._get_embed_im(recon, mean, std, maps)
-                        condition_im = self._get_embed_im(condition, mean, std, maps)
-
-                        img_e = self.image_embedding(self.transforms(image))
-                        cond_e = self.condition_embedding(self.transforms(condition_im))
-
-                        if self.cuda:
-                            image_embed.append(img_e)
-                            cond_embed.append(cond_e)
-                        else:
-                            image_embed.append(img_e.cpu().numpy())
-                            cond_embed.append(cond_e.cpu().numpy())
-
-                        total += image.size(0)
+        # if self.use_train:
+        #     for i, data in tqdm(enumerate(self.ref_loader),
+        #                         desc='Computing generated distribution',
+        #                         total=len(self.ref_loader), disable=True):
+        #         condition, gt, true_cond, mean, std, mask, inds = data
+        #         condition = condition.cuda()
+        #         gt = gt.cuda()
+        #         true_cond = true_cond.cuda()
+        #         mean = mean.cuda()
+        #         std = std.cuda()
+        #         mask = mask.cuda()
+        #         maps = []
+        #
+        #         with torch.no_grad():
+        #             for j in range(condition.shape[0]):
+        #                 if total >= self.max_num:
+        #                     break
+        #                 new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
+        #                 s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+        #                                              device=sp.Device(0), show_pbar=False, crop=0.70,
+        #                                              kernel_width=6).run().get()
+        #                 S = sp.linop.Multiply((self.args.im_size, self.args.im_size), s_maps)
+        #
+        #                 maps.append(S)
+        #
+        #             for k in range(self.num_samps):
+        #                 recon = self.gan(condition, true_cond, mask=mask.cuda())
+        #
+        #                 image = self._get_embed_im(recon, mean, std, maps)
+        #                 condition_im = self._get_embed_im(condition, mean, std, maps)
+        #
+        #                 img_e = self.image_embedding(self.transforms(image))
+        #                 cond_e = self.condition_embedding(self.transforms(condition_im))
+        #
+        #                 if self.cuda:
+        #                     image_embed.append(img_e)
+        #                     cond_embed.append(cond_e)
+        #                 else:
+        #                     image_embed.append(img_e.cpu().numpy())
+        #                     cond_embed.append(cond_e.cpu().numpy())
+        #
+        #                 total += image.size(0)
 
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)

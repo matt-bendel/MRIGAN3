@@ -166,7 +166,7 @@ class SelectiveSliceData(torch.utils.data.Dataset):
             else:
                 # if restrict_size and ((kspace.shape[1] != 640) or (kspace.shape[2] != 368)):
                 #     continue  # skip non uniform sized images
-                num_slices = 8 # kspace.shape[0]
+                num_slices = 6 # kspace.shape[0]
                 self.examples += [(fname, slice) for slice in range(num_slices)]
 
     def __len__(self):
