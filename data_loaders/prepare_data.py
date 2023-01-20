@@ -61,9 +61,7 @@ class DataTransformLang:
         gt_ksp = sp.ifft(gt_ksp, axes=(-2,))
         gt_ksp = sp.resize(gt_ksp, (gt_ksp.shape[0], self.image_size[0],
                                     gt_ksp.shape[2]))
-        maps = mr.app.EspiritCalib(gt_ksp, calib_width=32,
-                                   device=sp.Device(0), show_pbar=False, crop=0.70,
-                                   kernel_width=6).run().get()
+        maps = sense_maps
         gt_ksp = sp.fft(gt_ksp, axes=(-2,))  # Back to k-space
 
         # Crop extra lines and reduce FoV in phase-encode
