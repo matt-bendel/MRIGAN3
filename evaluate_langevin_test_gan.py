@@ -119,6 +119,7 @@ def main(args):
 
     print("FID_1")
     fid_1 = compute_fid.get_fid(args, G, train_loader, loader, max=1000000)
+    print(fid_1)
     return
     max_vals = np.linspace(520, 2280, num = 15)
     fids = []
