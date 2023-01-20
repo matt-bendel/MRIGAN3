@@ -49,7 +49,7 @@ class DataTransformLang:
         # GRO Sampling mask:
         mask, inds = self.mask, self.inds
         gt_ksp = kspace
-        gt_ksp = sp.resize(gt.numpy(), (
+        gt_ksp = sp.resize(gt_ksp, (
             gt_ksp.shape[0], gt_ksp.shape[1], 384))
 
         # Reduce FoV by half in the readout direction
