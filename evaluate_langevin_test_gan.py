@@ -95,21 +95,21 @@ def main(args):
 
     print("SMALL CFID")
     # cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
-    max_vals = np.linspace(520, 2280, num=15)
-    cfids = []
-    for max in max_vals:
-        cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1, max=max)
-        cfids.append(cfid_1)
-        print(f"CFID: {cfid_1}")
-        # print(f"NUM SAMPLES: {max}")
-        print("\n")
+    # max_vals = np.linspace(520, 2280, num=15)
+    # cfids = []
+    # for max in max_vals:
+    #     cfid_1 = compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1, max=max)
+    #     cfids.append(cfid_1)
+    #     print(f"CFID: {cfid_1}")
+    #     # print(f"NUM SAMPLES: {max}")
+    #     print("\n")
 
-    file = open(f"{args.checkpoint_dir}/cfids.txt", "w+")
+    # file = open(f"{args.checkpoint_dir}/cfids.txt", "w+")
 
     # Saving the 2D array in a text file
-    content = str(cfids)
-    file.write(content)
-    file.close()
+    # content = str(cfids)
+    # file.write(content)
+    # file.close()
 
     print("MEDIUM CFID")
     cfid_2 = 0#compute_cfid.get_cfid(args, G, langevin=True, loader=dev_loader, ref_loader=None, num_samps=1)
