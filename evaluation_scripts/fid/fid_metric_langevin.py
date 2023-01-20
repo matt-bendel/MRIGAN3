@@ -282,6 +282,7 @@ class FIDMetric:
         for data in tqdm(self.ref_loader,
                          desc='Computing reference distribution'):
             gt = data
+            gt_ksp = gt.numpy()
 
             for j in range(gt.size(0)):
                 # Reduce FoV by half in the readout direction
