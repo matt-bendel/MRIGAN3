@@ -252,6 +252,7 @@ class FIDMetric:
     def _get_reference_distribution(self):
         stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
         mu_real, sigma_real, alpha = stats
+        mu_real, sigma_real = self._compute_reference_distribution()
 
         self.mu_real, self.sigma_real, self.alpha = mu_real, sigma_real, alpha
 
