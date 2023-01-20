@@ -52,6 +52,7 @@ class DataTransformLang:
         """
         # GRO Sampling mask:
         mask, inds = self.mask, self.inds
+        gt_ksp = kspace
         # Crop extra lines and reduce FoV in phase-encode
         gt_ksp = sp.resize(kspace, (
             gt_ksp.shape[0], gt_ksp.shape[1], self.image_size[1]))
