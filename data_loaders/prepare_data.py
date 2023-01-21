@@ -67,7 +67,7 @@ class DataTransform:
         kspace = fft2c_new(image)
         masked_kspace = kspace * mask
         # maps = mr.app.EspiritCalib(tensor_to_complex_np(masked_kspace.cpu()), calib_width=32,
-        #                            device=sp.Device(3), show_pbar=False, crop=0.70,
+        #                            device=sp.Device(0), show_pbar=False, crop=0.70,
         #                            kernel_width=6).run().get()
         # S = sp.linop.Multiply((384, 384), maps)
         input_tensor = ifft2c_new(masked_kspace)

@@ -441,7 +441,7 @@ def main(args):
 
                 new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                           device=sp.Device(3), show_pbar=False, crop=0.70,
+                                           device=sp.Device(0), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
                 S = sp.linop.Multiply((384, 384), maps)
                 gt_ksp, avg_ksp_ours, avg_ksp_adler, avg_ksp_ohayon = tensor_to_complex_np((gt * std[j] + mean[j]).cpu()), tensor_to_complex_np(

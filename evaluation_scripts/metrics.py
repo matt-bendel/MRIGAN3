@@ -242,7 +242,7 @@ def get_metrics(args, num_z, is_super=False, std_val=-1):
             for j in range(y.size(0)):
                 new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                           device=sp.Device(3), show_pbar=False, crop=0.70, kernel_width=6).run().get()
+                                           device=sp.Device(0), show_pbar=False, crop=0.70, kernel_width=6).run().get()
                 S = sp.linop.Multiply((384, 384), maps)
                 # F = sp.linop.FFT((8, 384, 384), axes=(-1, -2))
                 # gt_ksp, avg_ksp = tensor_to_complex_np(fft2c_new(gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(

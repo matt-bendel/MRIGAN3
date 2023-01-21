@@ -93,9 +93,9 @@ def main(R, data):
                 # plt.savefig('temp0.png')
 
                 s_map = mr.app.EspiritCalib(y, calib_width=32, show_pbar=True, crop=0.7, kernel_width=5,
-                                            device=sp.Device(1)).run()
+                                            device=sp.Device(0)).run()
 
-                x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(1)).run()
+                x_ls = mr.app.L1WaveletRecon(y, s_map, lamda=1e-10, show_pbar=True, device=sp.Device(0)).run()
 
                 sense_op = sp.linop.Multiply((384, 384), s_map)
                 # pl.ImagePlot(sense_op.H * coil_compressed_x, title='LS Recon', save_basename='temp')

@@ -274,7 +274,7 @@ def test(args):
 
             for j in range(zf.size(0)):
                 maps = mr.app.EspiritCalib(tensor_to_complex_np(mean_kspace[j].cpu()), calib_width=16,
-                                           device=sp.Device(3), show_pbar=False, crop=0.70,
+                                           device=sp.Device(0), show_pbar=False, crop=0.70,
                                            kernel_width=6).run().get()
                 S_vals.append(sp.linop.Multiply((384, 384), maps))
 

@@ -370,7 +370,7 @@ def train(args, bl=1, adv_mult=0.0):
                 for j in range(y.size(0)):
                     new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                     maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=args.calib_width,
-                                               device=sp.Device(1), show_pbar=False, crop=0.70,
+                                               device=sp.Device(0), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
                     S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
@@ -517,6 +517,7 @@ def train(args, bl=1, adv_mult=0.0):
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
+    torch.backends.cudnn.enabled = True
     torch.backends.cudnn.benchmark = True
 
     args = create_arg_parser().parse_args()

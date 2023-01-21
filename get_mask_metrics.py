@@ -167,7 +167,7 @@ def main(args, mask_num):
                 for j in range(y.size(0)):
                     new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
                     maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
-                                               device=sp.Device(1), show_pbar=False, crop=0.70,
+                                               device=sp.Device(0), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
                     S = sp.linop.Multiply((args.im_size, args.im_size), maps)
                     gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(

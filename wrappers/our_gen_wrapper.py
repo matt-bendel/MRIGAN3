@@ -114,7 +114,7 @@ class GANWrapper:
         noise_fft = fft2c_new(z)
         measured_noise = ifft2c_new(mask[:, 0, :, :, :] * noise_fft).permute(0, 3, 1, 2)
         # nonmeasured_noise = ifft2c_new((1 - mask[:, 0, :, :, :]) * noise_fft).permute(0, 3, 1, 2)
-        return measured_noise
+        return measured_noise, z.permute(0, 3, 1, 2)
 
         # return torch.cat([measured_noise, nonmeasured_noise], dim=1)
         # return torch.randn(num_vectors, 2, self.resolution, self.resolution).cuda()
@@ -149,8 +149,8 @@ class GANWrapper:
 
     def __call__(self, y, true_measures, noise_var=1, mask=None, inds=None):
         num_vectors = y.size(0)
-        z = self.get_noise(num_vectors, 1, mask)
-        samples = self.gen(input=torch.cat([y, z], dim=1), mid_z=None)
+        measured, z = self.get_noise(num_vectors, 1, mask)
+        samples = self.gen(y, measured, z, mid_z=None)
         # samples = self.gen(y, None, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
         #
         samples = self.readd_measures(samples, true_measures, mask)
