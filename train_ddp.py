@@ -235,7 +235,8 @@ def train(rank, world_size, args):
     bl = 1
     adv_mult=0.0
 
-    print(f"WEIGHT: {adv_mult}")
+    if rank == 0:
+        print(f"WEIGHT: {adv_mult}")
     args.exp_dir.mkdir(parents=True, exist_ok=True)
 
     args.in_chans = 16
@@ -373,11 +374,12 @@ def train(rank, world_size, args):
             batch_loss['g_loss'].append(g_loss.item())
             batch_loss['d_loss'].append(d_loss.item())
 
-            print(
-                "[Epoch %d/%d] [Batch %d/%d] [D loss: %.4f] [G loss: %.4f]"
-                % (epoch + 1, args.num_epochs, i, len(train_loader.dataset) / args.batch_size, d_loss.item(),
-                   g_loss.item())
-            )
+            if rank == 0:
+                print(
+                    "[Epoch %d/%d] [Batch %d/%d] [D loss: %.4f] [G loss: %.4f]"
+                    % (epoch + 1, args.num_epochs, i, len(train_loader.dataset) / args.batch_size, d_loss.item(),
+                       g_loss.item())
+                )
 
         losses = {
             'psnr': [],
@@ -493,8 +495,9 @@ def train(rank, world_size, args):
                         plt.close()
 
         psnr_diff = (np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr'])
-        print(f"PSNR DIFF: {psnr_diff:.2f}")
-        print(f"WEIGHT: {std_mult}")
+        if rank == 0:
+            print(f"PSNR DIFF: {psnr_diff:.2f}")
+            print(f"WEIGHT: {std_mult}")
         psnr_loss = np.mean(losses['psnr'])
 
         CFID = compute_cfid.get_cfid(args, G, dev_loader, num_samps=1)
@@ -506,12 +509,13 @@ def train(rank, world_size, args):
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
 
-        save_str = f"END OF EPOCH {epoch + 1}: [Average D loss: {GLOBAL_LOSS_DICT['d_loss'][epoch - start_epoch]:.4f}] [Average G loss: {GLOBAL_LOSS_DICT['g_loss'][epoch - start_epoch]:.4f}]\n"
-        print(save_str)
-        save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
-        print(save_str_2)
+        if rank == 0:
+            save_str = f"END OF EPOCH {epoch + 1}: [Average D loss: {GLOBAL_LOSS_DICT['d_loss'][epoch - start_epoch]:.4f}] [Average G loss: {GLOBAL_LOSS_DICT['g_loss'][epoch - start_epoch]:.4f}]\n"
+            print(save_str)
+            save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
+            print(save_str_2)
 
-        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}\nPSNR Diff: {psnr_diff}", file_name="variation_gif.gif")
+            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}\nPSNR Diff: {psnr_diff}", file_name="variation_gif.gif")
 
         save_model_ddp(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', rank)
         save_model_ddp(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', rank)
