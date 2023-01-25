@@ -219,7 +219,6 @@ def create_data_loaders_ddp(args, val_only=False, big_test=False, rank=0, world_
     train_loader = DataLoader(
         dataset=train_data,
         batch_size=args.batch_size,
-        shuffle=True,
         num_workers=0,
         pin_memory=False,
         drop_last=True,
