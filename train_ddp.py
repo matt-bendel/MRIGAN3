@@ -225,6 +225,7 @@ def generate_gif(type):
         os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
 def train(rank, world_size, args):
+    torch.cuda.set_device(rank)
     dist.init_process_group(
         backend='nccl',
         init_method='env://',
