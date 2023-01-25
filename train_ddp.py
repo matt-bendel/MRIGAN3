@@ -321,7 +321,7 @@ def train(rank, world_size, args):
                     fake_pred = D(input=x_hat, y=y)
 
                     # Gradient penalty
-                    gradient_penalty = 0#compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
+                    gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
 
                     d_loss = fake_pred.mean() - real_pred.mean()
                     d_loss += args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)

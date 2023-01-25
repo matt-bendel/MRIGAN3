@@ -135,7 +135,7 @@ class GANWrapper:
         # return torch.cuda.FloatTensor(np.random.normal(size=(num_vectors, self.args.latent_size), scale=1))
         z = torch.randn(num_vectors, self.resolution, self.resolution, 2).cuda()
         noise_fft = fft2c_new(z)
-        measured_noise = ifft2c_new(mask[:, 0, :, :, :] * noise_fft).permute(0, 3, 1, 2)
+        measured_noise = ifft2c_new(mask[:, 0, :, :, :] * noise_fft).permute(0, 3, 1, 2).clone()
         # nonmeasured_noise = ifft2c_new((1 - mask[:, 0, :, :, :]) * noise_fft).permute(0, 3, 1, 2)
         return measured_noise
 
