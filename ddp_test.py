@@ -29,6 +29,6 @@ if __name__ == "__main__":
 
     mp.spawn(
         train,
-        args=(args),
+        args=(world_size, args),
         nprocs=world_size
     )

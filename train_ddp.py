@@ -17,7 +17,7 @@ from evaluation_scripts.metrics import get_metrics
 from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from utils.parse_args import create_arg_parser
-from wrappers.our_gen_wrapper import get_gan, save_model
+from wrappers.our_gen_wrapper import get_gan, save_model_ddp
 from data_loaders.prepare_data import create_data_loaders_ddp
 from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
@@ -226,8 +226,10 @@ def generate_gif(type):
     for i in range(8):
         os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
-def train(args, bl=1, adv_mult=0.0):
+def train(rank, world_size, args):
     setup()
+    bl = 1
+    adv_mult=0.0
 
     print(f"WEIGHT: {adv_mult}")
     args.exp_dir.mkdir(parents=True, exist_ok=True)
@@ -263,7 +265,7 @@ def train(args, bl=1, adv_mult=0.0):
         std_mult = std_mults[-1]
         print(std_mult)
 
-    G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
+    G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args, rank=rank, world_size=world_size)
     #
 
     if args.resume:
@@ -271,7 +273,7 @@ def train(args, bl=1, adv_mult=0.0):
     else:
         best_loss = 100000
 
-    train_loader, dev_loader = create_data_loaders_ddp(args, big_test=False)
+    train_loader, dev_loader = create_data_loaders_ddp(args, big_test=False, rank=rank, world_size=world_size)
 
     # exit()
 
@@ -507,8 +509,8 @@ def train(args, bl=1, adv_mult=0.0):
 
         send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}\nPSNR Diff: {psnr_diff}", file_name="variation_gif.gif")
 
-        save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator')
-        save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator')
+        save_model_ddp(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', rank)
+        save_model_ddp(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', rank)
 
         mu_0 = 2e-2
         std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))

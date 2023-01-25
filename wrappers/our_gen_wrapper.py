@@ -29,7 +29,7 @@ def load_best_gan(args):
     return generator
 
 
-def get_gan(args):
+def get_gan(args, rank=0, world_size=2):
     from utils.prepare_models import build_model, build_model_sg, build_optim, build_discriminator
 
     if args.resume:
@@ -68,8 +68,8 @@ def get_gan(args):
         discriminator = build_discriminator(args)
 
         if args.data_parallel:
-            generator = DDP(generator.to(0), device_ids=[0])#torch.nn.DataParallel(generator)
-            discriminator = DDP(discriminator.to(0), device_ids=[0])#torch.nn.DataParallel(discriminator)
+            generator = DDP(generator.to(rank), device_ids=[rank], output_device=rank)#torch.nn.DataParallel(generator)
+            discriminator = DDP(discriminator.to(rank), device_ids=[rank], output_device=rank)#torch.nn.DataParallel(discriminator)
 
         generator = GANWrapper(generator, args)
 
@@ -100,6 +100,29 @@ def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type
         shutil.copyfile(fpath / f'{m_type}_model.pt',
                         fpath / f'{m_type}_best_model.pt')
 
+def save_model_ddp(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type, rank):
+    fpath = args.exp_dir / 'ls' if args.ls else args.exp_dir if not args.stylegan else args.exp_dir / 'stylegan'
+    if rank == 0:
+        torch.save(
+            {
+                'epoch': epoch,
+                'args': args,
+                'model': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'best_dev_loss': best_dev_loss,
+                'exp_dir': args.exp_dir
+            },
+            f=fpath / f'{m_type}_model.pt'
+        )
+
+        if is_new_best:
+            shutil.copyfile(fpath / f'{m_type}_model.pt',
+                            fpath / f'{m_type}_best_model.pt')
+
+    dist.barrier()
+    # map_location = {'cuda:%d' % 0: 'cuda:%d' % rank}
+    # ddp_model.load_state_dict(
+    #     torch.load(fpath / f'{m_type}_model.pt', map_location=map_location))
 
 class GANWrapper:
     def __init__(self, gen, args):
