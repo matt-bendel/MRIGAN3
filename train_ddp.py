@@ -227,7 +227,13 @@ def generate_gif(type):
         os.remove(f'/home/bendel.8/Git_Repos/MRIGAN3/gif_{type}_{i}.png')
 
 def train(rank, world_size, args):
-    setup()
+    dist.init_process_group(
+        backend='nccl',
+        init_method='env://',
+        world_size=world_size,
+        rank=rank
+    )
+
     bl = 1
     adv_mult=0.0
 
