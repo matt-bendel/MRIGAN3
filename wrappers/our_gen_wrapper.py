@@ -158,7 +158,7 @@ class GANWrapper:
         reformatted_tensor = self.reformat(samples)
         reconstructed_kspace = fft2c_new(reformatted_tensor)
 
-        reconstructed_kspace = mask * measures + (1 - mask) * reconstructed_kspace
+        reconstructed_kspace = mask * measures + (1 - mask) * reconstructed_kspace.clone()
 
         # for i in range(reconstructed_kspace.size(0)):
         #     reconstructed_kspace[i, :, inds[i, 0], inds[i, 1], :] = measures[i, :, inds[i, 0], inds[i, 1], :]
@@ -177,5 +177,5 @@ class GANWrapper:
         samples = self.gen(input=torch.cat([y, z], dim=1), mid_z=None)
         # samples = self.gen(y, None, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=None, truncation_latent=None)
         #
-        samples = self.readd_measures(samples, true_measures, mask)
+        samples = self.readd_measures(samples, true_measures.clone(), mask.clone())
         return samples
