@@ -68,8 +68,8 @@ def get_gan(args, rank=0, world_size=2):
         discriminator = build_discriminator(args)
 
         if args.data_parallel:
-            generator = DDP(generator.to(rank), device_ids=[rank], output_device=rank)#torch.nn.DataParallel(generator)
-            discriminator = DDP(discriminator.to(rank), device_ids=[rank], output_device=rank)#torch.nn.DataParallel(discriminator)
+            generator = torch.nn.DataParallel(generator)#DDP(generator.to(rank), device_ids=[rank], output_device=rank)#
+            discriminator = torch.nn.DataParallel(discriminator)#DDP(discriminator.to(rank), device_ids=[rank], output_device=rank)#
 
         generator = GANWrapper(generator, args)
 
