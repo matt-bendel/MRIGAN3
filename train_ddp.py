@@ -325,7 +325,7 @@ def train(rank, world_size, args):
 
                     d_loss = fake_pred.mean() - real_pred.mean()
                     d_loss += args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
-                    d_loss.backward()
+                    d_loss.backward(retain_graph=True)
                     opt_D.step()
 
                 for param in G.gen.parameters():
