@@ -267,13 +267,11 @@ def train(args, bl=1, adv_mult=0.0):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            y, x, y_true, mean, std = data
+            y, x, y_true, mean, std, mask, inds = data
             y = y.to(args.device)
             x = x.to(args.device)
             y_true = y_true.to(args.device)
-            mask = get_mask(384, args=args)
-            mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
-            inds = None
+            mask = mask.to(args.device)
 
             # for k in range (5):
             #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
@@ -366,13 +364,11 @@ def train(args, bl=1, adv_mult=0.0):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                y, x, y_true, mean, std, = data
+                y, x, y_true, mean, std, mask, inds = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
-                mask = get_mask(384, args=args)
-                mask = mask[0].repeat(x.size(0), 1, 1, 1, 1).to(args.device)
-                inds = None
+                mask = mask.to(args.device)
 
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
