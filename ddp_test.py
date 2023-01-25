@@ -31,6 +31,10 @@ if __name__ == "__main__":
     args.out_chans = 16
     world_size=2
 
+    os.environ["MASTER_ADDR"] = 'localhost'
+    os.environ["MASTER_PORT"] = "12355"
+    os.environ["WORLD_SIZE"] = str(world_size)
+
     mp.spawn(
         train,
         args=(world_size, args,),
