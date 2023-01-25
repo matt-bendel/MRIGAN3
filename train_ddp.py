@@ -282,270 +282,270 @@ def train(rank, world_size, args):
     train_loader, dev_loader = create_data_loaders_ddp(args, big_test=False, rank=rank, world_size=world_size)
 
     # exit()
+    with torch.autograd.set_detect_anomaly(True):
+        for epoch in range(start_epoch, args.num_epochs):
+            batch_loss = {
+                'g_loss': [],
+                'd_loss': [],
+            }
+            train_loader.sampler.set_epoch(epoch)
+            dev_loader.sampler.set_epoch(epoch)
 
-    for epoch in range(start_epoch, args.num_epochs):
-        batch_loss = {
-            'g_loss': [],
-            'd_loss': [],
-        }
-        train_loader.sampler.set_epoch(epoch)
-        dev_loader.sampler.set_epoch(epoch)
-
-        for i, data in enumerate(train_loader):
-            G.update_gen_status(val=False)
-            y, x, y_true, mean, std, mask, inds = data
-            y = y.to(args.device)
-            x = x.to(args.device)
-            y_true = y_true.to(args.device)
-            mask = mask.to(args.device)
-
-            # for k in range (5):
-            #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
-            #     print(mask_np[0, :])
-            #     print(mask_np[:, 0])
-            #     plt.figure()
-            #     plt.imshow(mask_np, cmap='viridis')
-            #     plt.savefig(f'mask_{k}.png')
-            #     plt.close()
-            #
-            # break
-            # exit()
-
-            for j in range(args.num_iters_discriminator):
-                for param in D.parameters():
-                    param.grad = None
-
-                x_hat = G(y, y_true, mask=mask, inds=inds)
-
-                real_pred = D(input=x, y=y)
-                fake_pred = D(input=x_hat, y=y)
-
-                # Gradient penalty
-                gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
-
-                d_loss = fake_pred.mean() - real_pred.mean()
-                d_loss += args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
-                d_loss.backward()
-                opt_D.step()
-
-            for param in G.gen.parameters():
-                param.grad = None
-
-            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
-                               device=args.device)
-            for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y, y_true, mask=mask)
-
-            # patch_out = 30
-            patch_out = 94
-
-            if args.patch_disc:
-                fake_pred = torch.zeros(size=(y.shape[0], args.num_z, patch_out, patch_out), device=args.device)
-                for k in range(y.shape[0]):
-                    cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
-                    cond[0, :, :, :] = y[k, :, :, :]
-                    cond = cond.repeat(args.num_z, 1, 1, 1)
-                    temp = D(input=gens[k], y=cond)
-                    fake_pred[k, :, :, :] = temp[:, 0, :, :]
-            else:
-                fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
-                for k in range(y.shape[0]):
-                    cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
-                    cond[0, :, :, :] = y[k, :, :, :]
-                    cond = cond.repeat(args.num_z, 1, 1, 1)
-                    temp = D(input=gens[k], y=cond)
-                    fake_pred[k] = temp[:, 0]
-
-            avg_recon = torch.mean(gens, dim=1)
-
-            gen_pred_loss = torch.mean(fake_pred[0])
-            for k in range(y.shape[0] - 1):
-                gen_pred_loss += torch.mean(fake_pred[k + 1])
-
-            std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-2
-            l1_weight = 1
-            g_loss = - adv_weight * gen_pred_loss.mean()
-            g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
-            g_loss += - std_weight * torch.std(gens, dim=1).mean()
-
-            g_loss.backward()
-            opt_G.step()
-
-            batch_loss['g_loss'].append(g_loss.item())
-            batch_loss['d_loss'].append(d_loss.item())
-
-            if rank == 0:
-                print(
-                    "[Epoch %d/%d] [Batch %d/%d] [D loss: %.4f] [G loss: %.4f]"
-                    % (epoch + 1, args.num_epochs, i, len(train_loader.dataset) / args.batch_size, d_loss.item(),
-                       g_loss.item())
-                )
-
-        losses = {
-            'psnr': [],
-            'single_psnr': [],
-            'ssim': []
-        }
-
-        for i, data in enumerate(dev_loader):
-            G.update_gen_status(val=True)
-            with torch.no_grad():
+            for i, data in enumerate(train_loader):
+                G.update_gen_status(val=False)
                 y, x, y_true, mean, std, mask, inds = data
                 y = y.to(args.device)
                 x = x.to(args.device)
                 y_true = y_true.to(args.device)
                 mask = mask.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
+                # for k in range (5):
+                #     mask_np = mask[k, 0, :, :, 0].cpu().numpy()
+                #     print(mask_np[0, :])
+                #     print(mask_np[:, 0])
+                #     plt.figure()
+                #     plt.imshow(mask_np, cmap='viridis')
+                #     plt.savefig(f'mask_{k}.png')
+                #     plt.close()
+                #
+                # break
+                # exit()
+
+                for j in range(args.num_iters_discriminator):
+                    for param in D.parameters():
+                        param.grad = None
+
+                    x_hat = G(y, y_true, mask=mask, inds=inds)
+
+                    real_pred = D(input=x, y=y)
+                    fake_pred = D(input=x_hat, y=y)
+
+                    # Gradient penalty
+                    gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
+
+                    d_loss = fake_pred.mean() - real_pred.mean()
+                    d_loss += args.gp_weight * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
+                    d_loss.backward()
+                    opt_D.step()
+
+                for param in G.gen.parameters():
+                    param.grad = None
+
+                gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
-                for z in range(8):
-                    gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask, inds=None)
+                for z in range(args.num_z):
+                    gens[:, z, :, :, :] = G(y, y_true, mask=mask)
 
-                avg = torch.mean(gens, dim=1)
+                # patch_out = 30
+                patch_out = 94
 
-                avg_gen = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
-                avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
-                avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
+                if args.patch_disc:
+                    fake_pred = torch.zeros(size=(y.shape[0], args.num_z, patch_out, patch_out), device=args.device)
+                    for k in range(y.shape[0]):
+                        cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
+                        cond[0, :, :, :] = y[k, :, :, :]
+                        cond = cond.repeat(args.num_z, 1, 1, 1)
+                        temp = D(input=gens[k], y=cond)
+                        fake_pred[k, :, :, :] = temp[:, 0, :, :]
+                else:
+                    fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
+                    for k in range(y.shape[0]):
+                        cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
+                        cond[0, :, :, :] = y[k, :, :, :]
+                        cond = cond.repeat(args.num_z, 1, 1, 1)
+                        temp = D(input=gens[k], y=cond)
+                        fake_pred[k] = temp[:, 0]
 
-                gt = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
-                gt[:, :, :, :, 0] = x[:, 0:8, :, :]
-                gt[:, :, :, :, 1] = x[:, 8:16, :, :]
+                avg_recon = torch.mean(gens, dim=1)
 
-                for j in range(y.size(0)):
-                    new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
-                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=args.calib_width,
-                                               device=sp.Device(0), show_pbar=False, crop=0.70,
-                                               kernel_width=6).run().get()
-                    S = sp.linop.Multiply((args.im_size, args.im_size), maps)
-                    gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
-                        (avg_gen[j] * std[j] + mean[j]).cpu())
+                gen_pred_loss = torch.mean(fake_pred[0])
+                for k in range(y.shape[0] - 1):
+                    gen_pred_loss += torch.mean(fake_pred[k + 1])
 
-                    # temp_re = complex_abs(fft2c_new(transforms.to_tensor(S.H * avg_ksp))) ** 0.4
-                    # temp_gt = complex_abs(fft2c_new(transforms.to_tensor(S.H * gt_ksp))) ** 0.4
-                    #
-                    # error = np.abs(temp_gt.cpu().numpy() - temp_re.cpu().numpy())
-                    #
-                    # plt.imshow(3 * error, cmap='jet', vmax=1)
-                    # plt.savefig('temp_kspace_error.png')
-                    # print(temp_re.shape)
-                    #
-                    # exit()
+                std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+                adv_weight = 1e-2
+                l1_weight = 1
+                g_loss = - adv_weight * gen_pred_loss.mean()
+                g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
+                g_loss += - std_weight * torch.std(gens, dim=1).mean()
 
-                    avg_gen_np = torch.tensor(S.H * avg_ksp).numpy()
-                    gt_np = torch.tensor(S.H * gt_ksp).numpy()
+                g_loss.backward()
+                opt_G.step()
 
-                    single_gen = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
-                    single_gen[:, :, :, 0] = gens[j, 0, 0:8, :, :]
-                    single_gen[:, :, :, 1] = gens[j, 0, 8:16, :, :]
+                batch_loss['g_loss'].append(g_loss.item())
+                batch_loss['d_loss'].append(d_loss.item())
 
-                    single_gen_complex_np = tensor_to_complex_np((single_gen * std[j] + mean[j]).cpu())
-                    single_gen_np = torch.tensor(S.H * single_gen_complex_np).numpy()
+                if rank == 0:
+                    print(
+                        "[Epoch %d/%d] [Batch %d/%d] [D loss: %.4f] [G loss: %.4f]"
+                        % (epoch + 1, args.num_epochs, i, len(train_loader.dataset) / args.batch_size, d_loss.item(),
+                           g_loss.item())
+                    )
 
-                    losses['ssim'].append(np.abs(ssim(gt_np, avg_gen_np)))
-                    losses['psnr'].append(psnr_complex(gt_np, avg_gen_np))
-                    losses['single_psnr'].append(psnr_complex(gt_np, single_gen_np))
+            losses = {
+                'psnr': [],
+                'single_psnr': [],
+                'ssim': []
+            }
 
-                    ind = 1
+            for i, data in enumerate(dev_loader):
+                G.update_gen_status(val=True)
+                with torch.no_grad():
+                    y, x, y_true, mean, std, mask, inds = data
+                    y = y.to(args.device)
+                    x = x.to(args.device)
+                    y_true = y_true.to(args.device)
+                    mask = mask.to(args.device)
 
-                    if i == 0 and j == ind:
-                        output = transforms.root_sum_of_squares(
-                            complex_abs(avg_gen[ind] * std[ind] + mean[ind])).cpu().numpy()
-                        target = transforms.root_sum_of_squares(
-                            complex_abs(gt[ind] * std[ind] + mean[ind])).cpu().numpy()
+                    gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
+                                       device=args.device)
+                    for z in range(8):
+                        gens[:, z, :, :, :] = G(y, y_true, noise_var=1, mask=mask, inds=None)
 
-                        gen_im_list = []
-                        for z in range(8):
-                            val_rss = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
-                            val_rss[:, :, :, 0] = gens[ind, z, 0:8, :, :]
-                            val_rss[:, :, :, 1] = gens[ind, z, 8:16, :, :]
-                            gen_im_list.append(transforms.root_sum_of_squares(
-                                complex_abs(val_rss * std[ind] + mean[ind])).cpu().numpy())
+                    avg = torch.mean(gens, dim=1)
 
-                        std_dev = np.zeros(output.shape)
-                        for val in gen_im_list:
-                            std_dev = std_dev + np.power((val - output), 2)
+                    avg_gen = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
+                    avg_gen[:, :, :, :, 0] = avg[:, 0:8, :, :]
+                    avg_gen[:, :, :, :, 1] = avg[:, 8:16, :, :]
 
-                        std_dev = std_dev / 8
-                        std_dev = np.sqrt(std_dev)
+                    gt = torch.zeros(size=(y.size(0), 8, args.im_size, args.im_size, 2), device=args.device)
+                    gt[:, :, :, :, 0] = x[:, 0:8, :, :]
+                    gt[:, :, :, :, 1] = x[:, 8:16, :, :]
 
-                        place = 1
-                        for r, val in enumerate(gen_im_list):
-                            gif_im(target, val, place, 'image')
-                            place += 1
+                    for j in range(y.size(0)):
+                        new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
+                        maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=args.calib_width,
+                                                   device=sp.Device(0), show_pbar=False, crop=0.70,
+                                                   kernel_width=6).run().get()
+                        S = sp.linop.Multiply((args.im_size, args.im_size), maps)
+                        gt_ksp, avg_ksp = tensor_to_complex_np((gt[j] * std[j] + mean[j]).cpu()), tensor_to_complex_np(
+                            (avg_gen[j] * std[j] + mean[j]).cpu())
 
-                        generate_gif('image')
+                        # temp_re = complex_abs(fft2c_new(transforms.to_tensor(S.H * avg_ksp))) ** 0.4
+                        # temp_gt = complex_abs(fft2c_new(transforms.to_tensor(S.H * gt_ksp))) ** 0.4
+                        #
+                        # error = np.abs(temp_gt.cpu().numpy() - temp_re.cpu().numpy())
+                        #
+                        # plt.imshow(3 * error, cmap='jet', vmax=1)
+                        # plt.savefig('temp_kspace_error.png')
+                        # print(temp_re.shape)
+                        #
+                        # exit()
 
-                        fig = plt.figure()
-                        ax = fig.add_subplot(1, 1, 1)
-                        im = ax.imshow(std_dev, cmap='viridis')
-                        ax.set_xticks([])
-                        ax.set_yticks([])
-                        fig.subplots_adjust(right=0.85)  # Make room for colorbar
+                        avg_gen_np = torch.tensor(S.H * avg_ksp).numpy()
+                        gt_np = torch.tensor(S.H * gt_ksp).numpy()
 
-                        # Get position of final error map axis
-                        [[x10, y10], [x11, y11]] = ax.get_position().get_points()
+                        single_gen = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
+                        single_gen[:, :, :, 0] = gens[j, 0, 0:8, :, :]
+                        single_gen[:, :, :, 1] = gens[j, 0, 8:16, :, :]
 
-                        pad = 0.01
-                        width = 0.02
-                        cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10])
+                        single_gen_complex_np = tensor_to_complex_np((single_gen * std[j] + mean[j]).cpu())
+                        single_gen_np = torch.tensor(S.H * single_gen_complex_np).numpy()
 
-                        fig.colorbar(im, cax=cbar_ax)
+                        losses['ssim'].append(np.abs(ssim(gt_np, avg_gen_np)))
+                        losses['psnr'].append(psnr_complex(gt_np, avg_gen_np))
+                        losses['single_psnr'].append(psnr_complex(gt_np, single_gen_np))
 
-                        plt.savefig(f'std_dev_gen.png')
-                        plt.close()
+                        ind = 1
 
-        psnr_diff = (np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr'])
-        if rank == 0:
-            print(f"PSNR DIFF: {psnr_diff:.2f}")
-            print(f"WEIGHT: {std_mult}")
-        psnr_loss = np.mean(losses['psnr'])
+                        if i == 0 and j == ind:
+                            output = transforms.root_sum_of_squares(
+                                complex_abs(avg_gen[ind] * std[ind] + mean[ind])).cpu().numpy()
+                            target = transforms.root_sum_of_squares(
+                                complex_abs(gt[ind] * std[ind] + mean[ind])).cpu().numpy()
 
-        CFID = compute_cfid.get_cfid(args, G, dev_loader, num_samps=1)
-        cfids.append(CFID)
+                            gen_im_list = []
+                            for z in range(8):
+                                val_rss = torch.zeros(8, args.im_size, args.im_size, 2).to(args.device)
+                                val_rss[:, :, :, 0] = gens[ind, z, 0:8, :, :]
+                                val_rss[:, :, :, 1] = gens[ind, z, 8:16, :, :]
+                                gen_im_list.append(transforms.root_sum_of_squares(
+                                    complex_abs(val_rss * std[ind] + mean[ind])).cpu().numpy())
 
-        best_model = CFID < best_loss and (psnr_diff <= 0.25)
-        best_loss = CFID if best_model else best_loss
+                            std_dev = np.zeros(output.shape)
+                            for val in gen_im_list:
+                                std_dev = std_dev + np.power((val - output), 2)
 
-        GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
-        GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
+                            std_dev = std_dev / 8
+                            std_dev = np.sqrt(std_dev)
 
-        if rank == 0:
-            save_str = f"END OF EPOCH {epoch + 1}: [Average D loss: {GLOBAL_LOSS_DICT['d_loss'][epoch - start_epoch]:.4f}] [Average G loss: {GLOBAL_LOSS_DICT['g_loss'][epoch - start_epoch]:.4f}]\n"
-            print(save_str)
-            save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
-            print(save_str_2)
+                            place = 1
+                            for r, val in enumerate(gen_im_list):
+                                gif_im(target, val, place, 'image')
+                                place += 1
 
-            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}\nPSNR Diff: {psnr_diff}", file_name="variation_gif.gif")
+                            generate_gif('image')
 
-        save_model_ddp(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', rank)
-        save_model_ddp(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', rank)
+                            fig = plt.figure()
+                            ax = fig.add_subplot(1, 1, 1)
+                            im = ax.imshow(std_dev, cmap='viridis')
+                            ax.set_xticks([])
+                            ax.set_yticks([])
+                            fig.subplots_adjust(right=0.85)  # Make room for colorbar
 
-        mu_0 = 2e-2
-        std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
-        std_mults.append(std_mult)
-        psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
+                            # Get position of final error map axis
+                            [[x10, y10], [x11, y11]] = ax.get_position().get_points()
 
-        file = open("std_weights.txt", "w+")
+                            pad = 0.01
+                            width = 0.02
+                            cbar_ax = fig.add_axes([x11 + pad, y10, width, y11 - y10])
 
-        # Saving the 2D array in a text file
-        content = str(std_mults)
-        file.write(content)
-        file.close()
+                            fig.colorbar(im, cax=cbar_ax)
 
-        file = open("psnr_diffs.txt", "w+")
+                            plt.savefig(f'std_dev_gen.png')
+                            plt.close()
 
-        # Saving the 2D array in a text file
-        content = str(psnr_diffs)
-        file.write(content)
-        file.close()
+            psnr_diff = (np.mean(losses['single_psnr']) + 2.5) - np.mean(losses['psnr'])
+            if rank == 0:
+                print(f"PSNR DIFF: {psnr_diff:.2f}")
+                print(f"WEIGHT: {std_mult}")
+            psnr_loss = np.mean(losses['psnr'])
 
-        file = open("cfids.txt", "w+")
+            CFID = compute_cfid.get_cfid(args, G, dev_loader, num_samps=1)
+            cfids.append(CFID)
 
-        # Saving the 2D array in a text file
-        content = str(cfids)
-        file.write(content)
-        file.close()
+            best_model = CFID < best_loss and (psnr_diff <= 0.25)
+            best_loss = CFID if best_model else best_loss
+
+            GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
+            GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
+
+            if rank == 0:
+                save_str = f"END OF EPOCH {epoch + 1}: [Average D loss: {GLOBAL_LOSS_DICT['d_loss'][epoch - start_epoch]:.4f}] [Average G loss: {GLOBAL_LOSS_DICT['g_loss'][epoch - start_epoch]:.4f}]\n"
+                print(save_str)
+                save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
+                print(save_str_2)
+
+                send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {CFID:.2f}\nPSNR Diff: {psnr_diff}", file_name="variation_gif.gif")
+
+            save_model_ddp(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', rank)
+            save_model_ddp(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', rank)
+
+            mu_0 = 2e-2
+            std_mult += mu_0 * (np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
+            std_mults.append(std_mult)
+            psnr_diffs.append(np.mean(losses['single_psnr']) + 2.5 - np.mean(losses['psnr']))
+
+            file = open("std_weights.txt", "w+")
+
+            # Saving the 2D array in a text file
+            content = str(std_mults)
+            file.write(content)
+            file.close()
+
+            file = open("psnr_diffs.txt", "w+")
+
+            # Saving the 2D array in a text file
+            content = str(psnr_diffs)
+            file.write(content)
+            file.close()
+
+            file = open("cfids.txt", "w+")
+
+            # Saving the 2D array in a text file
+            content = str(cfids)
+            file.write(content)
+            file.close()
 
     std_mult_str = ""
     for val in std_mults:
