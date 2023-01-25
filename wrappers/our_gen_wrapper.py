@@ -149,8 +149,8 @@ class GANWrapper:
     def reformat(self, samples):
         reformatted_tensor = torch.zeros(size=(samples.size(0), 8, self.resolution, self.resolution, 2),
                                          device=self.args.device)
-        reformatted_tensor[:, :, :, :, 0] = samples[:, 0:8, :, :]
-        reformatted_tensor[:, :, :, :, 1] = samples[:, 8:16, :, :]
+        reformatted_tensor[:, :, :, :, 0] = samples[:, 0:8, :, :].clone()
+        reformatted_tensor[:, :, :, :, 1] = samples[:, 8:16, :, :].clone()
 
         return reformatted_tensor
 
