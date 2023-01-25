@@ -215,7 +215,7 @@ def create_data_loaders(args, val_only=False, big_test=False):
 def create_data_loaders_ddp(args, val_only=False, big_test=False, rank=0, world_size=2):
     dev_data, train_data = create_datasets(args, val_only, big_test=big_test)
 
-    train_sampler = DistributedSampler(train_data, num_replicas=world_size, rank=rank, shuffle=False, drop_last=True)
+    train_sampler = torch.utils.data.distributed.DistributedSampler(train_data, num_replicas=world_size, rank=rank, shuffle=False, drop_last=True)
     train_loader = DataLoader(
         dataset=train_data,
         batch_size=args.batch_size,
@@ -226,7 +226,7 @@ def create_data_loaders_ddp(args, val_only=False, big_test=False, rank=0, world_
         sampler=train_sampler
     )
 
-    dev_sampler = DistributedSampler(dev_data, num_replicas=world_size, rank=rank, shuffle=False, drop_last=True)
+    dev_sampler = torch.utils.data.distributed.DistributedSampler(dev_data, num_replicas=world_size, rank=rank, shuffle=False, drop_last=True)
     dev_loader = DataLoader(
         dataset=dev_data,
         batch_size=args.batch_size,
