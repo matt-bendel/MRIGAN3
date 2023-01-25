@@ -4,7 +4,7 @@ import os
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
-
+from train_ddp import train
 
 if __name__ == "__main__":
     cuda = True if torch.cuda.is_available() else False
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     args.out_chans = 16
 
     mp.spawn(
-        main,
+        train,
         args=(args),
         nprocs=world_size
     )

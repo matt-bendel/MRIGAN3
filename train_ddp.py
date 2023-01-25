@@ -18,7 +18,7 @@ from utils.fftc import fft2c_new, ifft2c_new
 from utils.math import complex_abs, tensor_to_complex_np
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import get_gan, save_model
-from data_loaders.prepare_data import create_data_loaders
+from data_loaders.prepare_data import create_data_loaders_ddp
 from data_loaders.prepare_data_ls import create_data_loaders_ls
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
@@ -271,7 +271,7 @@ def train(args, bl=1, adv_mult=0.0):
     else:
         best_loss = 100000
 
-    train_loader, dev_loader = create_data_loaders(args, big_test=False) if not args.ls else create_data_loaders_ls(args, big_test=False)
+    train_loader, dev_loader = create_data_loaders_ddp(args, big_test=False)
 
     # exit()
 
