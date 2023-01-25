@@ -25,6 +25,11 @@ from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
 from evaluation_scripts import compute_cfid
 from utils.get_mask import get_mask
+import torch.distributed as dist
+def setup(rank, world_size):
+    os.environ['MASTER_ADDR'] = 'localhost'
+    os.environ['MASTER_PORT'] = '12355'
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
