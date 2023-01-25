@@ -5,7 +5,7 @@ import numpy as np
 
 from utils.fftc import ifft2c_new, fft2c_new
 from utils.get_mask import get_mask
-
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 # THIS FILE CONTAINTS UTILITY FUNCTIONS FOR OUR GAN AND A WRAPPER CLASS FOR THE GENERATOR
 # TODO: CHANGE BACK TO LOADING BEST
@@ -68,8 +68,8 @@ def get_gan(args):
         discriminator = build_discriminator(args)
 
         if args.data_parallel:
-            generator = torch.nn.DataParallel(generator)
-            discriminator = torch.nn.DataParallel(discriminator)
+            generator = DDP(generator.to(0), device_ids=[0])#torch.nn.DataParallel(generator)
+            discriminator = DDP(discriminator.to(0), device_ids=[0])#torch.nn.DataParallel(discriminator)
 
         generator = GANWrapper(generator, args)
 

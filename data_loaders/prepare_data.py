@@ -212,6 +212,31 @@ def create_data_loaders(args, val_only=False, big_test=False):
 
     return train_loader if not val_only else None, dev_loader
 
+def create_data_loaders_ddp(args, val_only=False, big_test=False):
+    dev_data, train_data = create_datasets(args, val_only, big_test=big_test)
+
+    train_sampler = DistributedSampler(train_data, num_replicas=2, rank=0, shuffle=False, drop_last=True)
+    train_loader = DataLoader(
+        dataset=train_data,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=0,
+        pin_memory=False,
+        drop_last=True,
+        sampler=train_sampler
+    )
+
+    dev_sampler = DistributedSampler(dev_data, num_replicas=2, rank=0, shuffle=False, drop_last=True)
+    dev_loader = DataLoader(
+        dataset=dev_data,
+        batch_size=args.batch_size,
+        num_workers=0,
+        pin_memory=False,
+        drop_last=True,
+        sampler=dev_sampler
+    )
+
+    return train_loader if not val_only else None, dev_loader
 
 def create_test_dataset(args):
     data = SelectiveSliceData_Val(
