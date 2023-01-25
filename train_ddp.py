@@ -34,7 +34,7 @@ def setup(rank=0, world_size=2):
     os.environ["MASTER_PORT"] = "12355"
 
     # Initialize the process group
-    dist.init_process_group("nccl", rank=rank, world_size=world_size)
+    dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
 def cleanup():
     "Cleans up the distributed environment"
