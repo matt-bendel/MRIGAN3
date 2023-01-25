@@ -29,6 +29,7 @@ if __name__ == "__main__":
 
     args.in_chans = 16
     args.out_chans = 16
+    world_size=2
 
     mp.spawn(
         train,
