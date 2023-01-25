@@ -166,8 +166,8 @@ class GANWrapper:
         image = ifft2c_new(reconstructed_kspace)
 
         output_im = torch.zeros(size=samples.shape, device=self.args.device)
-        output_im[:, 0:8, :, :] = image[:, :, :, :, 0]
-        output_im[:, 8:16, :, :] = image[:, :, :, :, 1]
+        output_im[:, 0:8, :, :] = image[:, :, :, :, 0].clone()
+        output_im[:, 8:16, :, :] = image[:, :, :, :, 1].clone()
 
         return output_im
 
