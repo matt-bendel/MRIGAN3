@@ -171,7 +171,7 @@ class GeneratorModel(nn.Module):
         """
         super().__init__()
 
-        # self.preprocess_unet = UNET()
+        self.preprocess_unet = UNET()
         self.in_chans = in_chans
         self.out_chans = out_chans
         self.chans = 256
