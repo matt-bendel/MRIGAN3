@@ -257,7 +257,7 @@ class GeneratorModel(nn.Module):
         Returns:
             (torch.Tensor): Output tensor of shape [batch_size, self.out_chans, height, width]
         """
-        inp_noise = torch.cat(measured, dim=1)#self.preprocess_unet(torch.cat(measured, dim=1))
+        inp_noise = self.preprocess_unet(torch.cat(measured, dim=1))
         output = torch.cat([input, inp_noise], dim=1)
         stack = []
         # Apply down-sampling layers
