@@ -536,39 +536,8 @@ if __name__ == '__main__':
     args.in_chans = 16
     args.out_chans = 16
 
-    # vals = [1.8]
-    #
-    # for val in vals:
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models/base"
-    #     try:
-    #         args.batch_size = 36
-    #         train(args, bl=0, adv_mult=val)
-    #     except KeyboardInterrupt:
-    #         exit()
-    #     except Exception as e:
-    #         print(e)
-    #         send_mail("TRAINING CRASH", "See terminal for failure cause.")
-    #
-    #     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-    #     try:
-    #         args.batch_size = 20
-    #         for i in range(8):
-    #             num = 2 ** i
-    #             get_metrics(args, num, is_super=True, std_val=val)
-    #     except KeyboardInterrupt:
-    #         exit()
-    #     except Exception as e:
-    #         print(e)
-    #         send_mail("TESTING FAILED", "See terminal for failure cause.")
-
     args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-    # try:
     train(args, bl=0, adv_mult=1e-5)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TRAINING CRASH", "See terminal for failure cause.")
 
     try:
         for i in range(6):
@@ -579,29 +548,3 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
         send_mail("TESTING FAILED", "See terminal for failure cause.")
-    # args.checkpoint_dir = "/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/trained_models"
-
-    # try:
-    #     train(args, bl=0, adv_mult=1e-2)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TRAINING CRASH", "See terminal for failure cause.")
-    #
-    # try:
-    #     for i in range(6):
-    #         num = 2 ** i
-    #         get_metrics(args, num, is_super=True, std_val=1e-2)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TESTING FAILED", "See terminal for failure cause.")
-    # try:
-    # train(args)
-    # except KeyboardInterrupt:
-    #     exit()
-    # except Exception as e:
-    #     print(e)
-    #     send_mail("TRAINING CRASH", "Log in to see cause.")
