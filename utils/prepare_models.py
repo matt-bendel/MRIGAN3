@@ -9,7 +9,7 @@ from models.discriminators.patch_disc import PatchDisc
 
 def build_model(args):
     model = GeneratorModel(
-        in_chans=args.in_chans + 2,
+        in_chans=args.in_chans + 4,
         out_chans=args.out_chans,
     ).to(torch.device('cuda'))
     #
