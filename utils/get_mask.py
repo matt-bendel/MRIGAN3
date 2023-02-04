@@ -7,18 +7,18 @@ from data import transforms
 def get_mask(resolution, return_mask=False, R=4, p_m=False, args=None):
     total_lines = resolution // R - args.calib_width
     m = np.zeros((resolution, resolution))
-    midway = resolution // 2
-    s = midway - args.calib_width // 2
-    e = s + args.calib_width
-    m[:, s:e] = True
-    a = np.random.choice(resolution - args.calib_width, total_lines, replace=False)
-    a = np.where(a < s, a, a + args.calib_width)
-    # a = np.array(
-    #     [
-    #         1, 10, 18, 25, 31, 37, 42, 46, 50, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 72, 76, 80, 84, 88,
-    #         93, 99, 105, 112, 120
-    #     ]
-    # )
+    # midway = resolution // 2
+    # s = midway - args.calib_width // 2
+    # e = s + args.calib_width
+    # m[:, s:e] = True
+    # a = np.random.choice(resolution - args.calib_width, total_lines, replace=False)
+    # a = np.where(a < s, a, a + args.calib_width)
+    a = np.array(
+        [
+            1, 10, 18, 25, 31, 37, 42, 46, 50, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 72, 76, 80, 84, 88,
+            93, 99, 105, 112, 120
+        ]
+    )
     # a = np.array(
     #     [0, 10, 19, 28, 37, 46, 54, 61, 69, 76, 83, 89, 95, 101, 107, 112, 118, 122, 127, 132, 136, 140, 144, 148,
     #      151, 155, 158, 161, 164,
