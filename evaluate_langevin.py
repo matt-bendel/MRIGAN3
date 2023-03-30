@@ -91,7 +91,7 @@ def unnormalize(gen_img, estimated_mvue):
     return gen_img / scaling
 
 
-R = 4
+R = 8
 
 # assign directory
 ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
@@ -103,7 +103,7 @@ args = create_arg_parser().parse_args()
 
 train_loader, _ = create_data_loaders(args, big_test=False)
 get_cfid(args, None, train_loader, None)
-exit()
+get_fid(args, None, train_loader, None)
 
 vals = [32]
 

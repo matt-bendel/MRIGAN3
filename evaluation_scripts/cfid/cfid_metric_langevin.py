@@ -189,7 +189,7 @@ class CFIDMetric:
         true_embed = []
 
         ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
-        recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
+        recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=8/'
 
         for filename in os.listdir(ref_directory):
             for i in range(6):
@@ -197,7 +197,7 @@ class CFIDMetric:
                 with torch.no_grad():
                     for j in range(32):
                         try:
-                            new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt'
+                            new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt'
                             recon_object = torch.load(new_filename)
 
                             recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
@@ -223,7 +223,7 @@ class CFIDMetric:
                             exit()
                         except Exception as e:
                             print(e)
-                            print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=4_sample={j}_outputs.pt')
+                            print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt')
                             break
 
         print("WE GOT EMBEDDINGS BABY")
