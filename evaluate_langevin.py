@@ -13,6 +13,16 @@ from evaluation_scripts.fid.fid_metric_langevin import FIDMetric
 from evaluation_scripts.cfid.cfid_metric_langevin import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders
 
+# M: 2.61
+# C: 4.7
+# CFID: 7.34
+
+# FID: 20.52
+
+# APSD: 7.6e-6
+# PSNR: 33.90 \pm 0.45
+# SSIM: 0.8589 \pm 0.0083
+
 def get_cfid(args, G, ref_loader, cond_loader):
     print("GETTING INCEPTION EMBEDDING")
     vgg_embedding = VGG16Embedding(parallel=True)
