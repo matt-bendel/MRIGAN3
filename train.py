@@ -304,6 +304,11 @@ def train(args, bl=1, adv_mult=0.0):
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = 1e-5
+            if epoch <= 4:
+                adv_weight = 1e-2
+            elif epoch <= 22:
+                adv_weight = 1e-4
+
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += l1_weight * F.l1_loss(avg_recon, x)  # - args.ssim_weight * mssim_tensor(x, avg_recon)
