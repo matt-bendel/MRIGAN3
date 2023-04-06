@@ -434,7 +434,7 @@ def train(args, bl=1, adv_mult=0.0):
         CFID = compute_cfid.get_cfid(args, G, dev_loader, num_samps=1)
         cfids.append(CFID)
 
-        best_model = CFID < best_loss and (psnr_diff <= 0.25)
+        best_model = CFID < best_loss and (psnr_diff <= 0.35)
         best_loss = CFID if best_model else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
