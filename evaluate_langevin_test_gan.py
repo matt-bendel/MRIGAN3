@@ -8,7 +8,7 @@ import h5py
 import numpy as np
 import sigpy as sp
 import sigpy.mri as mr
-from data.mri_data import SelectiveSliceData_Val
+from data.mri_data import SelectiveSliceData_Test
 from data_loaders.prepare_data import DataTransform
 from evaluation_scripts import compute_cfid
 from evaluation_scripts import compute_fid
@@ -74,7 +74,7 @@ def main(args):
     train_loader, dev_loader = create_data_loaders(args, big_test=True)
     # compute_cfid.get_cfid(args, G, langevin=True)
 
-    data = SelectiveSliceData_Val(
+    data = SelectiveSliceData_Test(
         root=args.data_path / 'small_T2_test',
         transform=DataTransform(args, test=True),
         challenge='multicoil',
