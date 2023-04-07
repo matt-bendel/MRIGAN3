@@ -303,7 +303,7 @@ def train(args, bl=1, adv_mult=0.0):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-3
+            adv_weight = 1e-5
 
             l1_weight = 1
             g_loss = - adv_weight * gen_pred_loss.mean()
