@@ -395,7 +395,7 @@ def train(args, bl=1, adv_mult=0.0):
                         plt.close()
 
         psnr_loss = np.mean(losses['psnr'])
-        CFID = compute_cfid.get_cfid(args, G, dev_loader)
+        CFID = compute_cfid.get_cfid(args, G, dev_loader, num_samps=1)
 
         best_model = CFID < best_loss
         best_loss = CFID if best_model else best_loss
