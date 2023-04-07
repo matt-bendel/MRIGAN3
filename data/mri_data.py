@@ -23,9 +23,9 @@ from warnings import warn
 
 
 def et_query(
-    root: etree.Element,
-    qlist: Sequence[str],
-    namespace: str = "http://www.ismrm.org/ISMRMRD",
+        root: etree.Element,
+        qlist: Sequence[str],
+        namespace: str = "http://www.ismrm.org/ISMRMRD",
 ) -> str:
     """
     ElementTree query function.
@@ -55,7 +55,7 @@ def et_query(
 
 
 def fetch_dir(
-    key: str, data_config_file: Union[str, Path, os.PathLike] = "fastmri_dirs.yaml"
+        key: str, data_config_file: Union[str, Path, os.PathLike] = "fastmri_dirs.yaml"
 ) -> Path:
     """
     Data directory fetcher.
@@ -99,7 +99,8 @@ class SelectiveSliceData(torch.utils.data.Dataset):
     A PyTorch Dataset that provides access to MR image slices.
     """
 
-    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6, restrict_size=False):
+    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6,
+                 restrict_size=False):
         """
         Args:
             root (pathlib.Path): Path to the dataset.
@@ -129,7 +130,7 @@ class SelectiveSliceData(torch.utils.data.Dataset):
             try:
                 with h5py.File(fname, 'r') as data:
                     if (data.attrs['acquisition'] == 'AXT2'):
-                        #scanner_str = findScannerStrength(data['ismrmrd_header'].value)
+                        # scanner_str = findScannerStrength(data['ismrmrd_header'].value)
                         # if (scanner_str > 2.2):
                         keep_files.append(fname)
             except:
@@ -158,15 +159,15 @@ class SelectiveSliceData(torch.utils.data.Dataset):
             kspace = h5py.File(fname, 'r')['kspace']
             if kspace.shape[-1] < 384 or kspace.shape[1] < 8 or str(
                     fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_209_2090296.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
                 continue
             else:
                 # if restrict_size and ((kspace.shape[1] != 640) or (kspace.shape[2] != 368)):
                 #     continue  # skip non uniform sized images
-                num_slices = 8 # kspace.shape[0]
+                num_slices = 8  # kspace.shape[0]
                 self.examples += [(fname, slice) for slice in range(num_slices)]
 
     def __len__(self):
@@ -179,12 +180,14 @@ class SelectiveSliceData(torch.utils.data.Dataset):
             target = data[self.recons_key][slice] if self.recons_key in data else None
             return self.transform(kspace, target, data.attrs, fname.name, slice)
 
+
 class SelectiveSliceData_Test(torch.utils.data.Dataset):
     """
     A PyTorch Dataset that provides access to MR image slices.
     """
 
-    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6, restrict_size=False, big_test=False, test_set=False):
+    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6,
+                 restrict_size=False, big_test=False, test_set=False):
         """
         Args:
             root (pathlib.Path): Path to the dataset.
@@ -225,7 +228,7 @@ class SelectiveSliceData_Test(torch.utils.data.Dataset):
                 #             print(fname)
                 # except:
                 #     pass
-                    # print("UHOH")
+                # print("UHOH")
 
         files = f
 
@@ -254,15 +257,33 @@ class SelectiveSliceData_Test(torch.utils.data.Dataset):
             #         fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
             #     continue
             # else:
-            num_slices = 6 # kspace.shape[0]
+            num_slices = 6  # kspace.shape[0]
             self.examples += [(fname, slice) for slice in range(num_slices)]
+
+    def __len__(self):
+        return len(self.examples)
+
+    def __getitem__(self, i):
+        fname, slice = self.examples[i]
+        with h5py.File(fname, 'r') as data:
+            kspace = data['kspace'][slice]
+            target = data[self.recons_key][slice] if self.recons_key in data else None
+            # if self.test_set:
+            #     with h5py.File(pathlib.Path(str(fname).replace('small_T2_test', 'small_T2_test_sense_maps')), 'r') as sense_data:
+            #         sense_maps = sense_data['s_maps'][slice]
+            # else:
+            #     with h5py.File(pathlib.Path(str(fname).replace('multicoil_val', 'multicoil_val_T2_sense_maps')), 'r') as sense_data:
+            #         sense_maps = sense_data['s_maps'][slice]
+            return self.transform(kspace, target, data.attrs, fname.name, slice)
+
 
 class SelectiveSliceData_Val(torch.utils.data.Dataset):
     """
     A PyTorch Dataset that provides access to MR image slices.
     """
 
-    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6, restrict_size=False, big_test=False, test_set=False):
+    def __init__(self, root, transform, challenge, sample_rate=1, use_top_slices=True, number_of_top_slices=6,
+                 restrict_size=False, big_test=False, test_set=False):
         """
         Args:
             root (pathlib.Path): Path to the dataset.
@@ -303,7 +324,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
                         if data['kspace'].shape[1] >= 8:
                             keep_files.append(fname)
                         # else:
-                            # print(fname)
+                        # print(fname)
                 except:
                     pass
                     # print("UHOH")
@@ -317,7 +338,7 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
 
         random.shuffle(files)
 
-        num_files = (round(len(files)*0.7) if big_test else round(len(files)*0.3))
+        num_files = (round(len(files) * 0.7) if big_test else round(len(files) * 0.3))
         print(num_files)
 
         f_testing_and_Val = sorted(files[-num_files:]) if big_test else sorted(files[0:num_files])
@@ -333,13 +354,13 @@ class SelectiveSliceData_Val(torch.utils.data.Dataset):
 
             if kspace.shape[-1] <= 384 or kspace.shape[1] < 8 or str(
                     fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_209_2090296.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
-                    fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_200_2000250.h5' or str(
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_201_2010106.h5' or str(
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_204_2130024.h5' or str(
+                fname) == '/storage/fastMRI_brain/data/multicoil_val/file_brain_AXT2_210_2100025.h5':
                 continue
             else:
-                num_slices = 8 # kspace.shape[0]
+                num_slices = 8  # kspace.shape[0]
                 self.examples += [(fname, slice) for slice in range(num_slices)]
 
         print(len(self.examples))
@@ -367,15 +388,15 @@ class CombinedSliceDataset(torch.utils.data.Dataset):
     """
 
     def __init__(
-        self,
-        roots: Sequence[Path],
-        challenges: Sequence[str],
-        transforms: Optional[Sequence[Optional[Callable]]] = None,
-        sample_rates: Optional[Sequence[Optional[float]]] = None,
-        volume_sample_rates: Optional[Sequence[Optional[float]]] = None,
-        use_dataset_cache: bool = False,
-        dataset_cache_file: Union[str, Path, os.PathLike] = "dataset_cache.pkl",
-        num_cols: Optional[Tuple[int]] = None,
+            self,
+            roots: Sequence[Path],
+            challenges: Sequence[str],
+            transforms: Optional[Sequence[Optional[Callable]]] = None,
+            sample_rates: Optional[Sequence[Optional[float]]] = None,
+            volume_sample_rates: Optional[Sequence[Optional[float]]] = None,
+            use_dataset_cache: bool = False,
+            dataset_cache_file: Union[str, Path, os.PathLike] = "dataset_cache.pkl",
+            num_cols: Optional[Tuple[int]] = None,
     ):
         """
         Args:
@@ -415,11 +436,11 @@ class CombinedSliceDataset(torch.utils.data.Dataset):
         if volume_sample_rates is None:
             volume_sample_rates = [None] * len(roots)
         if not (
-            len(roots)
-            == len(transforms)
-            == len(challenges)
-            == len(sample_rates)
-            == len(volume_sample_rates)
+                len(roots)
+                == len(transforms)
+                == len(challenges)
+                == len(sample_rates)
+                == len(volume_sample_rates)
         ):
             raise ValueError(
                 "Lengths of roots, transforms, challenges, sample_rates do not match"
@@ -460,15 +481,15 @@ class SliceDataset(torch.utils.data.Dataset):
     """
 
     def __init__(
-        self,
-        root: Union[str, Path, os.PathLike],
-        challenge: str,
-        transform: Optional[Callable] = None,
-        use_dataset_cache: bool = False,
-        sample_rate: Optional[float] = None,
-        volume_sample_rate: Optional[float] = None,
-        dataset_cache_file: Union[str, Path, os.PathLike] = "dataset_cache.pkl",
-        num_cols: Optional[Tuple[int]] = None,
+            self,
+            root: Union[str, Path, os.PathLike],
+            challenge: str,
+            transform: Optional[Callable] = None,
+            use_dataset_cache: bool = False,
+            sample_rate: Optional[float] = None,
+            volume_sample_rate: Optional[float] = None,
+            dataset_cache_file: Union[str, Path, os.PathLike] = "dataset_cache.pkl",
+            num_cols: Optional[Tuple[int]] = None,
     ):
         """
         Args:
