@@ -87,10 +87,9 @@ def main(args):
 
     loader = DataLoader(
         dataset=data,
-        batch_size=16,
+        batch_size=4,
         num_workers=16,
         pin_memory=True,
-        drop_last=True
     )
 
     compute_cfid.get_cfid(args, G, langevin=True, loader=loader, ref_loader=None, num_samps=32)
