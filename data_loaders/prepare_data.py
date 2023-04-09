@@ -90,6 +90,7 @@ class DataTransform:
 
 
 def create_datasets(args, val_only, big_test=False):
+    print("TRAIN SET")
     if not val_only:
         train_data = SelectiveSliceData(
             root=args.data_path / 'multicoil_train',
@@ -101,6 +102,7 @@ def create_datasets(args, val_only, big_test=False):
             restrict_size=False,
         )
 
+    print("VAL SET")
     dev_data = SelectiveSliceData_Val(
         root=args.data_path / 'multicoil_val',
         transform=DataTransform(args, test=True),
@@ -118,6 +120,7 @@ def create_datasets(args, val_only, big_test=False):
 def create_data_loaders(args, val_only=False, big_test=False):
     dev_data, train_data = create_datasets(args, val_only, big_test=big_test)
 
+    print("TRAIN LOADER")
     if not val_only:
         train_loader = DataLoader(
             dataset=train_data,
@@ -128,6 +131,7 @@ def create_data_loaders(args, val_only=False, big_test=False):
             drop_last=True,
         )
 
+    print("VAL LOADER")
     dev_loader = DataLoader(
         dataset=dev_data,
         batch_size=args.batch_size,
