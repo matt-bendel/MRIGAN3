@@ -126,7 +126,7 @@ def create_data_loaders(args, val_only=False, big_test=False):
             dataset=train_data,
             batch_size=args.batch_size,
             shuffle=True,
-            num_workers=20,
+            num_workers=0,
             pin_memory=True,
             drop_last=True,
         )
@@ -135,7 +135,7 @@ def create_data_loaders(args, val_only=False, big_test=False):
     dev_loader = DataLoader(
         dataset=dev_data,
         batch_size=args.batch_size,
-        num_workers=20,
+        num_workers=0,
         pin_memory=True,
         drop_last=True,
     )
