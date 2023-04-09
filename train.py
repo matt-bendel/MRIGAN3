@@ -182,7 +182,7 @@ def gif_im(true, gen_im, index, type, disc_num=False):
 
     plt.savefig(f'/home/bendel.8/Git_Repos/full_scale_mrigan/MRIGAN3/gif_{type}_{index - 1}.png')
     plt.close()
-
+# t
 
 def generate_gif(type):
     images = []
