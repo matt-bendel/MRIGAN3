@@ -14,7 +14,7 @@ from evaluation_scripts.cfid.cfid_metric_langevin import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders
 
 # M: 2.61
-# C: 4.7
+# C: 4.73
 # CFID: 7.34
 
 # FID: 20.52

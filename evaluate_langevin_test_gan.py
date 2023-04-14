@@ -23,6 +23,23 @@ from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from utils.parse_args import create_arg_parser
 from wrappers.our_gen_wrapper import load_best_gan
 
+# M_1: 2.15
+# C_1: 3.50
+# CFID_1: 5.65
+
+# M_2: 1.76
+# C_2: 1.18
+# CFID_2: 2.94
+
+# M_3: 1.69
+# C_3: 0.77
+# CFID_3: 2.46
+
+# FID: 7.51
+
+# PSNR: 35.32 \pm 0.22
+# SSIM: 0.8991 \pm 0.0037
+# APSD: 4.34e-06
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -153,7 +170,7 @@ def main(args):
 
                 for j in range(y.size(0)):
                     new_y_true = fft2c_new(ifft2c_new(y_true[j]) * std[j] + mean[j])
-                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                    maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=16,
                                                device=sp.Device(3), show_pbar=False, crop=0.70,
                                                kernel_width=6).run().get()
                     S = sp.linop.Multiply((384, 384), maps)

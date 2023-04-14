@@ -189,7 +189,7 @@ class CFIDMetric:
             with torch.no_grad():
                 for j in range(condition.shape[0]):
                     new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
-                    s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                    s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=16,
                                                  device=sp.Device(3), show_pbar=False, crop=0.70,
                                                  kernel_width=6).run().get()
                     S = sp.linop.Multiply((384, 384), s_maps)
@@ -235,7 +235,7 @@ class CFIDMetric:
 
                             for j in range(condition.shape[0]):
                                 new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
-                                s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=32,
+                                s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=16,
                                                              device=sp.Device(3), show_pbar=False, crop=0.70,
                                                              kernel_width=6).run().get()
                                 S = sp.linop.Multiply((384, 384), s_maps)
