@@ -201,6 +201,7 @@ def main(args):
 
 
 if __name__ == '__main__':
+    print(torch.__version__)
     cuda = True if torch.cuda.is_available() else False
 
     args = create_arg_parser().parse_args()
