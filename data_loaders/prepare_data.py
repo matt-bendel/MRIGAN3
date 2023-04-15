@@ -61,7 +61,7 @@ class DataTransform:
         # im_tensor = reduce_resolution(im_tensor)
 
         true_image = torch.clone(im_tensor)
-        true_measures = fft2c_new(im_tensor) * mask
+        true_measures = fft2c_new(im_tensor)
         image = im_tensor
 
         kspace = fft2c_new(image)

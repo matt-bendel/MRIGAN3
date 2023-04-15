@@ -306,13 +306,13 @@ class FIDMetric:
         return mu.to('cuda:3'), sigma.to('cuda:3'), alpha.to('cuda:3')
 
     def _get_reference_distribution(self):
-        # if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
-        #     stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
-        #     mu_real, sigma_real, alpha = stats
-        # else:
-        mu_real, sigma_real, alpha = self._compute_reference_distribution()
-        alpha = torch.tensor(alpha).cuda()
-        self._save_activation_statistics(mu_real, sigma_real, self.alpha)
+        if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
+            stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
+            mu_real, sigma_real, alpha = stats
+        else:
+            mu_real, sigma_real, alpha = self._compute_reference_distribution()
+            alpha = torch.tensor(alpha).cuda()
+            self._save_activation_statistics(mu_real, sigma_real, self.alpha)
 
 
         self.mu_real, self.sigma_real, self.alpha = mu_real.to('cuda:3'), sigma_real.to('cuda:3'), alpha.to('cuda:3')
@@ -336,7 +336,7 @@ class FIDMetric:
             with torch.no_grad():
                 for j in range(condition.shape[0]):
                     new_y_true = fft2c_new(ifft2c_new(true_cond[j]) * std[j] + mean[j])
-                    s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=16,
+                    s_maps = mr.app.EspiritCalib(tensor_to_complex_np(new_y_true.cpu()), calib_width=64,
                                                  device=sp.Device(3), show_pbar=False, crop=0.70,
                                                  kernel_width=6).run().get()
                     S = sp.linop.Multiply((384, 384), s_maps)
