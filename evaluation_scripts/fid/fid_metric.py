@@ -306,13 +306,13 @@ class FIDMetric:
         return mu.to('cuda:3'), sigma.to('cuda:3'), alpha.to('cuda:3')
 
     def _get_reference_distribution(self):
-        if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
-            stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
-            mu_real, sigma_real, alpha = stats
-        else:
-            mu_real, sigma_real, alpha = self._compute_reference_distribution()
-            alpha = torch.tensor(alpha).cuda()
-            self._save_activation_statistics(mu_real, sigma_real, self.alpha)
+        # if os.path.isfile('/storage/fastMRI/ref_stats.npz'):
+        #     stats = self._get_statistics_from_file('/storage/fastMRI/ref_stats.npz')
+        #     mu_real, sigma_real, alpha = stats
+        # else:
+        mu_real, sigma_real, alpha = self._compute_reference_distribution()
+        alpha = torch.tensor(alpha).cuda()
+        self._save_activation_statistics(mu_real, sigma_real, self.alpha)
 
 
         self.mu_real, self.sigma_real, self.alpha = mu_real.to('cuda:3'), sigma_real.to('cuda:3'), alpha.to('cuda:3')
