@@ -166,7 +166,7 @@ for k in vals:
             psnr_vals.append(psnr(gt, mean))
             snr_vals.append(snr(gt, mean))
             ssim_vals.append(ssim(gt, mean))
-            lpips_vals.append(lpips_met(rgb(gt_np), rgb(avg_gen_np)).numpy())
+            lpips_vals.append(lpips_met(rgb(gt), rgb(mean)).numpy())
 
     # print('AVERAGE')
     # print(f'APSD: {np.mean(apsd_vals)} \pm {np.std(apsd_vals) / np.sqrt(len(apsd_vals))}')
