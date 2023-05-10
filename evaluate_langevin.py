@@ -13,6 +13,7 @@ from evaluation_scripts.fid.fid_metric_langevin import FIDMetric
 from evaluation_scripts.cfid.cfid_metric_langevin import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders
 import lpips
+from DISTS_pytorch import DISTS
 
 # M: 2.61
 # C: 4.73
@@ -101,10 +102,15 @@ def unnormalize(gen_img, estimated_mvue):
     scaling = torch.quantile(estimated_mvue.abs(), 0.99)
     return gen_img / scaling
 
-def rgb(im):
+def rgb(im, unit_norm=False):
     embed_ims = torch.zeros(size=(3, 384, 384))
     tens_im = torch.tensor(im)
-    tens_im = 2 * (tens_im - torch.min(tens_im)) / (torch.max(tens_im) - torch.min(tens_im)) - 1
+
+    if unit_norm:
+        tens_im = (tens_im - torch.min(tens_im)) / (torch.max(tens_im) - torch.min(tens_im))
+    else:
+        tens_im = 2 * (tens_im - torch.min(tens_im)) / (torch.max(tens_im) - torch.min(tens_im)) - 1
+
     embed_ims[0, :, :] = tens_im
     embed_ims[1, :, :] = tens_im
     embed_ims[2, :, :] = tens_im
@@ -127,6 +133,7 @@ train_loader, _ = create_data_loaders(args, big_test=False)
 # exit()
 vals = [1, 2, 4, 8, 16, 32]
 lpips_met = lpips.LPIPS(net='alex')
+dists_met = DISTS()
 
 exceptions = False
 count = 0
@@ -137,6 +144,7 @@ for k in vals:
     snr_vals = []
     apsd_vals = []
     lpips_vals = []
+    dists_vals = []
 
     for filename in os.listdir(ref_directory):
         for i in range(6):
@@ -169,13 +177,16 @@ for k in vals:
             ssim_vals.append(ssim(gt, mean))
             with torch.no_grad():
                 lpips_vals.append(lpips_met(rgb(gt), rgb(mean)).numpy())
+                dists_vals.append(dists_met(rgb(gt, unit_norm=True), rgb(mean, unit_norm=True)))
 
     # print('AVERAGE')
     # print(f'APSD: {np.mean(apsd_vals)} \pm {np.std(apsd_vals) / np.sqrt(len(apsd_vals))}')
     print(f'PSNR: {np.mean(psnr_vals)} \pm {np.std(psnr_vals) / np.sqrt(len(psnr_vals))}')
     # print(f'SNR: {np.mean(snr_vals)} \pm {np.std(snr_vals) / np.sqrt(len(snr_vals))}')
     print(f'SSIM: {np.mean(ssim_vals)} \pm {np.std(ssim_vals) / np.sqrt(len(ssim_vals))}')
-    print(f'LPIPS: {np.mean(lpips_vals)} \pm {np.std(lpips_vals) / np.sqrt(len(lpips_vals))}')
+    # print(f'LPIPS: {np.mean(lpips_vals)} \pm {np.std(lpips_vals) / np.sqrt(len(lpips_vals))}')
+    print(f'DISTS: {np.mean(dists_vals)} \pm {np.std(dists_vals) / np.sqrt(len(dists_vals))}')
+
     print("\n")
 
     # print('MEDIAN')
