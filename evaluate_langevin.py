@@ -103,6 +103,7 @@ def unnormalize(gen_img, estimated_mvue):
 
 def rgb(im):
     embed_ims = torch.zeros(size=(3, 384, 384))
+    tens_im = torch.tensor(im)
     tens_im = 2 * (tens_im - torch.min(tens_im)) / (torch.max(tens_im) - torch.min(tens_im)) - 1
     embed_ims[0, :, :] = tens_im
     embed_ims[1, :, :] = tens_im
