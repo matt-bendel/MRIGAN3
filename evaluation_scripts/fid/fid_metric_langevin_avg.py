@@ -123,7 +123,8 @@ class FIDMetric:
                  condition_embedding,
                  cuda=False,
                  args=None,
-                 eps=1e-6):
+                 eps=1e-6,
+                 num_samps=32):
 
         self.gan = gan
         self.args = args
@@ -134,6 +135,7 @@ class FIDMetric:
         self.cuda = cuda
         self.eps = eps
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
+        self.num_samps = num_samps
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -195,7 +197,7 @@ class FIDMetric:
                 recon_object = None
                 with torch.no_grad():
                     recons = torch.zeros(1, 32, 384, 384).cuda()
-                    for j in range(32):
+                    for j in range(self.num_samps):
                         try:
                             new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt'
                             recon_object = torch.load(new_filename)
@@ -211,7 +213,7 @@ class FIDMetric:
                     zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
 
                     recons = torch.mean(recons, dim=1)
-                    image = self._get_embed_im_lang(recon)
+                    image = self._get_embed_im_lang(recons)
                     condition_im = self._get_embed_im_lang(zfr)
 
                     img_e = self.image_embedding(self.transforms(image))
