@@ -42,7 +42,7 @@ def get_cfid(args, G, ref_loader, cond_loader):
     cfid = cfid_metric.get_cfid_torch_pinv()
     print(f"CFID: {cfid}")
 
-def get_fid(args, G, ref_loader, cond_loader):
+def get_fid(args, G, ref_loader, cond_loader, num_samps=32):
     print("GETTING INCEPTION EMBEDDING")
     vgg_embedding = VGG16Embedding(parallel=True)
 
@@ -54,7 +54,8 @@ def get_fid(args, G, ref_loader, cond_loader):
                            image_embedding=vgg_embedding,
                            condition_embedding=vgg_embedding,
                            cuda=True,
-                           args=args)
+                           args=args,
+                           num_samps=num_samps)
 
     fid_metric.get_fid()
 
@@ -129,8 +130,11 @@ args = create_arg_parser().parse_args()
 
 train_loader, _ = create_data_loaders(args, big_test=False)
 # get_cfid(args, None, train_loader, None)
-# get_fid(args, None, train_loader, None)
-# exit()
+n_samps = [1, 2, 4, 8, 16, 32]
+for n in n_samps:
+    print(f"{n} SAMPLES")
+    get_fid(args, None, train_loader, None, num_samps=n)
+exit()
 vals = [1, 2, 4, 8, 16, 32]
 lpips_met = lpips.LPIPS(net='alex')
 dists_met = DISTS()

@@ -123,8 +123,7 @@ class FIDMetric:
                  condition_embedding,
                  cuda=False,
                  args=None,
-                 eps=1e-6,
-                 num_samps=32):
+                 eps=1e-6):
 
         self.gan = gan
         self.args = args
@@ -135,7 +134,6 @@ class FIDMetric:
         self.cuda = cuda
         self.eps = eps
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
-        self.num_samps = num_samps
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -170,7 +168,7 @@ class FIDMetric:
 
         return embed_ims
 
-    def _get_embed_im(self, inp):
+    def _get_embed_im_lang(self, inp):
         embed_ims = torch.zeros(size=(inp.size(0), 3, 384, 384),
                                 device=self.args.device)
         for i in range(inp.size(0)):
@@ -196,32 +194,35 @@ class FIDMetric:
             for i in range(6):
                 recon_object = None
                 with torch.no_grad():
-                    for j in range(self.num_samps):
+                    recons = torch.zeros(1, 32, 384, 384).cuda()
+                    for j in range(32):
                         try:
                             new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt'
                             recon_object = torch.load(new_filename)
 
-                            recon = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
-                            zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
-
-                            image = self._get_embed_im(recon)
-                            condition_im = self._get_embed_im(zfr)
-
-                            img_e = self.image_embedding(self.transforms(image))
-                            cond_e = self.condition_embedding(self.transforms(condition_im))
-
-                            if self.cuda:
-                                image_embed.append(img_e)
-                                cond_embed.append(cond_e)
-                            else:
-                                image_embed.append(img_e.cpu().numpy())
-                                cond_embed.append(cond_e.cpu().numpy())
+                            recons[0, j, :, :] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
                         except KeyboardInterrupt:
                             exit()
                         except Exception as e:
                             print(e)
                             print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt')
                             break
+
+                    zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
+
+                    recons = torch.mean(recons, dim=1)
+                    image = self._get_embed_im_lang(recon)
+                    condition_im = self._get_embed_im_lang(zfr)
+
+                    img_e = self.image_embedding(self.transforms(image))
+                    cond_e = self.condition_embedding(self.transforms(condition_im))
+
+                    if self.cuda:
+                        image_embed.append(img_e)
+                        cond_embed.append(cond_e)
+                    else:
+                        image_embed.append(img_e.cpu().numpy())
+                        cond_embed.append(cond_e.cpu().numpy())
 
         print("WE GOT EMBEDDINGS BABY")
         if self.cuda:
