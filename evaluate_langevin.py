@@ -144,7 +144,7 @@ exceptions = False
 count = 0
 n_psnrs = []
 n_ssims = []
-n_dists = []
+n_distss = []
 n_lpipss = []
 
 for k in vals:
@@ -201,7 +201,7 @@ for k in vals:
     n_psnrs.append(np.mean(psnr_vals))
     n_ssims.append(np.mean(ssim_vals))
     n_lpipss.append(np.mean(lpips_vals))
-    n_dists.append(np.mean(dists_vals))
+    n_distss.append(np.mean(dists_vals))
 
 psnr_str = ''
 ssim_str = ''
