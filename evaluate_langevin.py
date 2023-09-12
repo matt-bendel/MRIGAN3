@@ -13,6 +13,7 @@ from evaluation_scripts.fid.fid_metric_langevin_avg import FIDMetric
 from evaluation_scripts.cfid.cfid_metric_langevin import CFIDMetric
 from data_loaders.prepare_data import create_data_loaders
 import lpips
+import pickle
 from DISTS_pytorch import DISTS
 
 # M: 2.61
@@ -118,7 +119,7 @@ def rgb(im, unit_norm=False):
 
     return embed_ims.unsqueeze(0)
 
-R = 8
+R = 4
 
 # assign directory
 ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
@@ -130,17 +131,22 @@ args = create_arg_parser().parse_args()
 
 train_loader, _ = create_data_loaders(args, big_test=False)
 # get_cfid(args, None, train_loader, None)
-n_samps = [1, 2, 4, 8, 16, 32]
-for n in n_samps:
-    print(f"{n} SAMPLES")
-    get_fid(args, None, train_loader, None, num_samps=n)
-exit()
+# n_samps = [1, 2, 4, 8, 16, 32]
+# for n in n_samps:
+#     print(f"{n} SAMPLES")
+#     get_fid(args, None, train_loader, None, num_samps=n)
+# exit()
 vals = [1, 2, 4, 8, 16, 32]
 lpips_met = lpips.LPIPS(net='alex')
 dists_met = DISTS()
 
 exceptions = False
 count = 0
+n_psnrs = []
+n_ssims = []
+n_dists = []
+n_lpipss = []
+
 for k in vals:
     print(f"{k} CODE VECTORS")
     psnr_vals = []
@@ -154,6 +160,13 @@ for k in vals:
         for i in range(6):
             recons = np.zeros((k, 384, 384))
             recon_object = None
+
+            maps = None
+            with open(f'/storage/fastMRI_brain/sense_maps/test_full_res/{filename}_{i}.pkl', 'rb') as inp:
+                maps = pickle.load(inp)
+
+            test_mask = maps[0, :, :] > 1e-3
+
             for j in range(k):
                 try:
                     new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R={R}_sample={j}_outputs.pt'
@@ -171,8 +184,9 @@ for k in vals:
                 print("EXCEPTION")
                 exceptions = False
                 continue
-            mean = np.mean(recons, axis=0)
-            gt = recon_object['gt'][0][0].abs().cpu().numpy()
+
+            mean = np.mean(recons, axis=0) * test_mask
+            gt = recon_object['gt'][0][0].abs().cpu().numpy() * test_mask
             apsd = np.mean(np.std(recons, axis=0), axis=(0, 1))
 
             apsd_vals.append(apsd)
@@ -184,14 +198,34 @@ for k in vals:
                 dists_vals.append(dists_met(rgb(gt, unit_norm=True), rgb(mean, unit_norm=True)))
 
     # print('AVERAGE')
-    # print(f'APSD: {np.mean(apsd_vals)} \pm {np.std(apsd_vals) / np.sqrt(len(apsd_vals))}')
-    print(f'PSNR: {np.mean(psnr_vals)} \pm {np.std(psnr_vals) / np.sqrt(len(psnr_vals))}')
-    # print(f'SNR: {np.mean(snr_vals)} \pm {np.std(snr_vals) / np.sqrt(len(snr_vals))}')
-    print(f'SSIM: {np.mean(ssim_vals)} \pm {np.std(ssim_vals) / np.sqrt(len(ssim_vals))}')
-    # print(f'LPIPS: {np.mean(lpips_vals)} \pm {np.std(lpips_vals) / np.sqrt(len(lpips_vals))}')
-    print(f'DISTS: {np.mean(dists_vals)} \pm {np.std(dists_vals) / np.sqrt(len(dists_vals))}')
+    n_psnrs.append(np.mean(psnr_vals))
+    n_ssims.append(np.mean(ssim_vals))
+    n_lpipss.append(np.mean(lpips_vals))
+    n_dists.append(np.mean(dists_vals))
 
-    print("\n")
+psnr_str = ''
+ssim_str = ''
+lpips_str = ''
+dists_str = ''
+
+for i in range(len(n_psnrs)):
+    psnr_str = f'{psnr_str} {n_psnrs[i]:.2f} &'
+    ssim_str = f'{ssim_str} {n_ssims[i]:.4f} &'
+    lpips_str = f'{lpips_str} {n_lpipss[i]:.4f} &'
+    dists_str = f'{dists_str} {n_distss[i]:.4f} &'
+
+print("PSNR and SSIM:")
+print(f'{psnr_str} {ssim_str}')
+print("LPIPS and DISTS")
+print(f'{lpips_str} {dists_str}')
+    # # print(f'APSD: {np.mean(apsd_vals)} \pm {np.std(apsd_vals) / np.sqrt(len(apsd_vals))}')
+    # print(f'PSNR: {np.mean(psnr_vals)} \pm {np.std(psnr_vals) / np.sqrt(len(psnr_vals))}')
+    # # print(f'SNR: {np.mean(snr_vals)} \pm {np.std(snr_vals) / np.sqrt(len(snr_vals))}')
+    # print(f'SSIM: {np.mean(ssim_vals)} \pm {np.std(ssim_vals) / np.sqrt(len(ssim_vals))}')
+    # # print(f'LPIPS: {np.mean(lpips_vals)} \pm {np.std(lpips_vals) / np.sqrt(len(lpips_vals))}')
+    # print(f'DISTS: {np.mean(dists_vals)} \pm {np.std(dists_vals) / np.sqrt(len(dists_vals))}')
+    #
+    # print("\n")
 
     # print('MEDIAN')
     # print('APSD: ', np.median(apsd_vals))
