@@ -190,7 +190,7 @@ class FIDMetric:
         cond_embed = []
 
         ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
-        recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=8/'
+        recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
 
         for filename in os.listdir(ref_directory):
             for i in range(6):
