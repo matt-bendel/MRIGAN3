@@ -129,7 +129,7 @@ recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 
 args = create_arg_parser().parse_args()
 
-# train_loader, _ = create_data_loaders(args, big_test=False)
+train_loader, _ = create_data_loaders(args, big_test=False)
 get_cfid(args, None, train_loader, None)
 # n_samps = [1, 2, 4, 8, 16, 32]
 # for n in n_samps:
