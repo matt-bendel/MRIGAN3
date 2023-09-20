@@ -189,8 +189,10 @@ class FIDMetric:
         image_embed = []
         cond_embed = []
 
+        R = 4
+
         ref_directory = '/storage/fastMRI_brain/data/small_T2_test'
-        recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R=4/'
+        recon_directory = f'/storage/fastMRI_brain/Langevin_Recons_R={R}/'
 
         for filename in os.listdir(ref_directory):
             for i in range(6):
@@ -199,7 +201,7 @@ class FIDMetric:
                     recons = torch.zeros(1, 32, 384, 384).cuda()
                     for j in range(self.num_samps):
                         try:
-                            new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt'
+                            new_filename = recon_directory + filename + f'|langevin|slide_idx_{i}_R={R}_sample={j}_outputs.pt'
                             recon_object = torch.load(new_filename)
 
                             recons[0, j, :, :] = complex_abs(recon_object['mvue'][0].permute(1, 2, 0)).cuda().unsqueeze(0).unsqueeze(0)
@@ -207,7 +209,7 @@ class FIDMetric:
                             exit()
                         except Exception as e:
                             print(e)
-                            print(recon_directory + filename + f'|langevin|slide_idx_{i}_R=8_sample={j}_outputs.pt')
+                            print(recon_directory + filename + f'|langevin|slide_idx_{i}_R={R}_sample={j}_outputs.pt')
                             break
 
                     zfr = recon_object['zfr'][0].abs().cuda().unsqueeze(0).unsqueeze(0)
