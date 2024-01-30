@@ -5,7 +5,7 @@ import torch
 import numpy as np
 from utils.math import complex_abs
 from utils.parse_args import create_arg_parser
-from evaluation_scripts.fid.embeddings import VGG16Embedding
+from evaluation_scripts.fid.embeddings import VGG16Embedding, AlexNetEmbedding
 
 from typing import Optional
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
@@ -28,7 +28,7 @@ from DISTS_pytorch import DISTS
 
 def get_cfid(args, G, ref_loader, cond_loader):
     print("GETTING INCEPTION EMBEDDING")
-    vgg_embedding = VGG16Embedding(parallel=True)
+    vgg_embedding = AlexNetEmbedding(parallel=True)
 
     print("GETTING DATA LOADERS")
 
@@ -45,7 +45,7 @@ def get_cfid(args, G, ref_loader, cond_loader):
 
 def get_fid(args, G, ref_loader, cond_loader, num_samps=32):
     print("GETTING INCEPTION EMBEDDING")
-    vgg_embedding = VGG16Embedding(parallel=True)
+    vgg_embedding = AlexNetEmbedding(parallel=True)
 
     print("GETTING DATA LOADERS")
 
@@ -135,7 +135,7 @@ get_cfid(args, None, train_loader, None)
 # for n in n_samps:
 #     print(f"{n} SAMPLES")
 get_fid(args, None, train_loader, None, num_samps=32)
-# exit()
+exit()
 vals = [1, 2, 4, 8, 16, 32]
 lpips_met = lpips.LPIPS(net='alex')
 dists_met = DISTS()
